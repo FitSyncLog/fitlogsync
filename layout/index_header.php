@@ -30,16 +30,20 @@ if ($result->num_rows > 0) {
                     <a href="https://<?= $info['x'] ?>" class="twitter" target="_blank"><i class="bi bi-twitter-x"></i></a>
                 <?php endif; ?>
                 <?php if (!empty($info['facebook'])): ?>
-                    <a href="https://<?= $info['facebook'] ?>" class="facebook" target="_blank"><i class="bi bi-facebook"></i></a>
+                    <a href="https://<?= $info['facebook'] ?>" class="facebook" target="_blank"><i
+                            class="bi bi-facebook"></i></a>
                 <?php endif; ?>
                 <?php if (!empty($info['instagram'])): ?>
-                    <a href="https://<?= $info['instagram'] ?>" class="instagram" target="_blank"><i class="bi bi-instagram"></i></a>
+                    <a href="https://<?= $info['instagram'] ?>" class="instagram" target="_blank"><i
+                            class="bi bi-instagram"></i></a>
                 <?php endif; ?>
                 <?php if (!empty($info['youtube'])): ?>
-                    <a href="https://<?= $info['youtube'] ?>" class="linkedin" target="_blank"><i class="bi bi-youtube"></i></a>
+                    <a href="https://<?= $info['youtube'] ?>" class="linkedin" target="_blank"><i
+                            class="bi bi-youtube"></i></a>
                 <?php endif; ?>
                 <?php if (!empty($info['tiktok'])): ?>
-                    <a href="https://<?= $info['tiktok'] ?>" class="linkedin" target="_blank"><i class="bi bi-tiktok"></i></a>
+                    <a href="https://<?= $info['tiktok'] ?>" class="linkedin" target="_blank"><i
+                            class="bi bi-tiktok"></i></a>
                 <?php endif; ?>
             </div>
         </div>
@@ -51,6 +55,10 @@ if ($result->num_rows > 0) {
                 <img src="assets/fitlogsync1.png" alt="FiT-LOGSYNC Logo" class="img-fluid" style="height: 100px;">
             </a>
 
+            <?php
+            $current_page = basename($_SERVER['PHP_SELF']);
+            ?>
+
             <nav id="navmenu" class="navmenu">
                 <ul>
                     <li><a href="./#welcome" class="active">Home</a></li>
@@ -59,10 +67,16 @@ if ($result->num_rows > 0) {
                     <li><a href="./#instructors">Instructors</a></li>
                     <li><a href="./#pricing">Pricing</a></li>
                     <li><a href="./#contact">Contact</a></li>
-                    <li><a href="./login.php" class="btn btn-warning py-2 px-4">Login</a></li>
+
+                    <?php if ($current_page === 'login.php'): ?>
+                        <li><a href="./register.php" class="btn btn-warning py-2 px-4">Register</a></li>
+                    <?php else: ?>
+                        <li><a href="./login.php" class="btn btn-warning py-2 px-4">Login</a></li>
+                    <?php endif; ?>
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
             </nav>
+
         </div>
     </div>
 </header>
