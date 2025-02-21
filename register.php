@@ -59,28 +59,28 @@ include "indexes/db_con.php";
                     <div class="card border-0 rounded-4">
                         <div class="card-body p-4">
                             <h3 class="mb-4 text-center"><strong>Registration Form</strong></h3>
-                            <form action="#" method="POST">
+                            <form action="indexes/register.php" method="POST">
                                 <!-- Personal Information -->
                                 <h5 class="text-warning text-center"><strong>Personal Information</strong></h5>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <div class="form-floating">
                                             <input type="text" class="form-control" name="username" id="username"
-                                                placeholder="Username" required>
+                                                placeholder="Username">
                                             <label for="username">Username</label>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating">
                                             <input type="text" class="form-control" name="lastname" id="lastname"
-                                                placeholder="Last Name" required>
+                                                placeholder="Last Name">
                                             <label for="lastname">Last Name</label>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating">
                                             <input type="text" class="form-control" name="firstname" id="firstname"
-                                                placeholder="First Name" required>
+                                                placeholder="First Name">
                                             <label for="firstname">First Name</label>
                                         </div>
                                     </div>
@@ -93,47 +93,47 @@ include "indexes/db_con.php";
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating">
-                                            <input type="date" class="form-control" name="dob" id="dob"
-                                                placeholder="Date of Birth" required>
+                                            <input type="date" class="form-control" name="dateofbrirth" id="dob"
+                                                placeholder="Date of Birth">
                                             <label for="dob">Date of Birth</label>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating">
-                                            <select class="form-select" name="gender" id="gender" required>
+                                            <select class="form-select" name="gender" id="gender">
                                                 <option value="" disabled selected>Select Gender</option>
-                                                <option value="male">Male</option>
-                                                <option value="female">Female</option>
-                                                <option value="prefer_not_to_say">Prefer not to say</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Prefer not to say">Prefer not to say</option>
                                             </select>
                                             <label for="gender">Gender</label>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating">
-                                            <input type="text" class="form-control" name="phone" id="phone"
-                                                placeholder="Phone Number" required>
+                                            <input type="text" class="form-control" name="phonenumber" id="phone"
+                                                placeholder="Phone Number">
                                             <label for="phone">Phone Number</label>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating">
-                                            <input type="email" class="form-control" name="email" id="email"
-                                                placeholder="Email Address" required>
+                                            <input type="text" class="form-control" name="email" id="email"
+                                                placeholder="Email Address">
                                             <label for="email">Email Address</label>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating">
                                             <input type="password" class="form-control" name="password" id="password"
-                                                placeholder="Password" required>
+                                                placeholder="Password">
                                             <label for="password">Password</label>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating">
                                             <input type="password" class="form-control" name="confirm_password"
-                                                id="confirm_password" placeholder="Retype Password" required>
+                                                id="confirm_password" placeholder="Retype Password">
                                             <label for="confirm_password">Retype Password</label>
                                         </div>
                                     </div>
@@ -181,13 +181,13 @@ include "indexes/db_con.php";
                                             <div class="mt-2">
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q1" id="q1-yes"
-                                                        value="yes" required>
+                                                        value="yes">
                                                     <label class="form-check-label text-success"
                                                         for="q2-yes">Yes</label>
                                                 </div>
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q1" id="q1-no"
-                                                        value="no" required>
+                                                        value="no">
                                                     <label class="form-check-label" for="q1-no">No</label>
                                                 </div>
                                             </div>
@@ -198,13 +198,13 @@ include "indexes/db_con.php";
                                             <div class="mt-2">
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q2" id="q2-yes"
-                                                        value="yes" required>
+                                                        value="yes">
                                                     <label class="form-check-label text-success"
                                                         for="q2-yes">Yes</label>
                                                 </div>
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q2" id="q2-no"
-                                                        value="no" required>
+                                                        value="no">
                                                     <label class="form-check-label" for="q2-no">No</label>
                                                 </div>
                                             </div>
@@ -215,13 +215,13 @@ include "indexes/db_con.php";
                                             <div class="mt-2">
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q3" id="q3-yes"
-                                                        value="yes" required>
+                                                        value="yes">
                                                     <label class="form-check-label text-success"
                                                         for="q3-yes">Yes</label>
                                                 </div>
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q3" id="q3-no"
-                                                        value="no" required>
+                                                        value="no">
                                                     <label class="form-check-label" for="q3-no">No</label>
                                                 </div>
                                             </div>
@@ -232,13 +232,13 @@ include "indexes/db_con.php";
                                             <div class="mt-2">
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q4" id="q4-yes"
-                                                        value="yes" required>
+                                                        value="yes">
                                                     <label class="form-check-label text-success"
                                                         for="q4-yes">Yes</label>
                                                 </div>
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q4" id="q4-no"
-                                                        value="no" required>
+                                                        value="no">
                                                     <label class="form-check-label" for="q4-no">No</label>
                                                 </div>
                                             </div>
@@ -249,13 +249,13 @@ include "indexes/db_con.php";
                                             <div class="mt-2">
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q5" id="q5-yes"
-                                                        value="yes" required>
+                                                        value="yes">
                                                     <label class="form-check-label text-success"
                                                         for="q5-yes">Yes</label>
                                                 </div>
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q5" id="q5-no"
-                                                        value="no" required>
+                                                        value="no">
                                                     <label class="form-check-label" for="q5-no">No</label>
                                                 </div>
                                             </div>
@@ -266,13 +266,13 @@ include "indexes/db_con.php";
                                             <div class="mt-2">
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q6" id="q6-yes"
-                                                        value="yes" required>
+                                                        value="yes">
                                                     <label class="form-check-label text-success"
                                                         for="q6-yes">Yes</label>
                                                 </div>
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q6" id="q6-no"
-                                                        value="no" required>
+                                                        value="no">
                                                     <label class="form-check-label" for="q6-no">No</label>
                                                 </div>
                                             </div>
@@ -283,13 +283,13 @@ include "indexes/db_con.php";
                                             <div class="mt-2">
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q7" id="q7-yes"
-                                                        value="yes" required>
+                                                        value="yes">
                                                     <label class="form-check-label text-success"
                                                         for="q7-yes">Yes</label>
                                                 </div>
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q7" id="q7-no"
-                                                        value="no" required>
+                                                        value="no">
                                                     <label class="form-check-label" for="q7-no">No</label>
                                                 </div>
                                             </div>
@@ -300,13 +300,13 @@ include "indexes/db_con.php";
                                             <div class="mt-2">
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q8" id="q8-yes"
-                                                        value="yes" required>
+                                                        value="yes">
                                                     <label class="form-check-label text-success"
                                                         for="q8-yes">Yes</label>
                                                 </div>
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q8" id="q8-no"
-                                                        value="no" required>
+                                                        value="no">
                                                     <label class="form-check-label" for="q8-no">No</label>
                                                 </div>
                                             </div>
@@ -317,13 +317,13 @@ include "indexes/db_con.php";
                                             <div class="mt-2">
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q9" id="q9-yes"
-                                                        value="yes" required>
+                                                        value="yes">
                                                     <label class="form-check-label text-success"
                                                         for="q9-yes">Yes</label>
                                                 </div>
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q9" id="q9-no"
-                                                        value="no" required>
+                                                        value="no">
                                                     <label class="form-check-label" for="q9-no">No</label>
                                                 </div>
                                             </div>
@@ -334,13 +334,13 @@ include "indexes/db_con.php";
                                             <div class="mt-2">
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q10" id="q10-yes"
-                                                        value="yes" required>
+                                                        value="yes">
                                                     <label class="form-check-label text-success"
                                                         for="q10-yes">Yes</label>
                                                 </div>
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="q10" id="q10-no"
-                                                        value="no" required>
+                                                        value="no">
                                                     <label class="form-check-label" for="q10-no">No</label>
                                                 </div>
                                             </div>
@@ -353,7 +353,7 @@ include "indexes/db_con.php";
                                 <!-- Waiver -->
                                 <h5 class="text-warning text-center"><strong>Waiver</strong></h5>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="waiver_rules" required>
+                                    <input class="form-check-input" type="checkbox" name="waiver_rules">
                                     <label class="form-check-label">
                                         I agree to the <a href="rule_and_policy.php" target="_blank">Rules and
                                             Policy</a>.
@@ -361,14 +361,14 @@ include "indexes/db_con.php";
 
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="waiver_liability" required>
+                                    <input class="form-check-input" type="checkbox" name="waiver_liability">
                                     <label class="form-check-label">
                                         I agree to the <a href="liability_waiver.php" target="_blank">Liability
                                             Waiver</a>.
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="waiver_cancel" required>
+                                    <input class="form-check-input" type="checkbox" name="waiver_cancel">
                                     <label class="form-check-label">
                                         I agree to the <a href="cancellation_and_refund_policy.php"
                                             target="_blank">Cancellation and
@@ -376,7 +376,7 @@ include "indexes/db_con.php";
                                     </label>
                                 </div>
                                 <div class="d-grid mt-4">
-                                    <button type="submit" class="btn btn-warning btn-lg">Register</button>
+                                    <button type="submit" class="btn btn-warning btn-lg" name="register">Register</button>
                                 </div>
                             </form>
                         </div>
@@ -401,58 +401,6 @@ include "indexes/db_con.php";
 
 
 </body>
-
-<script>
-    $(function () {
-        // Build the availableConditions array from PHP
-        var availableConditions = [
-            <?php
-            $conditions = [];
-            while ($row = $result->fetch_assoc()) {
-                $conditions[] = '"' . $row['medical_condition'] . '"';
-            }
-            echo implode(',', $conditions);
-            ?>
-        ];
-
-        // Helper functions for handling input
-        function split(val) {
-            return val.split(/,\s*/);
-        }
-
-        function extractLast(term) {
-            return split(term).pop();
-        }
-
-        // Initialize autocomplete
-        $("#medical_conditions")
-            .on("keydown", function (event) {
-                if (event.keyCode === $.ui.keyCode.TAB &&
-                    $(this).autocomplete("instance").menu.active) {
-                    event.preventDefault();
-                }
-            })
-            .autocomplete({
-                minLength: 1,
-                source: function (request, response) {
-                    response($.ui.autocomplete.filter(
-                        availableConditions, extractLast(request.term)));
-                },
-                focus: function () {
-                    return false;
-                },
-                select: function (event, ui) {
-                    var terms = split(this.value);
-                    terms.pop();
-                    terms.push(ui.item.value);
-                    terms.push("");
-                    this.value = terms.join(", ");
-                    return false;
-                }
-            });
-    });
-</script>
-
 
 
 </html>
