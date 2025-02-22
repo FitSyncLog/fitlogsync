@@ -12,6 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo "</pre>";
 
     if (isset($_POST['register'])) {
+        echo "Submit button detected!";
+
         function validate($data)
         {
             $data = trim($data ?? ''); // Use null coalescing operator to avoid null values
