@@ -53,6 +53,19 @@
                   </div>
                 </div>
               </div>
+
+              <?php if (isset($_GET['registrationfailed'])): ?>
+                <div class="alert alert-warning">
+                  <?php echo htmlspecialchars($_GET['registrationfailed']); ?>
+                </div>
+              <?php endif; ?>
+
+              <?php if (isset($_GET['registrationSuccess'])): ?>
+                <div class="alert alert-success">
+                  <?php echo htmlspecialchars($_GET['registrationSuccess']); ?>
+                </div>
+              <?php endif; ?>
+
               <form action="#!">
                 <div class="row gy-3 overflow-hidden">
                   <div class="col-12">
