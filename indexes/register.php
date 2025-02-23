@@ -24,6 +24,38 @@ function isValidPhoneNumber($phone)
     return preg_match('/^09\d{9}$/', $phone);
 }
 
+function generateAccountNumber($conn)
+{
+    // Get the current year and month
+    $year = date('Y');
+    $month = date('m');
+
+    // Format the month to be 4 digits (e.g., 0001 for January)
+    $monthFormatted = str_pad($month, 4, '0', STR_PAD_LEFT);
+
+    // Generate a random 4-digit number
+    $random = str_pad(mt_rand(0, 9999), 4, '0', STR_PAD_LEFT);
+
+    // Get the last increment number for the current month
+    $sql = "SELECT MAX(SUBSTRING(account_number, 13, 4)) AS last_increment 
+            FROM users 
+            WHERE SUBSTRING(account_number, 1, 4) = ? 
+            AND SUBSTRING(account_number, 5, 4) = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "ss", $year, $monthFormatted);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $row = mysqli_fetch_assoc($result);
+
+    $lastIncrement = $row['last_increment'] ?? 0;
+    $increment = str_pad($lastIncrement + 1, 4, '0', STR_PAD_LEFT);
+
+    // Construct the account number
+    $accountNumber = $year . $monthFormatted . $random . $increment;
+
+    return $accountNumber;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     // Validate and sanitize inputs
     $username = validate($_POST['username'] ?? '');
@@ -88,7 +120,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         '&contact_number=' . $contact_number .
         '&relationship=' . $relationship;
 
-
     // Validate required fields
     if (empty($username) || empty($lastname) || empty($firstname) || empty($dateofbirth) || empty($gender) || empty($address) || empty($phonenumber) || empty($email) || empty($password) || empty($confirm_password)) {
         $error_message = "All fields are required except middle name.";
@@ -99,20 +130,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     // Validate email and phone number
     if (!isValidEmail($email)) {
         $error_message = "Invalid email address.";
-        header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+        header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
         exit();
     }
 
     if (!isValidPhoneNumber($phonenumber)) {
         $error_message = "Phone number must be 11 digits and start with '09'.";
-        header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+        header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
         exit();
     }
 
     // Validate password match
     if ($password !== $confirm_password) {
         $error_message = "Passwords do not match.";
-        header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+        header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
         exit();
     }
 
@@ -130,7 +161,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     $status = "Not Verified";
     $role = "Member";
 
-
     // Check if username already exists
     $sql_check_username = "SELECT * FROM users WHERE username=?";
     $stmt_check_username = mysqli_prepare($conn, $sql_check_username);
@@ -138,12 +168,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     mysqli_stmt_execute($stmt_check_username);
     $result_check_username = mysqli_stmt_get_result($stmt_check_username);
 
-    // Validate account number if already exists
     if (mysqli_num_rows($result_check_username) > 0) {
-        header("Location: ../register.php?username_already_exist=Username already exists&$user_data");
+        header("Location: ../register.php?username_already_exist=Username already exists&" . $user_data);
         exit();
     }
-
 
     // Check if email already exists
     $sql_check_email = "SELECT * FROM users WHERE email=?";
@@ -152,40 +180,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     mysqli_stmt_execute($stmt_check_email);
     $result_check_email = mysqli_stmt_get_result($stmt_check_email);
 
-    // Validate account number if already exists
     if (mysqli_num_rows($result_check_email) > 0) {
-        header("Location: ../register.php?email_already_taken=Email is already taken.&$user_data");
+        header("Location: ../register.php?email_already_taken=Email is already taken.&" . $user_data);
         exit();
     }
 
+    // Generate the account number
+    do {
+        $accountNumber = generateAccountNumber($conn);
+        $sql_check_account = "SELECT * FROM users WHERE account_number = ?";
+        $stmt_check_account = mysqli_prepare($conn, $sql_check_account);
+        mysqli_stmt_bind_param($stmt_check_account, "s", $accountNumber);
+        mysqli_stmt_execute($stmt_check_account);
+        $result_check_account = mysqli_stmt_get_result($stmt_check_account);
+    } while (mysqli_num_rows($result_check_account) > 0);
 
-
-
-    // Insert data into the `users` table
-    $sql_new_user = "INSERT INTO users (username, firstname, middlename, lastname, date_of_birth, password, gender, phone_number, email, address, verification_code, v_code_expiration, status, registration_date)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    // Insert data into the users table
+    $sql_new_user = "INSERT INTO users (username, firstname, middlename, lastname, date_of_birth, password, gender, phone_number, email, address, verification_code, v_code_expiration, status, registration_date, account_number)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt_new_user_query = mysqli_prepare($conn, $sql_new_user);
 
     if ($stmt_new_user_query === false) {
         $error_message = "Failed to prepare the SQL statement.";
-        header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+        header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
         exit();
     }
 
-    mysqli_stmt_bind_param($stmt_new_user_query, "ssssssssssssss", $username, $firstname, $middlename, $lastname, $dateofbirth, $hashed_password, $gender, $phonenumber, $email, $address, $verification_code, $v_code_expiration, $status, $registration_date);
+    mysqli_stmt_bind_param($stmt_new_user_query, "sssssssssssssss", $username, $firstname, $middlename, $lastname, $dateofbirth, $hashed_password, $gender, $phonenumber, $email, $address, $verification_code, $v_code_expiration, $status, $registration_date, $accountNumber);
     $result_new_user_query = mysqli_stmt_execute($stmt_new_user_query);
 
     if ($result_new_user_query) {
         $user_id = mysqli_insert_id($conn);
 
-        // Insert medical background and PAR-Q data into the `medical_backgrounds` table
+        // Insert medical background and PAR-Q data into the medical_backgrounds table
         $sql_medical_background = "INSERT INTO medical_backgrounds (user_id, medical_conditions, current_medications, previous_injuries, par_q_1, par_q_2, par_q_3, par_q_4, par_q_5, par_q_6, par_q_7, par_q_8, par_q_9, par_q_10)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt_medical_background = mysqli_prepare($conn, $sql_medical_background);
 
         if ($stmt_medical_background === false) {
             $error_message = "Failed to prepare the SQL statement for medical background.";
-            header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
@@ -194,18 +228,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         if (!$result_medical_background) {
             $error_message = "Failed to insert medical background data.";
-            header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
-        // Insert waiver/agreement data into the `waiver_agreements` table
+        // Insert waiver/agreement data into the waiver_agreements table
         $sql_waiver_agreements = "INSERT INTO waivers (user_id, rules_and_policy, liability_waiver, cancellation_and_refund_policy)
                 VALUES (?, ?, ?, ?)";
         $stmt_waiver_agreements = mysqli_prepare($conn, $sql_waiver_agreements);
 
         if ($stmt_waiver_agreements === false) {
             $error_message = "Failed to prepare the SQL statement for waiver agreements.";
-            header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
@@ -214,18 +248,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         if (!$result_waiver_agreements) {
             $error_message = "Failed to insert waiver agreements data.";
-            header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
-        // Insert emergency contact data into the `emergency_contacts` table
+        // Insert emergency contact data into the emergency_contacts table
         $sql_emergency_contact = "INSERT INTO emergency_contacts (user_id, contact_person, contact_number, relationship)
                 VALUES (?, ?, ?, ?)";
         $stmt_emergency_contact = mysqli_prepare($conn, $sql_emergency_contact);
 
         if ($stmt_emergency_contact === false) {
             $error_message = "Failed to prepare the SQL statement for emergency contact.";
-            header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
@@ -233,19 +267,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         $result_emergency_contact = mysqli_stmt_execute($stmt_emergency_contact);
 
         if (!$result_emergency_contact) {
-            $error_message = "Failed to insert waiver agreements data.";
-            header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+            $error_message = "Failed to insert emergency contact data.";
+            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
-        // Insert user role data into the `user_role` table
+        // Insert user role data into the user_role table
         $sql_user_role = "INSERT INTO user_roles (user_id, role)
                 VALUES (?, ?)";
         $stmt_user_role = mysqli_prepare($conn, $sql_user_role);
 
         if ($stmt_user_role === false) {
-            $error_message = "Failed to prepare the SQL statement for emergency contact.";
-            header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+            $error_message = "Failed to prepare the SQL statement for user role.";
+            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
@@ -253,18 +287,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         $result_user_role = mysqli_stmt_execute($stmt_user_role);
 
         if (!$result_user_role) {
-            $error_message = "Failed to insert waiver agreements data.";
-            header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+            $error_message = "Failed to insert user role data.";
+            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
-
 
         // Registration successful
         header("Location: ../login.php?registrationSuccess=Registration successful!");
         exit();
     } else {
-        $error_message = "Database error.";
-        header("Location: ../register.php?registrationfailed=" . urlencode($error_message) & $user_data);
+        // Registration failed
+        header("Location: ../login.php?registrationFailed=Database error!");
         exit();
     }
 

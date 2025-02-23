@@ -26,10 +26,6 @@
     <script src="assets/js/jquery-3.6.0.min.js"></script>
     <script src="assets/js/jquery-ui.js"></script>
 
-    <!-- Sweet Alert -->
-    <script src="assets/css/sweetalert2.min.css"></script>
-    <script src="assets/js/sweetalert2.all.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Main CSS File -->
     <link href="assets/css/main.css" rel="stylesheet">

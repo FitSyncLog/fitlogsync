@@ -30,11 +30,128 @@
   <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
 
+  <script src="assets/css/sweetalert2.min.css"></script>
+  <script src="assets/js/sweetalert2.all.min.js"></script>
   <link rel="icon" type="image/x-icon" href="assets/fitlogsync.ico">
+
+
+  <style>
+    .form-check-input:checked {
+      background-color: #ffc107;
+      border-color: #ffc107;
+    }
+
+    .form-check-input:focus {
+      box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25);
+    }
+
+    .error {
+      border: 1px solid #DC3545 !important;
+    }
+
+    .error-message {
+      color: #DC3545;
+      font-size: 0.875rem;
+    }
+  </style>
 
 </head>
 
 <body>
+
+  <?php
+  if (isset($_GET['registrationSuccess'])) {
+    $message = htmlspecialchars($_GET['registrationSuccess']);
+    echo "<script>
+        Swal.fire({
+          position: 'center',
+          icon: 'success',
+          title: '{$message}',
+          showConfirmButton: false,
+          timer: 1500
+        });
+    </script>";
+  }
+  ?>
+
+  <?php
+  if (isset($_GET['registrationFailed'])) {
+    $message = htmlspecialchars($_GET['registrationFailed']);
+    echo "<script>
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: '{$message}',
+          showConfirmButton: false,
+          timer: 1500
+        });
+    </script>";
+  }
+  ?>
+
+  <?php
+  if (isset($_GET['UnexpectedError'])) {
+    $message = htmlspecialchars($_GET['UnexpectedError']);
+    echo "<script>
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: '{$message}',
+          showConfirmButton: false,
+          timer: 1500
+        });
+    </script>";
+  }
+  ?>
+
+  <?php
+  if (isset($_GET['LoginFirst'])) {
+    $message = htmlspecialchars($_GET['LoginFirst']);
+    echo "<script>
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: '{$message}',
+          showConfirmButton: false,
+          timer: 1500
+        });
+    </script>";
+  }
+  ?>
+
+  <?php
+  if (isset($_GET['EmailisnotRegistered'])) {
+    $message = htmlspecialchars($_GET['EmailisnotRegistered']);
+    echo "<script>
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        title: '{$message}',
+        showConfirmButton: true,
+        confirmButtonText: 'Register Now',
+        confirmButtonColor: '#ffc107',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = 'register.php';
+        }
+      });
+  </script>";
+  }
+  ?>
+
+  <?php
+  if (isset($_GET['incorrectPassword'])) {
+    $message = htmlspecialchars($_GET['incorrectPassword']);
+    echo "<script>
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: '{$message}',
+          showConfirmButton: true
+        });
+    </script>";
+  }
+  ?>
 
   <?php include 'layout/index_header.php'; ?>
 
@@ -54,37 +171,26 @@
                 </div>
               </div>
 
-              <?php if (isset($_GET['registrationfailed'])): ?>
-                <div class="alert alert-warning">
-                  <?php echo htmlspecialchars($_GET['registrationfailed']); ?>
-                </div>
-              <?php endif; ?>
-
-              <?php if (isset($_GET['registrationSuccess'])): ?>
-                <div class="alert alert-success">
-                  <?php echo htmlspecialchars($_GET['registrationSuccess']); ?>
-                </div>
-              <?php endif; ?>
-
-              <form action="#!">
+              <form id="loginForm" action="indexes/login.php" method="POST">
                 <div class="row gy-3 overflow-hidden">
                   <div class="col-12">
-                    <div class="form-floating mb-3">
-                      <input type="email" class="form-control" name="email" id="email" placeholder="name@example.com"
-                        required>
-                      <label for="email" class="form-label">Email</label>
+                    <div class="form-floating">
+                      <input type="text" class="form-control" id="email" name="email" placeholder="Email"
+                        value="<?php echo htmlspecialchars($_GET['email'] ?? ''); ?>">
+                      <label for="email">Email</label>
+                      <div class="error-message" id="emailError"></div>
                     </div>
                   </div>
                   <div class="col-12">
-                    <div class="form-floating mb-3">
-                      <input type="password" class="form-control" name="password" id="password" value=""
-                        placeholder="Password" required>
-                      <label for="password" class="form-label">Password</label>
+                    <div class="form-floating">
+                      <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                      <label for="password">Password</label>
+                      <div class="error-message" id="passwordError"></div>
                     </div>
                   </div>
                   <div class="col-12">
                     <div class="d-grid">
-                      <button class="btn btn-warning btn-lg" type="submit">Login</button>
+                      <button class="btn btn-warning btn-lg" type="submit" name="login">Login</button>
                     </div>
                   </div>
                 </div>
@@ -96,7 +202,7 @@
                   </div>
                 </div>
               </div>
-              <div class="row">
+              <!-- <div class="row">
                 <div class="col-12">
                   <p class="mt-4 mb-4">Or continue with</p>
                   <div class="col-12">
@@ -109,7 +215,7 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> -->
             </div>
           </div>
         </div>
@@ -129,6 +235,51 @@
     <div></div>
     <div></div>
   </div>
+
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function (event) {
+      let isValid = true;
+
+      // Get the email and password fields
+      const email = document.getElementById('email');
+      const password = document.getElementById('password');
+
+      // Get the error message elements
+      const emailError = document.getElementById('emailError');
+      const passwordError = document.getElementById('passwordError');
+
+      // Reset error messages and styles
+      emailError.innerHTML = '';
+      email.classList.remove('error');
+      passwordError.innerHTML = '';
+      password.classList.remove('error');
+
+      // Validate email
+      if (!email.value) {
+        emailError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Email is required`;
+        email.classList.add('error');
+        isValid = false;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+        emailError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Please enter a valid email address`;
+        email.classList.add('error');
+        isValid = false;
+      }
+
+      // Validate password
+      if (!password.value) {
+        passwordError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Password is required`;
+        password.classList.add('error');
+        isValid = false;
+      }
+
+      // Prevent form submission if validation fails
+      if (!isValid) {
+        event.preventDefault();
+      }
+    });
+  </script>
+
 
   <!-- Vendor JS Files -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
