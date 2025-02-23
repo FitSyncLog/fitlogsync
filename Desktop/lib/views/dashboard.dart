@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '/main.dart'; // Import MyApp from main.dart
+import 'profile_screen.dart'; // Import the ProfileScreen
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -12,6 +13,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   String username = "Loading...";
   String email = "Loading...";
+  bool _isLoggingOut = false;
 
   @override
   void initState() {
@@ -27,13 +29,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  void _logout(BuildContext context) async {
+  Future<void> _logout(BuildContext context) async {
+    setState(() {
+      _isLoggingOut = true;
+    });
+
+    // Show a loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 15),
+              const Text("Logging out..."),
+            ],
+          ),
+        );
+      },
+    );
+
+    // Simulate a delay for the logout process
+    await Future.delayed(Duration(seconds: 2));
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear();
 
-    Navigator.pushReplacement(
+    if (!mounted) return;
+
+    // Close the dialog
+    Navigator.of(context).pop();
+
+    Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      MaterialPageRoute(builder: (context) => const MyApp()),
+      (route) => false,
+    );
+  }
+
+  void _navigateToProfile() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ProfileScreen()),
     );
   }
 
@@ -58,19 +98,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: const Color.fromRGBO(255, 179, 0, 1)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.white,
-                    child: Icon(Icons.person, size: 40, color: Colors.blue),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(username, style: const TextStyle(color: Colors.white, fontSize: 18)),
-                  Text(email, style: const TextStyle(color: Colors.white70, fontSize: 14)),
-                ],
+              decoration: const BoxDecoration(color: Color.fromRGBO(255, 179, 0, 1)),
+              child: GestureDetector(
+                onTap: _navigateToProfile,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Colors.white,
+                      child: Icon(Icons.person, size: 40, color: Color.fromRGBO(255, 179, 0, 1)),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(username, style: const TextStyle(color: Colors.white, fontSize: 18)),
+                    Text(email, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                  ],
+                ),
               ),
             ),
             ListTile(
@@ -136,7 +179,7 @@ class DashboardCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 40, color: Color.fromRGBO(255, 179, 0, 1)),
+            Icon(icon, size: 40, color: const Color.fromRGBO(255, 179, 0, 1)),
             const SizedBox(height: 10),
             Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 5),
