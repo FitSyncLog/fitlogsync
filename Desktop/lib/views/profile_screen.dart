@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -25,6 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _hasChanges = false;
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   @override
   void initState() {
@@ -33,31 +34,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadUserData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? username = await _storage.read(key: "username");
+    String? email = await _storage.read(key: "email");
+    String? firstName = await _storage.read(key: "firstname");
+    String? middleName = await _storage.read(key: "middlename");
+    String? lastName = await _storage.read(key: "lastname");
+    String? phoneNumber = await _storage.read(key: "phone_number");
+    String? address = await _storage.read(key: "address");
+    String? dateOfBirth = await _storage.read(key: "date_of_birth");
+    String? gender = await _storage.read(key: "gender");
+
     setState(() {
-      _usernameController.text = prefs.getString("username") ?? "Unknown";
-      _emailController.text = prefs.getString("email") ?? "Unknown";
-      _firstNameController.text = prefs.getString("firstname") ?? "Unknown";
-      _middleNameController.text = prefs.getString("middlename") ?? "Unknown";
-      _lastNameController.text = prefs.getString("lastname") ?? "Unknown";
-      _phoneNumberController.text = prefs.getString("phone_number") ?? "Unknown";
-      _addressController.text = prefs.getString("address") ?? "Unknown";
-      _selectedGender = prefs.getString("gender") ?? "Unknown";
-      _dateOfBirthController.text = prefs.getString("date_of_birth") ?? "";
+      _usernameController.text = username ?? "Unknown";
+      _emailController.text = email ?? "Unknown";
+      _firstNameController.text = firstName ?? "Unknown";
+      _middleNameController.text = middleName ?? "Unknown";
+      _lastNameController.text = lastName ?? "Unknown";
+      _phoneNumberController.text = phoneNumber ?? "Unknown";
+      _addressController.text = address ?? "Unknown";
+      _dateOfBirthController.text = dateOfBirth ?? "";
+
+      // Ensure gender is valid
+      _selectedGender = _genders.contains(gender) ? gender : null;
     });
   }
 
   Future<void> _saveUserData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString("username", _usernameController.text);
-    await prefs.setString("email", _emailController.text);
-    await prefs.setString("firstname", _firstNameController.text);
-    await prefs.setString("middlename", _middleNameController.text);
-    await prefs.setString("lastname", _lastNameController.text);
-    await prefs.setString("date_of_birth", _dateOfBirthController.text);
-    await prefs.setString("gender", _selectedGender ?? "Unknown");
-    await prefs.setString("phone_number", _phoneNumberController.text);
-    await prefs.setString("address", _addressController.text);
+    await _storage.write(key: "username", value: _usernameController.text);
+    await _storage.write(key: "email", value: _emailController.text);
+    await _storage.write(key: "firstname", value: _firstNameController.text);
+    await _storage.write(key: "middlename", value: _middleNameController.text);
+    await _storage.write(key: "lastname", value: _lastNameController.text);
+    await _storage.write(key: "date_of_birth", value: _dateOfBirthController.text);
+    await _storage.write(key: "gender", value: _selectedGender ?? "Unknown");
+    await _storage.write(key: "phone_number", value: _phoneNumberController.text);
+    await _storage.write(key: "address", value: _addressController.text);
     // Optionally, update the user data on the server
     setState(() {
       _hasChanges = false;

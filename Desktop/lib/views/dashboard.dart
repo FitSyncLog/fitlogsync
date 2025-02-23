@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '/main.dart'; // Import MyApp from main.dart
 import 'profile_screen.dart'; // Import the ProfileScreen
 
@@ -14,6 +14,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String username = "Loading...";
   String email = "Loading...";
   bool _isLoggingOut = false;
+  final FlutterSecureStorage storage = const FlutterSecureStorage();
 
   @override
   void initState() {
@@ -22,10 +23,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _loadUserData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? storedUsername = await storage.read(key: "username");
+    String? storedEmail = await storage.read(key: "email");
+
     setState(() {
-      username = prefs.getString("username") ?? "Unknown User";
-      email = prefs.getString("email") ?? "Unknown Email";
+      username = storedUsername ?? "Unknown User";
+      email = storedEmail ?? "Unknown Email";
     });
   }
 
@@ -55,8 +58,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     // Simulate a delay for the logout process
     await Future.delayed(Duration(seconds: 2));
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    // Clear stored data
+    await storage.deleteAll();
 
     if (!mounted) return;
 

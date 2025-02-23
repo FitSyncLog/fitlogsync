@@ -4,37 +4,41 @@ header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json");
 
-$data = json_decode(file_get_contents("php://input"), true);
+include 'db_conn.php';
 
-// Debug print to check received data
-error_log(print_r($data, true));
+$data = json_decode(file_get_contents("php://input"), true);
 
 if (empty($data["email"]) || empty($data["password"])) {
     echo json_encode(["success" => false, "message" => "All fields are required"]);
     exit;
 }
 
-// Database connection
-$conn = new mysqli("localhost:3307", "root", "", "fitlogsync");
-
-if ($conn->connect_error) {
-    echo json_encode(["success" => false, "message" => "Database connection failed"]);
-    exit;
-}
+$conn = connectToDatabase();
 
 $email = $conn->real_escape_string($data["email"]);
-$password = $data["password"]; // No need to escape, it's used with password_verify()
+$password = $data["password"];
 
-// Fetch user from database
 $query = $conn->prepare("SELECT * FROM users WHERE email = ?");
 $query->bind_param("s", $email);
 $query->execute();
 $result = $query->get_result();
 
 if ($row = $result->fetch_assoc()) {
-    // Verify hashed password
     if (password_verify($password, $row["password"])) {
-        // Prepare user data to return
+        $userId = $row["user_id"];
+
+        // Retrieve user roles
+        $userRolesQuery = $conn->prepare("SELECT role FROM user_roles WHERE user_id = ?");
+        $userRolesQuery->bind_param("i", $userId);
+        $userRolesQuery->execute();
+        $userRolesResult = $userRolesQuery->get_result();
+
+        $roles = [];
+        while ($roleRow = $userRolesResult->fetch_assoc()) {
+            $roles[] = $roleRow['role'];
+        }
+
+        // ✅ Ensure roles is a proper array, not an object
         $userData = [
             "success" => true,
             "username" => $row["username"],
@@ -46,9 +50,14 @@ if ($row = $result->fetch_assoc()) {
             "gender" => $row["gender"],
             "phone_number" => $row["phone_number"],
             "address" => $row["address"],
+            "roles" => array_values($roles), // 🔹 Fix roles array format
             "message" => "Login successful"
         ];
-        echo json_encode($userData);
+
+        // Debugging Log
+        error_log("Response JSON: " . json_encode($userData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        echo json_encode($userData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     } else {
         echo json_encode(["success" => false, "message" => "Invalid credentials"]);
     }

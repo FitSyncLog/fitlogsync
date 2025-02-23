@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthController {
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('http://localhost/fitlogsync/Desktop/login.php'),
+        Uri.parse('http://localhost/fitlogsync/Desktop/database/login.php'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -16,10 +18,8 @@ class AuthController {
         }),
       );
 
-      print('Request body: ${jsonEncode(<String, String>{'email': email, 'password': password})}'); // Debug print
-
       if (response.statusCode == 200) {
-        return jsonDecode(response.body); // Ensure API response is correctly parsed
+        return jsonDecode(response.body);
       } else {
         return {'success': false, 'message': 'Server error'};
       }
@@ -29,7 +29,8 @@ class AuthController {
   }
 
   Future<bool> isLoggedIn() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.containsKey("email");
+    String? email = await _storage.read(key: "email");
+    return email != null;
   }
 }
+

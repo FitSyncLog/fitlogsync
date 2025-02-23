@@ -140,8 +140,7 @@
                                                 <option value="">Select Gender</option>
                                                 <option value="Male" <?php echo (isset($_GET['gender']) && $_GET['gender'] === 'Male' ? 'selected' : ''); ?>>Male</option>
                                                 <option value="Female" <?php echo (isset($_GET['gender']) && $_GET['gender'] === 'Female' ? 'selected' : ''); ?>>Female</option>
-                                                <option value="Prefer not to say" <?php echo (isset($_GET['gender']) && $_GET['gender'] === 'Prefer not to say' ? 'selected' : ''); ?>>Prefer
-                                                    not to say</option>
+                                                <option value="Prefer not to say" <?php echo (isset($_GET['gender']) && $_GET['gender'] === 'Prefer not to say' ? 'selected' : ''); ?>>Prefer not to say</option>
                                             </select>
                                             <label for="gender">Gender</label>
                                             <div class="error-message" id="genderError"></div>

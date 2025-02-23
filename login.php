@@ -8,10 +8,7 @@
 
   <link rel="stylesheet" type="text/css" href="bootstrap.css" />
   <link rel="stylesheet" type="text/css" href="style.css" />
-
   <link rel="icon" type="image/x-icon" href="assets/fitlogsync.ico">
-
-
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -54,7 +51,6 @@
       font-size: 0.875rem;
     }
   </style>
-
 </head>
 
 <body>
@@ -222,6 +218,7 @@
       </div>
     </div>
   </section>
+
   <?php include 'layout/footer.php'; ?>
 
   <!-- Scroll Top -->
@@ -294,6 +291,38 @@
 
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+      let isValid = true;
+
+      // Email Validation
+      const email = document.getElementById('email');
+      if (!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+        document.getElementById('emailError').innerHTML = `<i class="bi bi-exclamation-circle"></i> Please enter a valid email address`;
+        email.classList.add('error');
+        isValid = false;
+      } else {
+        document.getElementById('emailError').innerHTML = '';
+        email.classList.remove('error');
+      }
+
+      // Password Validation
+      const password = document.getElementById('password');
+      if (!password.value) {
+        document.getElementById('passwordError').innerHTML = `<i class="bi bi-exclamation-circle"></i> Password is required`;
+        password.classList.add('error');
+        isValid = false;
+      } else {
+        document.getElementById('passwordError').innerHTML = '';
+        password.classList.remove('error');
+      }
+
+      if (!isValid) {
+        event.preventDefault();
+      }
+    });
+  </script>
 
 </body>
 
