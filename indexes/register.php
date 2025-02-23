@@ -6,161 +6,271 @@ require "db_con.php";
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    echo "<pre>";
-    print_r($_POST);
-    echo "</pre>";
+function validate($data)
+{
+    $data = trim($data ?? '');
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+}
 
-    if (isset($_POST['register'])) {
-        echo "Submit button detected!";
+function isValidEmail($email)
+{
+    return filter_var($email, FILTER_VALIDATE_EMAIL);
+}
 
-        function validate($data)
-        {
-            $data = trim($data ?? ''); // Use null coalescing operator to avoid null values
-            $data = stripslashes($data);
-            $data = htmlspecialchars($data);
-            return $data;
-        }
+function isValidPhoneNumber($phone)
+{
+    return preg_match('/^09\d{9}$/', $phone);
+}
 
-        date_default_timezone_set('Asia/Manila');
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
+    // Validate and sanitize inputs
+    $username = validate($_POST['username'] ?? '');
+    $lastname = mb_convert_case(validate($_POST['lastname'] ?? ''), MB_CASE_TITLE, "UTF-8");
+    $firstname = mb_convert_case(validate($_POST['firstname'] ?? ''), MB_CASE_TITLE, "UTF-8");
+    $middlename = mb_convert_case(validate($_POST['middlename'] ?? ''), MB_CASE_TITLE, "UTF-8");
+    $dateofbirth = validate($_POST['dateofbirth'] ?? '');
+    $gender = validate($_POST['gender'] ?? '');
+    $address = validate($_POST['address'] ?? '');
+    $phonenumber = validate($_POST['phonenumber'] ?? '');
+    $email = validate($_POST['email'] ?? '');
+    $password = validate($_POST['password'] ?? '');
+    $confirm_password = validate($_POST['confirm_password'] ?? '');
+    $medical_conditions = validate($_POST['medical_conditions'] ?? '');
+    $current_medications = validate($_POST['current_medications'] ?? '');
+    $previous_injuries = validate($_POST['previous_injuries'] ?? '');
+    $q1 = validate($_POST['q1'] ?? '');
+    $q2 = validate($_POST['q2'] ?? '');
+    $q3 = validate($_POST['q3'] ?? '');
+    $q4 = validate($_POST['q4'] ?? '');
+    $q5 = validate($_POST['q5'] ?? '');
+    $q6 = validate($_POST['q6'] ?? '');
+    $q7 = validate($_POST['q7'] ?? '');
+    $q8 = validate($_POST['q8'] ?? '');
+    $q9 = validate($_POST['q9'] ?? '');
+    $q10 = validate($_POST['q10'] ?? '');
+    $waiver_rules = isset($_POST['waiver_rules']);
+    $waiver_liability = isset($_POST['waiver_liability']);
+    $waiver_cancel = isset($_POST['waiver_cancel']);
+    $contact_person = mb_convert_case(validate($_POST['contact_person'] ?? ''), MB_CASE_TITLE, "UTF-8");
+    $contact_number = validate($_POST['contact_number'] ?? '');
+    $relationship = validate($_POST['relationship'] ?? '');
 
-        // Validate and sanitize inputs
-        $lastnameNotProper = validate($_POST['lastname'] ?? '');
-        $firstnameNotProper = validate($_POST['firstname'] ?? '');
-        $middlenameNotProper = validate($_POST['middlename'] ?? '');
+    $user_data = 'username=' . $username .
+        '&lastname=' . $lastname .
+        '&firstname=' . $firstname .
+        '&middlename=' . $middlename .
+        '&dateofbirth=' . $dateofbirth .
+        '&gender=' . $gender .
+        '&address=' . $address .
+        '&phonenumber=' . $phonenumber .
+        '&email=' . $email .
+        '&password=' . $password .
+        '&confirm_password=' . $confirm_password .
+        '&medical_conditions=' . $medical_conditions .
+        '&current_medications=' . $current_medications .
+        '&previous_injuries=' . $previous_injuries .
+        '&q1=' . $q1 .
+        '&q2=' . $q2 .
+        '&q3=' . $q3 .
+        '&q4=' . $q4 .
+        '&q5=' . $q5 .
+        '&q6=' . $q6 .
+        '&q7=' . $q7 .
+        '&q8=' . $q8 .
+        '&q9=' . $q9 .
+        '&q10=' . $q10 .
+        '&waiver_rules=' . $waiver_rules .
+        '&waiver_liability=' . $waiver_liability .
+        '&waiver_cancel=' . $waiver_cancel .
+        '&contact_person=' . $contact_person .
+        '&contact_number=' . $contact_number .
+        '&relationship=' . $relationship;
 
-        $username = validate($_POST['username'] ?? '');
-        $lastname = mb_convert_case($lastnameNotProper, MB_CASE_TITLE, "UTF-8");
-        $firstname = mb_convert_case($firstnameNotProper, MB_CASE_TITLE, "UTF-8");
-        $middlename = mb_convert_case($middlenameNotProper, MB_CASE_TITLE, "UTF-8");
-        $dateofbirth = validate($_POST['dateofbirth'] ?? '');
-        $gender = validate($_POST['gender'] ?? '');
-        $address = validate($_POST['address'] ?? '');
-        $phonenumber = validate($_POST['phonenumber'] ?? '');
-        $email = validate($_POST['email'] ?? '');
-        $password = validate($_POST['password'] ?? '');
-        $confirm_password = validate($_POST['confirm_password'] ?? '');
-        $medical_conditions = validate($_POST['medical_conditions'] ?? '');
-        $current_medications = validate($_POST['current_medications'] ?? '');
-        $previous_injuries = validate($_POST['previous_injuries'] ?? '');
-        $q1 = validate($_POST['q1'] ?? '');
-        $q2 = validate($_POST['q2'] ?? '');
-        $q3 = validate($_POST['q3'] ?? '');
-        $q4 = validate($_POST['q4'] ?? '');
-        $q5 = validate($_POST['q5'] ?? '');
-        $q6 = validate($_POST['q6'] ?? '');
-        $q7 = validate($_POST['q7'] ?? '');
-        $q8 = validate($_POST['q8'] ?? '');
-        $q9 = validate($_POST['q9'] ?? '');
-        $q10 = validate($_POST['q10'] ?? '');
-        $waiver_rules = validate($_POST['waiver_rules'] ?? '');
-        $waiver_liability = validate($_POST['waiver_liability'] ?? '');
-        $waiver_cancel = validate($_POST['waiver_cancel'] ?? '');
 
-        // Generate verification code and expiration
-        $verification_code = "123456";
-        $datetime = new DateTime('now');
-        $datetime->modify('+10 minutes');
-        $v_code_expiration = $datetime->format('Y-m-d H:i:s');
-
-        // Set registration date and status
-        $registration_date = date('Y-m-d');
-        $status = "Not Verified";
-
-        // Validate required fields
-        if (empty($username) || empty($lastname) || empty($firstname) || empty($dateofbirth) || empty($gender) || empty($address) || empty($phonenumber) || empty($email) || empty($password) || empty($confirm_password)) {
-            $error_message = "All fields are required except middle name.";
-            header("Location: ../register.php?error=" . urlencode($error_message));
-            exit();
-        }
-
-        // Validate password match
-        if ($password !== $confirm_password) {
-            $error_message = "Passwords do not match.";
-            header("Location: ../register.php?error=" . urlencode($error_message));
-            exit();
-        }
-
-        // Hash the password
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-        // Insert data into the `users` table
-        $sql_new_user = "INSERT INTO users (username, firstname, middlename, lastname, date_of_birth, password, gender, phone_number, email, address, verification_code, v_code_expiration, status, registration_date)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt_new_user_query = mysqli_prepare($conn, $sql_new_user);
-
-        if ($stmt_new_user_query === false) {
-            $error_message = "Failed to prepare the SQL statement.";
-            header("Location: ../register.php?error=" . urlencode($error_message));
-            exit();
-        }
-
-        mysqli_stmt_bind_param($stmt_new_user_query, "ssssssssssssss", $username, $firstname, $middlename, $lastname, $dateofbirth, $hashed_password, $gender, $phonenumber, $email, $address, $verification_code, $v_code_expiration, $status, $registration_date);
-        $result_new_user_query = mysqli_stmt_execute($stmt_new_user_query);
-
-        if ($result_new_user_query) {
-            // Retrieve the `user_id` of the newly inserted user
-            $user_id = mysqli_insert_id($conn);
-
-            // Insert medical background and PAR-Q data into the `medical_backgrounds` table
-            $sql_medical_background = "INSERT INTO medical_backgrounds (user_id, medical_conditions, current_medications, previous_injuries, par_q_1, par_q_2, par_q_3, par_q_4, par_q_5, par_q_6, par_q_7, par_q_8, par_q_9, par_q_10)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            $stmt_medical_background = mysqli_prepare($conn, $sql_medical_background);
-
-            if ($stmt_medical_background === false) {
-                $error_message = "Failed to prepare the SQL statement for medical background.";
-                header("Location: ../register.php?error=" . urlencode($error_message));
-                exit();
-            }
-
-            mysqli_stmt_bind_param($stmt_medical_background, "isssssssssssss", $user_id, $medical_conditions, $current_medications, $previous_injuries, $q1, $q2, $q3, $q4, $q5, $q6, $q7, $q8, $q9, $q10);
-            $result_medical_background = mysqli_stmt_execute($stmt_medical_background);
-
-            if (!$result_medical_background) {
-                $error_message = "Failed to insert medical background data: " . mysqli_error($conn);
-                header("Location: ../register.php?error=" . urlencode($error_message));
-                exit();
-            }
-
-            // Insert waiver/agreement data into the `waiver_agreements` table
-            $sql_waiver_agreements = "INSERT INTO waiver_agreements (user_id, rules_and_policy, liability_waiver, cancellation_and_refund_policy)
-                    VALUES (?, ?, ?, ?)";
-            $stmt_waiver_agreements = mysqli_prepare($conn, $sql_waiver_agreements);
-
-            if ($stmt_waiver_agreements === false) {
-                $error_message = "Failed to prepare the SQL statement for waiver agreements.";
-                header("Location: ../register.php?error=" . urlencode($error_message));
-                exit();
-            }
-
-            mysqli_stmt_bind_param($stmt_waiver_agreements, "isss", $user_id, $waiver_rules, $waiver_liability, $waiver_cancel);
-            $result_waiver_agreements = mysqli_stmt_execute($stmt_waiver_agreements);
-
-            if (!$result_waiver_agreements) {
-                $error_message = "Failed to insert waiver agreements data: " . mysqli_error($conn);
-                header("Location: ../register.php?error=" . urlencode($error_message));
-                exit();
-            }
-
-            // Registration successful
-            header("Location: ../login.php?registrationSuccess=Registration successful!");
-            exit();
-        } else {
-            // Database error
-            $error_message = "Database error: " . mysqli_error($conn);
-            header("Location: ../register.php?registrationfailed=" . urlencode($error_message));
-            exit();
-        }
-
-        mysqli_stmt_close($stmt_new_user_query);
-        mysqli_close($conn);
-    } else {
-        // Submit button not detected
-        header("Location: ../register.php?register=Submit button not detected.");
+    // Validate required fields
+    if (empty($username) || empty($lastname) || empty($firstname) || empty($dateofbirth) || empty($gender) || empty($address) || empty($phonenumber) || empty($email) || empty($password) || empty($confirm_password)) {
+        $error_message = "All fields are required except middle name.";
+        header("Location: ../register.php?error=" . urlencode($error_message));
         exit();
     }
+
+    // Validate email and phone number
+    if (!isValidEmail($email)) {
+        $error_message = "Invalid email address.";
+        header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+        exit();
+    }
+
+    if (!isValidPhoneNumber($phonenumber)) {
+        $error_message = "Phone number must be 11 digits and start with '09'.";
+        header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+        exit();
+    }
+
+    // Validate password match
+    if ($password !== $confirm_password) {
+        $error_message = "Passwords do not match.";
+        header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+        exit();
+    }
+
+    // Hash the password
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+    // Generate verification code and expiration
+    $verification_code = "123456";
+    $datetime = new DateTime('now');
+    $datetime->modify('+10 minutes');
+    $v_code_expiration = $datetime->format('Y-m-d H:i:s');
+
+    // Set registration date and status
+    $registration_date = date('Y-m-d');
+    $status = "Not Verified";
+    $role = "Member";
+
+
+    // Check if username already exists
+    $sql_check_username = "SELECT * FROM users WHERE username=?";
+    $stmt_check_username = mysqli_prepare($conn, $sql_check_username);
+    mysqli_stmt_bind_param($stmt_check_username, "s", $username);
+    mysqli_stmt_execute($stmt_check_username);
+    $result_check_username = mysqli_stmt_get_result($stmt_check_username);
+
+    // Validate account number if already exists
+    if (mysqli_num_rows($result_check_username) > 0) {
+        header("Location: ../register.php?username_already_exist=Username already exists&$user_data");
+        exit();
+    }
+
+
+    // Check if email already exists
+    $sql_check_email = "SELECT * FROM users WHERE email=?";
+    $stmt_check_email = mysqli_prepare($conn, $sql_check_email);
+    mysqli_stmt_bind_param($stmt_check_email, "s", $email);
+    mysqli_stmt_execute($stmt_check_email);
+    $result_check_email = mysqli_stmt_get_result($stmt_check_email);
+
+    // Validate account number if already exists
+    if (mysqli_num_rows($result_check_email) > 0) {
+        header("Location: ../register.php?email_already_taken=Email is already taken.&$user_data");
+        exit();
+    }
+
+
+
+
+    // Insert data into the `users` table
+    $sql_new_user = "INSERT INTO users (username, firstname, middlename, lastname, date_of_birth, password, gender, phone_number, email, address, verification_code, v_code_expiration, status, registration_date)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt_new_user_query = mysqli_prepare($conn, $sql_new_user);
+
+    if ($stmt_new_user_query === false) {
+        $error_message = "Failed to prepare the SQL statement.";
+        header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt_new_user_query, "ssssssssssssss", $username, $firstname, $middlename, $lastname, $dateofbirth, $hashed_password, $gender, $phonenumber, $email, $address, $verification_code, $v_code_expiration, $status, $registration_date);
+    $result_new_user_query = mysqli_stmt_execute($stmt_new_user_query);
+
+    if ($result_new_user_query) {
+        $user_id = mysqli_insert_id($conn);
+
+        // Insert medical background and PAR-Q data into the `medical_backgrounds` table
+        $sql_medical_background = "INSERT INTO medical_backgrounds (user_id, medical_conditions, current_medications, previous_injuries, par_q_1, par_q_2, par_q_3, par_q_4, par_q_5, par_q_6, par_q_7, par_q_8, par_q_9, par_q_10)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt_medical_background = mysqli_prepare($conn, $sql_medical_background);
+
+        if ($stmt_medical_background === false) {
+            $error_message = "Failed to prepare the SQL statement for medical background.";
+            header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+            exit();
+        }
+
+        mysqli_stmt_bind_param($stmt_medical_background, "isssssssssssss", $user_id, $medical_conditions, $current_medications, $previous_injuries, $q1, $q2, $q3, $q4, $q5, $q6, $q7, $q8, $q9, $q10);
+        $result_medical_background = mysqli_stmt_execute($stmt_medical_background);
+
+        if (!$result_medical_background) {
+            $error_message = "Failed to insert medical background data.";
+            header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+            exit();
+        }
+
+        // Insert waiver/agreement data into the `waiver_agreements` table
+        $sql_waiver_agreements = "INSERT INTO waivers (user_id, rules_and_policy, liability_waiver, cancellation_and_refund_policy)
+                VALUES (?, ?, ?, ?)";
+        $stmt_waiver_agreements = mysqli_prepare($conn, $sql_waiver_agreements);
+
+        if ($stmt_waiver_agreements === false) {
+            $error_message = "Failed to prepare the SQL statement for waiver agreements.";
+            header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+            exit();
+        }
+
+        mysqli_stmt_bind_param($stmt_waiver_agreements, "isss", $user_id, $waiver_rules, $waiver_liability, $waiver_cancel);
+        $result_waiver_agreements = mysqli_stmt_execute($stmt_waiver_agreements);
+
+        if (!$result_waiver_agreements) {
+            $error_message = "Failed to insert waiver agreements data.";
+            header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+            exit();
+        }
+
+        // Insert emergency contact data into the `emergency_contacts` table
+        $sql_emergency_contact = "INSERT INTO emergency_contacts (user_id, contact_person, contact_number, relationship)
+                VALUES (?, ?, ?, ?)";
+        $stmt_emergency_contact = mysqli_prepare($conn, $sql_emergency_contact);
+
+        if ($stmt_emergency_contact === false) {
+            $error_message = "Failed to prepare the SQL statement for emergency contact.";
+            header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+            exit();
+        }
+
+        mysqli_stmt_bind_param($stmt_emergency_contact, "isss", $user_id, $contact_person, $contact_number, $relationship);
+        $result_emergency_contact = mysqli_stmt_execute($stmt_emergency_contact);
+
+        if (!$result_emergency_contact) {
+            $error_message = "Failed to insert waiver agreements data.";
+            header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+            exit();
+        }
+
+        // Insert user role data into the `user_role` table
+        $sql_user_role = "INSERT INTO user_roles (user_id, role)
+                VALUES (?, ?)";
+        $stmt_user_role = mysqli_prepare($conn, $sql_user_role);
+
+        if ($stmt_user_role === false) {
+            $error_message = "Failed to prepare the SQL statement for emergency contact.";
+            header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+            exit();
+        }
+
+        mysqli_stmt_bind_param($stmt_user_role, "is", $user_id, $role);
+        $result_user_role = mysqli_stmt_execute($stmt_user_role);
+
+        if (!$result_user_role) {
+            $error_message = "Failed to insert waiver agreements data.";
+            header("Location: ../register.php?error=" . urlencode($error_message) & $user_data);
+            exit();
+        }
+
+
+        // Registration successful
+        header("Location: ../login.php?registrationSuccess=Registration successful!");
+        exit();
+    } else {
+        $error_message = "Database error.";
+        header("Location: ../register.php?registrationfailed=" . urlencode($error_message) & $user_data);
+        exit();
+    }
+
+    mysqli_stmt_close($stmt_new_user_query);
+    mysqli_close($conn);
 } else {
-    // Form not submitted via POST
     header("Location: ../register.php?register=Please fill out the form below.");
     exit();
 }

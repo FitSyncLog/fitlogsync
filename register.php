@@ -26,6 +26,11 @@
     <script src="assets/js/jquery-3.6.0.min.js"></script>
     <script src="assets/js/jquery-ui.js"></script>
 
+    <!-- Sweet Alert -->
+    <script src="assets/css/sweetalert2.min.css"></script>
+    <script src="assets/js/sweetalert2.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Main CSS File -->
     <link href="assets/css/main.css" rel="stylesheet">
     <style>
@@ -55,34 +60,34 @@
     <section class="hero section light-background d-flex justify-content-center align-items-center"
         style="min-height: 100vh;">
         <div class="container">
-            <?php if (isset($_GET['register'])) { ?>
+            <?php if (isset($_GET['error'])): ?>
                 <div class="alert alert-danger text-center">
-                    <?php echo $_GET['register']; ?>
+                    <?php echo htmlspecialchars($_GET['error']); ?>
                 </div>
-            <?php } ?>
+            <?php endif; ?>
+
+            <?php if (isset($_GET['registrationSuccess'])): ?>
+                <div class="alert alert-success text-center">
+                    <?php echo htmlspecialchars($_GET['registrationSuccess']); ?>
+                </div>
+            <?php endif; ?>
+
             <div class="row justify-content-center">
                 <div class="col-12 col-md-8 col-xl-12">
                     <div class="card border-0 rounded-4">
                         <div class="card-body p-4">
                             <h3 class="mb-4 text-center"><strong>Registration Form</strong></h3>
-                            <?php if (isset($_GET['required'])) { ?>
-                                <div class="alert alert-danger text-center">
-                                    <?php echo $_GET['required']; ?>
-                                </div>
-                            <?php } ?>
-
-                            <!-- Display error message if any -->
-                            <?php if (isset($_GET['required'])): ?>
-                                <div class="alert alert-danger">
-                                    <?php echo htmlspecialchars($_GET['required']); ?>
-                                </div>
-                            <?php endif; ?>
 
                             <form id="registrationForm" action="indexes/register.php" method="POST">
                                 <!-- Personal Information -->
                                 <h5 class="text-warning text-center"><strong>Personal Information</strong></h5>
                                 <div class="row g-3">
                                     <!-- Username -->
+                                    <?php if (isset($_GET['username_already_exist'])): ?>
+                                        <div class="alert alert-danger text-center">
+                                            <?php echo htmlspecialchars($_GET['username_already_exist']); ?>
+                                        </div>
+                                    <?php endif; ?>
                                     <div class="col-md-6">
                                         <div class="form-floating">
                                             <input type="text" class="form-control" id="username" name="username"
@@ -156,6 +161,11 @@
                                             <div class="error-message" id="addressError"></div>
                                         </div>
                                     </div>
+                                    <?php if (isset($_GET['email_already_taken'])): ?>
+                                        <div class="alert alert-danger text-center">
+                                            <?php echo htmlspecialchars($_GET['email_already_taken']); ?>
+                                        </div>
+                                    <?php endif; ?>
                                     <!-- Phone Number -->
                                     <div class="col-md-6">
                                         <div class="form-floating">
@@ -176,11 +186,6 @@
                                             <div class="error-message" id="emailError"></div>
                                         </div>
                                     </div>
-                                    <?php if (isset($_GET['passworddonotmatch'])) { ?>
-                                        <div class="alert alert-danger text-center">
-                                            <?php echo $_GET['passworddonotmatch']; ?>
-                                        </div>
-                                    <?php } ?>
                                     <!-- Password -->
                                     <div class="col-md-6">
                                         <div class="form-floating">
@@ -200,6 +205,79 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Medical Background -->
+                                <hr class="my-4">
+                                <h5 class="text-warning text-center"><strong>Contact of Emergency</strong></h5>
+                                <div class="row g-3">
+                                    <!-- Contact Person -->
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="contact_person"
+                                                name="contact_person" placeholder="Contact Person"
+                                                value="<?php echo htmlspecialchars($_GET['contact_person'] ?? ''); ?>">
+                                            <label for="contact_person">Contact Person</label>
+                                            <div class="error-message" id="contact_personError"></div>
+                                        </div>
+                                    </div>
+                                    <!-- Contact Number -->
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="contact_number"
+                                                name="contact_number" placeholder="Contact Number"
+                                                value="<?php echo htmlspecialchars($_GET['contact_number'] ?? ''); ?>">
+                                            <label for="contact_number">Contact Number</label>
+                                            <div class="error-message" id="contact_numberError"></div>
+                                        </div>
+                                    </div> <!-- Relationship -->
+                                    <div class="col-md-12">
+                                        <div class="form-floating">
+                                            <select class="form-select" id="relationship" name="relationship">
+                                                <option value="">Select Relationship</option>
+                                                <option value="Mother" <?php echo (isset($_GET['relationship']) && $_GET['relationship'] === 'Mother' ? 'selected' : ''); ?>>Mother
+                                                </option>
+                                                <option value="Father" <?php echo (isset($_GET['relationship']) && $_GET['relationship'] === 'Father' ? 'selected' : ''); ?>>Father
+                                                </option>
+                                                <option value="Sister" <?php echo (isset($_GET['relationship']) && $_GET['relationship'] === 'Sister' ? 'selected' : ''); ?>>Sister
+                                                </option>
+                                                <option value="Brother" <?php echo (isset($_GET['relationship']) && $_GET['relationship'] === 'Brother' ? 'selected' : ''); ?>>Brother
+                                                </option>
+                                                <option value="Friend" <?php echo (isset($_GET['relationship']) && $_GET['relationship'] === 'Friend' ? 'selected' : ''); ?>>
+                                                    Friend</option>
+                                                <option value="Boyfriend" <?php echo (isset($_GET['relationship']) && $_GET['relationship'] === 'Boyfriend' ? 'selected' : ''); ?>>
+                                                    Boyfriend</option>
+                                                <option value="Girlfriend" <?php echo (isset($_GET['relationship']) && $_GET['relationship'] === 'Girlfriend' ? 'selected' : ''); ?>>
+                                                    Girlfriend</option>
+                                                <option value="Sister in Law" <?php echo (isset($_GET['relationship']) && $_GET['relationship'] === 'Sister in Law' ? 'selected' : ''); ?>>
+                                                    Sister in Law</option>
+                                                <option value="Brother in Law" <?php echo (isset($_GET['relationship']) && $_GET['relationship'] === 'Brother in Law' ? 'selected' : ''); ?>>
+                                                    Brother in Law</option>
+                                                <option value="Mother in Law" <?php echo (isset($_GET['relationship']) && $_GET['relationship'] === 'Mother in Law' ? 'selected' : ''); ?>>
+                                                    Mother in Law</option>
+                                                <option value="Father in Law" <?php echo (isset($_GET['relationship']) && $_GET['relationship'] === 'Father in Law' ? 'selected' : ''); ?>>
+                                                    Father in Law</option>
+                                                <option value="Wife" <?php echo (isset($_GET['relationship']) && $_GET['relationship'] === 'Wife' ? 'selected' : ''); ?>>Wife</option>
+                                                <option value="Husband" <?php echo (isset($_GET['relationship']) && $_GET['relationship'] === 'Husband' ? 'selected' : ''); ?>>Husband
+                                                </option>
+                                                <option value="Daughter" <?php echo (isset($_GET['relationship']) && $_GET['relationship'] === 'Daughter' ? 'selected' : ''); ?>>
+                                                    Daughter</option>
+                                                <option value="Cousin" <?php echo (isset($_GET['relationship']) && $_GET['relationship'] === 'Cousin' ? 'selected' : ''); ?>>
+                                                    Cousin</option>
+                                                <option value="Godmother" <?php echo (isset($_GET['relationship']) && $_GET['relationship'] === 'Godmother' ? 'selected' : ''); ?>>
+                                                    Godmother</option>
+                                                <option value="Godfather" <?php echo (isset($_GET['relationship']) && $_GET['relationship'] === 'Godfather' ? 'selected' : ''); ?>>
+                                                    Godfather</option>
+                                            </select>
+                                            <label for="relationship">Relationship</label>
+                                            <div class="error-message" id="relationshipError"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+
 
                                 <!-- Medical Background -->
                                 <hr class="my-4">
@@ -424,8 +502,8 @@
                                             <input class="form-check-input" type="checkbox" id="waiver_rules"
                                                 name="waiver_rules" <?php echo (isset($_GET['waiver_rules']) ? 'checked' : ''); ?>>
                                             <label class="form-check-label" for="waiver_rules">I agree to the <a
-                                                    href="rule_and_policy.php" target="_blank">Rules and
-                                                    Policy</a>.</label>
+                                                    href="rule_and_policy.php" target="_blank"><strong>Rules and
+                                                    Policy</strong></a>.</label>
                                             <div class="error-message" id="waiver_rulesError"></div>
                                         </div>
                                     </div>
@@ -435,8 +513,8 @@
                                             <input class="form-check-input" type="checkbox" id="waiver_liability"
                                                 name="waiver_liability" <?php echo (isset($_GET['waiver_liability']) ? 'checked' : ''); ?>>
                                             <label class="form-check-label" for="waiver_liability">I agree to the <a
-                                                    href="liability_waiver.php" target="_blank">Liability
-                                                    Waiver</a>.</label>
+                                                    href="liability_waiver.php" target="_blank"><strong>Liability
+                                                    Waiver</strong></a>.</label>
                                             <div class="error-message" id="waiver_liabilityError"></div>
                                         </div>
                                     </div>
@@ -447,14 +525,14 @@
                                                 name="waiver_cancel" <?php echo (isset($_GET['waiver_cancel']) ? 'checked' : ''); ?>>
                                             <label class="form-check-label" for="waiver_cancel">I agree to the <a
                                                     href="cancellation_and_refund_policy.php"
-                                                    target="_blank">Cancellation and Refund Policy</a>.</label>
+                                                    target="_blank"><strong>Cancellation and Refund Policy</strong></a>.</label>
                                             <div class="error-message" id="waiver_cancelError"></div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Submit Button -->
-                                <div class="text-center mt-4">
+                                <div class="d-grid mt-12 my-4 ">
                                     <button type="submit" class="btn btn-warning" name="register">Register</button>
                                 </div>
                             </form>
@@ -479,8 +557,6 @@
 
     <script>
         document.getElementById('registrationForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            console.log("Form submission intercepted");
             let isValid = true;
 
             // Personal Information Validation
@@ -494,24 +570,79 @@
             const email = document.getElementById('email');
             const password = document.getElementById('password');
             const confirm_password = document.getElementById('confirm_password');
+            const contact_person = document.getElementById('contact_person');
+            const contact_number = document.getElementById('contact_number');
+            const relationship = document.getElementById('relationship');
 
-            const fields = [
-                { element: username, errorId: 'usernameError', message: 'Username is required' },
-                { element: lastname, errorId: 'lastnameError', message: 'Last Name is required' },
-                { element: firstname, errorId: 'firstnameError', message: 'First Name is required' },
-                { element: dateofbirth, errorId: 'dateofbirthError', message: 'Date of Birth is required' },
-                { element: gender, errorId: 'genderError', message: 'Gender is required' },
-                { element: address, errorId: 'addressError', message: 'Address is required' },
-                { element: phonenumber, errorId: 'phonenumberError', message: 'Phone Number must be 11 digits and start with "09"' },
-                { element: email, errorId: 'emailError', message: 'Please enter a valid email address' },
-                { element: password, errorId: 'passwordError', message: 'Password is required' },
-                { element: confirm_password, errorId: 'confirm_passwordError', message: 'Please confirm your password' }
+            const fields = [{
+                element: username,
+                errorId: 'usernameError',
+                message: 'Username is required'
+            },
+            {
+                element: lastname,
+                errorId: 'lastnameError',
+                message: 'Last Name is required'
+            },
+            {
+                element: firstname,
+                errorId: 'firstnameError',
+                message: 'First Name is required'
+            },
+            {
+                element: dateofbirth,
+                errorId: 'dateofbirthError',
+                message: 'Date of Birth is required'
+            },
+            {
+                element: gender,
+                errorId: 'genderError',
+                message: 'Gender is required'
+            },
+            {
+                element: address,
+                errorId: 'addressError',
+                message: 'Address is required'
+            },
+            {
+                element: phonenumber,
+                errorId: 'phonenumberError',
+                message: 'Phone Number must be 11 digits and start with "09"'
+            },
+            {
+                element: email,
+                errorId: 'emailError',
+                message: 'Please enter a valid email address'
+            },
+            {
+                element: password,
+                errorId: 'passwordError',
+                message: 'Password is required'
+            },
+            {
+                element: confirm_password,
+                errorId: 'confirm_passwordError',
+                message: 'Please confirm your password'
+            },
+            {
+                element: contact_person,
+                errorId: 'contact_personError',
+                message: 'Contact Person name is required'
+            },
+            {
+                element: contact_number,
+                errorId: 'contact_numberError',
+                message: 'Phone Number must be 11 digits and start with "09"'
+            },
+            {
+                element: relationship,
+                errorId: 'relationshipError',
+                message: 'Relationship is required'
+            }
             ];
 
-            console.log("Validating fields...");
             fields.forEach(field => {
                 if (!field.element.value) {
-                    console.log(`Field ${field.element.id} is invalid`);
                     document.getElementById(field.errorId).innerHTML = `<i class="bi bi-exclamation-circle"></i> ${field.message}`;
                     field.element.classList.add('error');
                     isValid = false;
@@ -542,11 +673,29 @@
                 isValid = false;
             }
 
+            // Contact Phone Number Validation
+            if (contact_number.value && !/^09\d{9}$/.test(contact_number.value)) {
+                document.getElementById('contact_numberError').innerHTML = `<i class="bi bi-exclamation-circle"></i> Phone Number must be 11 digits and start with "09"`;
+                contact_number.classList.add('error');
+                isValid = false;
+            }
+
             // Medical Background Validation
-            const medicalFields = [
-                { element: document.getElementById('medical_conditions'), errorId: 'medical_conditionsError', message: 'Medical Conditions is required' },
-                { element: document.getElementById('current_medications'), errorId: 'current_medicationsError', message: 'Current Medications is required' },
-                { element: document.getElementById('previous_injuries'), errorId: 'previous_injuriesError', message: 'Previous Injuries is required' }
+            const medicalFields = [{
+                element: document.getElementById('medical_conditions'),
+                errorId: 'medical_conditionsError',
+                message: 'Medical Conditions is required'
+            },
+            {
+                element: document.getElementById('current_medications'),
+                errorId: 'current_medicationsError',
+                message: 'Current Medications is required'
+            },
+            {
+                element: document.getElementById('previous_injuries'),
+                errorId: 'previous_injuriesError',
+                message: 'Previous Injuries is required'
+            }
             ];
 
             medicalFields.forEach(field => {
@@ -572,10 +721,21 @@
             }
 
             // Waiver/Agreements Validation
-            const waiverFields = [
-                { element: document.getElementById('waiver_rules'), errorId: 'waiver_rulesError', message: 'You must agree to the rules and policy.' },
-                { element: document.getElementById('waiver_liability'), errorId: 'waiver_liabilityError', message: 'You must agree to the liability waiver' },
-                { element: document.getElementById('waiver_cancel'), errorId: 'waiver_cancelError', message: 'You must agree to the cancellation and refund policy' }
+            const waiverFields = [{
+                element: document.getElementById('waiver_rules'),
+                errorId: 'waiver_rulesError',
+                message: 'You must agree to the rules and policy.'
+            },
+            {
+                element: document.getElementById('waiver_liability'),
+                errorId: 'waiver_liabilityError',
+                message: 'You must agree to the liability waiver'
+            },
+            {
+                element: document.getElementById('waiver_cancel'),
+                errorId: 'waiver_cancelError',
+                message: 'You must agree to the cancellation and refund policy'
+            }
             ];
 
             waiverFields.forEach(field => {
@@ -588,10 +748,111 @@
             });
 
             if (isValid) {
-                console.log("Form is valid, submitting...");
                 this.submit();
             } else {
-                console.log("Form is invalid, not submitting");
+                event.preventDefault();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const usernameInput = document.getElementById('username');
+            const emailInput = document.getElementById('email');
+            const usernameError = document.getElementById('usernameError');
+            const emailError = document.getElementById('emailError');
+
+            // Function to check if a value exists in the database
+            async function checkIfExists(type, value) {
+                try {
+                    const response = await fetch(`check_exists.php?type=${type}&value=${encodeURIComponent(value)}`);
+                    const data = await response.json();
+                    return data.exists;
+                } catch (error) {
+                    console.error('Error checking existence:', error);
+                    return false;
+                }
+            }
+
+            // Validate username in real-time
+            usernameInput.addEventListener('blur', async () => {
+                const username = usernameInput.value.trim();
+                if (username) {
+                    const exists = await checkIfExists('username', username);
+                    if (exists) {
+                        usernameInput.classList.add('error');
+                        usernameError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Username is already taken`;
+                    } else {
+                        usernameInput.classList.remove('error');
+                        usernameError.innerHTML = '';
+                    }
+                }
+            });
+
+            // Validate email in real-time
+            emailInput.addEventListener('blur', async () => {
+                const email = emailInput.value.trim();
+                if (email) {
+                    const exists = await checkIfExists('email', email);
+                    if (exists) {
+                        emailInput.classList.add('error');
+                        emailError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Email is already used`;
+                    } else {
+                        emailInput.classList.remove('error');
+                        emailError.innerHTML = '';
+                    }
+                }
+            });
+        });
+
+        document.getElementById('registrationForm').addEventListener('submit', async function (event) {
+            let isValid = true;
+
+            // Personal Information Validation
+            const username = document.getElementById('username');
+            const email = document.getElementById('email');
+            const usernameError = document.getElementById('usernameError');
+            const emailError = document.getElementById('emailError');
+
+            // Function to check if a value exists in the database
+            async function checkIfExists(type, value) {
+                try {
+                    const response = await fetch(`check_exists.php?type=${type}&value=${encodeURIComponent(value)}`);
+                    const data = await response.json();
+                    return data.exists;
+                } catch (error) {
+                    console.error('Error checking existence:', error);
+                    return false;
+                }
+            }
+
+            // Check if username exists
+            if (username.value.trim()) {
+                const usernameExists = await checkIfExists('username', username.value.trim());
+                if (usernameExists) {
+                    username.classList.add('error');
+                    usernameError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Username is already taken`;
+                    isValid = false;
+                } else {
+                    username.classList.remove('error');
+                    usernameError.innerHTML = '';
+                }
+            }
+
+            // Check if email exists
+            if (email.value.trim()) {
+                const emailExists = await checkIfExists('email', email.value.trim());
+                if (emailExists) {
+                    email.classList.add('error');
+                    emailError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Email is already used`;
+                    isValid = false;
+                } else {
+                    email.classList.remove('error');
+                    emailError.innerHTML = '';
+                }
+            }
+
+            // If username or email is already taken, prevent form submission
+            if (!isValid) {
+                event.preventDefault();
             }
         });
     </script>
