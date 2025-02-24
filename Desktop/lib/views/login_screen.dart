@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'admin/admin_dashboard.dart';
 import 'instructor/instructor_dashboard.dart';
+import 'front_desk/front_desk_dashboard.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '/controller/auth_controller.dart';
 
@@ -131,16 +132,23 @@ class _LoginScreenState extends State<LoginScreen> {
               context,
               MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
             );
+          } else if (responseData["roles"] != null && responseData["roles"].contains("Front Desk")) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const FrontDeskDashboardScreen()),
+            );
           } else if (responseData["roles"] != null && responseData["roles"].contains("Instructor")) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const InstructorDashboardScreen()),
             );
-          } else {
+          } else if (responseData["roles"] != null && responseData["roles"].contains("Member")) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const DashboardScreen()),
             );
+          }else {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Account not found')));
           }
         }
       } else {

@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'views/login_screen.dart';
 import 'views/dashboard.dart';
 import 'views/admin/admin_dashboard.dart';
+import 'views/front_desk/front_desk_dashboard.dart';
 import 'views/instructor/instructor_dashboard.dart';
 
 void main() {
@@ -25,8 +26,10 @@ class MyApp extends StatelessWidget {
         return const AdminDashboardScreen();
       } else if (roles.contains("Instructor")) {
         return const InstructorDashboardScreen();
-      } else {
+      } else if (roles.contains("Member")) {
         return const DashboardScreen();
+      } else if (roles.contains("Front Desk")) {
+        return const FrontDeskDashboardScreen();
       }
     }
     return const LoginScreen();
