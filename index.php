@@ -1,9 +1,26 @@
 <?php
+// Start the session and include the database connection
+session_start();
 include "indexes/db_con.php";
 
+$query = "SELECT description FROM information WHERE information_for = 'home_video'";
+$result = mysqli_query($conn, $query);
+
+if ($result && $row = mysqli_fetch_assoc($result)) {
+    $home_video = $row['description'];
+} else {
+    $home_video = "https://www.youtube.com/watch?v=xvFZjo5PgG0&ab_channel=Duran";
+}
 
 $sql = "SELECT * FROM information";
 $result = $conn->query($sql);
+
+$info = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $info[$row['information_for']] = $row['description'];
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -34,10 +51,58 @@ $result = $conn->query($sql);
     <link href="assets/css/main.css" rel="stylesheet">
 
     <link rel="icon" type="image/x-icon" href="assets/fitlogsync.ico">
+    <link rel="stylesheet" href="assets/css/sweetalert2.min.css">
+    <script src="assets/js/sweetalert2.all.min.js"></script>
+
+    <style>
+        .error-message {
+            color: red;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .error-message i {
+            margin-right: 0.25rem;
+        }
+
+        .form-control.error {
+            border: 1px solid red;
+            outline: red;
+        }
+    </style>
 
 </head>
 
 <body class="index-page">
+
+    <?php
+    if (isset($_GET['Success'])) {
+        $message = htmlspecialchars($_GET['Success']);
+        echo "<script>
+                Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: '{$message}',
+                showConfirmButton: false,
+                timer: 1500
+                });
+            </script>";
+    }
+
+    if (isset($_GET['Failed'])) {
+        $message = htmlspecialchars($_GET['Failed']);
+        echo "<script>
+                Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: '{$message}',
+                showConfirmButton: false,
+                timer: 1500
+                });
+            </script>";
+    }
+    ?>
 
     <?php include 'layout/index_header.php'; ?>
 
@@ -55,7 +120,7 @@ $result = $conn->query($sql);
                         <p>Fitness Gym Membership and Attendance Log Management System</p>
                         <div class="d-flex">
                             <a href="register.php" class="btn-get-started">Register Now</a>
-                            <a href="https://www.youtube.com/watch?v=xvFZjo5PgG0&ab_channel=Duran"
+                            <a href="<?php echo htmlspecialchars($home_video); ?>"
                                 class="glightbox btn-watch-video d-flex align-items-center"><i
                                     class="bi bi-play-circle"></i><span>Watch Video</span></a>
                         </div>
@@ -65,54 +130,8 @@ $result = $conn->query($sql);
 
         </section><!-- /Hero Section -->
 
-        <!-- Featured Services Section -->
-        <section id="featured-services" class="featured-services section">
-
-            <div class="container">
-
-                <div class="row gy-4">
-
-                    <div class="col-xl-3 col-md-6 d-flex" data-aos="fade-up" data-aos-delay="100">
-                        <div class="service-item position-relative">
-                            <div class="icon"><i class="bi bi-activity icon"></i></div>
-                            <h4><a href="" class="stretched-link">Lorem Ipsum</a></h4>
-                            <p>Voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi</p>
-                        </div>
-                    </div><!-- End Service Item -->
-
-                    <div class="col-xl-3 col-md-6 d-flex" data-aos="fade-up" data-aos-delay="200">
-                        <div class="service-item position-relative">
-                            <div class="icon"><i class="bi bi-bounding-box-circles icon"></i></div>
-                            <h4><a href="" class="stretched-link">Sed ut perspici</a></h4>
-                            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore</p>
-                        </div>
-                    </div><!-- End Service Item -->
-
-                    <div class="col-xl-3 col-md-6 d-flex" data-aos="fade-up" data-aos-delay="300">
-                        <div class="service-item position-relative">
-                            <div class="icon"><i class="bi bi-calendar4-week icon"></i></div>
-                            <h4><a href="" class="stretched-link">Magni Dolores</a></h4>
-                            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia</p>
-                        </div>
-                    </div><!-- End Service Item -->
-
-                    <div class="col-xl-3 col-md-6 d-flex" data-aos="fade-up" data-aos-delay="400">
-                        <div class="service-item position-relative">
-                            <div class="icon"><i class="bi bi-broadcast icon"></i></div>
-                            <h4><a href="" class="stretched-link">Nemo Enim</a></h4>
-                            <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis</p>
-                        </div>
-                    </div><!-- End Service Item -->
-
-                </div>
-
-            </div>
-
-        </section><!-- /Featured Services Section -->
-
         <!-- About Section -->
         <section id="about" class="about section light-background">
-
             <!-- Section Title -->
             <div class="container section-title" data-aos="fade-up">
                 <h2>About</h2>
@@ -120,54 +139,54 @@ $result = $conn->query($sql);
             </div><!-- End Section Title -->
 
             <div class="container">
-
-                <div class="row gy-3">
-
+                <div class="row gy-3 align-items-stretch"> <!-- Added align-items-stretch -->
                     <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
-                        <img src="assets/img/about.jpg" alt="" class="img-fluid">
+                        <img src="assets/img/about.jpg" alt="" class="img-fluid h-100"> <!-- Added h-100 -->
                     </div>
 
                     <div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up"
                         data-aos-delay="200">
                         <div class="about-content ps-0 ps-lg-3">
-                            <h3>Voluptatem dignissimos provident quasi corporis voluptates sit assumenda.</h3>
+                            <h3>FiT-LOGSYNC is an all-in-one Fitness Gym Membership and Attendance Log Management System
+                            </h3>
                             <p class="fst-italic">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                incididunt ut labore et dolore
-                                magna aliqua.
+                                designed to simplify and streamline gym operations. Whether you're a gym owner, trainer,
+                                or fitness enthusiast, <strong>FiT-LOGSYNC</strong> provides a seamless way to manage
+                                memberships, track attendance, and boost overall gym efficiency.
                             </p>
                             <ul>
                                 <li>
-                                    <i class="bi bi-diagram-3"></i>
-                                    <div>
-                                        <h4>Ullamco laboris nisi ut aliquip consequat</h4>
-                                        <p>Magni facilis facilis repellendus cum excepturi quaerat praesentium libre
-                                            trade</p>
-                                    </div>
+                                    <a href="#about">
+                                        <i class="bi bi-browser-chrome" href="#"></i>
+                                    </a>
+                                    <a href="#about">
+                                        <i class="bi bi-phone-fill"></i>
+                                    </a>
+                                    <a href="#about">
+                                        <i class="bi bi-windows"></i>
+                                    </a>
                                 </li>
-                                <li>
-                                    <i class="bi bi-fullscreen-exit"></i>
-                                    <div>
-                                        <h4>Magnam soluta odio exercitationem reprehenderi</h4>
-                                        <p>Quo totam dolorum at pariatur aut distinctio dolorum laudantium illo direna
-                                            pasata redi</p>
-                                    </div>
-                                </li>
+                                <p>Available in any Web Browsers, Android Devices, and Windows Computers</p>
                             </ul>
                             <p>
-                                Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-                                reprehenderit in voluptate
-                                velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-                                proident, sunt in
-                                culpa qui officia deserunt mollit anim id est laborum
+                                Our cross-platform solution works flawlessly on web, mobile, and desktop, giving both
+                                staff and members the flexibility to access the system anytime, anywhere. We aim to
+                                eliminate the hassle of manual logbooks and outdated systems, making gym management
+                                faster, easier, and more organized.
+                            </p>
+                            <p>
+                                At <strong>FiT-LOGSYNC</strong>, we're committed to helping fitness centers focus on
+                                what truly matters—helping their members achieve their health and fitness goals—while we
+                                handle the
+                                backend work.
+                            </p>
+                            <p>
+                                <strong>Stay fit. Stay synced. Anytime, anywhere. 💪✨</strong>
                             </p>
                         </div>
-
                     </div>
                 </div>
-
             </div>
-
         </section><!-- /About Section -->
 
 
@@ -234,81 +253,99 @@ $result = $conn->query($sql);
                     <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
                         <div class="service-item position-relative">
                             <div class="icon">
-                                <i class="bi bi-activity"></i>
+                                <i class="bi bi-qr-code"></i>
                             </div>
-                            <a href="#" class="stretched-link">
-                                <h3>Nesciunt Mete</h3>
+                            <a class="stretched-link">
+                                <h3>QR Code-Based Log</h3>
                             </a>
-                            <p>Provident nihil minus qui consequatur non omnis maiores. Eos accusantium minus dolores
-                                iure perferendis tempore et consequatur.</p>
+                            <p>Our QR Code-Based Log system makes check-ins quick and contactless. Simply scan your
+                                unique QR code at the entrance to log your attendance.</p>
                         </div>
                     </div><!-- End Service Item -->
 
                     <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
                         <div class="service-item position-relative">
                             <div class="icon">
-                                <i class="bi bi-broadcast"></i>
+                                <i class="bi bi-wifi"></i>
                             </div>
-                            <a href="#" class="stretched-link">
-                                <h3>Eosle Commodi</h3>
+                            <a class="stretched-link">
+                                <h3>Free Wi-Fi</h3>
                             </a>
-                            <p>Ut autem aut autem non a. Sint sint sit facilis nam iusto sint. Libero corrupti neque eum
-                                hic non ut nesciunt dolorem.</p>
+                            <p>Stay connected while you work out! Enjoy complimentary high-speed Wi-Fi throughout the
+                                gym, perfect for streaming music, following workout videos, or staying in touch.
+                            </p>
                         </div>
                     </div><!-- End Service Item -->
 
                     <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
                         <div class="service-item position-relative">
                             <div class="icon">
-                                <i class="bi bi-easel"></i>
+                                <i class="bi bi-droplet-fill"></i>
                             </div>
-                            <a href="#" class="stretched-link">
-                                <h3>Ledo Markt</h3>
+                            <a class="stretched-link">
+                                <h3>Water Refill Station
+                                </h3>
                             </a>
-                            <p>Ut excepturi voluptatem nisi sed. Quidem fuga consequatur. Minus ea aut. Vel qui id
-                                voluptas adipisci eos earum corrupti.</p>
+                            <p>Stay hydrated with access to our filtered water refill stations, so you can refill your
+                                bottles anytime during your workout.</p>
                         </div>
                     </div><!-- End Service Item -->
 
                     <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
                         <div class="service-item position-relative">
                             <div class="icon">
-                                <i class="bi bi-bounding-box-circles"></i>
+                                <i class="bi bi-file-lock-fill"></i>
                             </div>
-                            <a href="#" class="stretched-link">
-                                <h3>Asperiores Commodit</h3>
+                            <a class="stretched-link">
+                                <h3>Locker Rooms</h3>
                             </a>
-                            <p>Non et temporibus minus omnis sed dolor esse consequatur. Cupiditate sed error ea fuga
-                                sit provident adipisci neque.</p>
-                            <a href="#" class="stretched-link"></a>
+                            <p>Keep your belongings safe in our secure locker rooms, equipped with spacious lockers,
+                                benches, and changing areas for your convenience.</p>
+                            <a class="stretched-link"></a>
                         </div>
                     </div><!-- End Service Item -->
 
                     <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
                         <div class="service-item position-relative">
                             <div class="icon">
-                                <i class="bi bi-calendar4-week"></i>
+                                <i class="bi bi-water"></i>
                             </div>
-                            <a href="#" class="stretched-link">
-                                <h3>Velit Doloremque</h3>
+                            <a class="stretched-link">
+                                <h3>Shower Facilities</h3>
                             </a>
-                            <p>Cumque et suscipit saepe. Est maiores autem enim facilis ut aut ipsam corporis aut. Sed
-                                animi at autem alias eius labore.</p>
-                            <a href="#" class="stretched-link"></a>
+                            <p>Freshen up post-workout in our clean and well-maintained showers. We ensure a hygienic
+                                and comfortable space so you can leave the gym feeling revitalized.</p>
+                            <a class="stretched-link"></a>
                         </div>
                     </div><!-- End Service Item -->
 
                     <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
                         <div class="service-item position-relative">
                             <div class="icon">
-                                <i class="bi bi-chat-square-text"></i>
+                                <i class="bi bi-flower1"></i>
                             </div>
-                            <a href="#" class="stretched-link">
-                                <h3>Dolori Architecto</h3>
+                            <a class="stretched-link">
+                                <h3>Yoga Area</h3>
                             </a>
-                            <p>Hic molestias ea quibusdam eos. Fugiat enim doloremque aut neque non et debitis iure.
-                                Corrupti recusandae ducimus enim.</p>
-                            <a href="#" class="stretched-link"></a>
+                            <p>Find your balance and inner peace with our Yoga classes, designed to improve flexibility,
+                                strength, and mindfulness. Suitable for all levels, from beginners to seasoned yogis.
+                            </p>
+                            <a class="stretched-link"></a>
+                        </div>
+                    </div><!-- End Service Item -->
+
+                    <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
+                        <div class="service-item position-relative">
+                            <div class="icon">
+                                <i class="bi bi-lightning"></i>
+                            </div>
+                            <a class="stretched-link">
+                                <h3>Boxing Ring</h3>
+                            </a>
+                            <p>Unleash your power in our Boxing sessions! Build strength, improve endurance, and master
+                                techniques while burning calories in a high-energy environment.
+                            </p>
+                            <a class="stretched-link"></a>
                         </div>
                     </div><!-- End Service Item -->
 
@@ -569,7 +606,7 @@ $result = $conn->query($sql);
                                 <li class="na">Massa ultricies mi</li>
                             </ul>
                             <div class="btn-wrap">
-                                <a href="#" class="btn-buy">Buy Now</a>
+                                <a class="btn-buy">Buy Now</a>
                             </div>
                         </div>
                     </div><!-- End Pricing Item -->
@@ -586,7 +623,7 @@ $result = $conn->query($sql);
                                 <li class="na">Massa ultricies mi</li>
                             </ul>
                             <div class="btn-wrap">
-                                <a href="#" class="btn-buy">Buy Now</a>
+                                <a class="btn-buy">Buy Now</a>
                             </div>
                         </div>
                     </div><!-- End Pricing Item -->
@@ -603,7 +640,7 @@ $result = $conn->query($sql);
                                 <li>Massa ultricies mi</li>
                             </ul>
                             <div class="btn-wrap">
-                                <a href="#" class="btn-buy">Buy Now</a>
+                                <a class="btn-buy">Buy Now</a>
                             </div>
                         </div>
                     </div><!-- End Pricing Item -->
@@ -621,7 +658,7 @@ $result = $conn->query($sql);
                                 <li>Massa ultricies mi</li>
                             </ul>
                             <div class="btn-wrap">
-                                <a href="#" class="btn-buy">Buy Now</a>
+                                <a class="btn-buy">Buy Now</a>
                             </div>
                         </div>
                     </div><!-- End Pricing Item -->
@@ -649,69 +686,25 @@ $result = $conn->query($sql);
 
                         <div class="faq-container">
 
-                            <div class="faq-item faq-active">
-                                <h3>Non consectetur a erat nam at lectus urna duis?</h3>
-                                <div class="faq-content">
-                                    <p>Feugiat pretium nibh ipsum consequat. Tempus iaculis urna id volutpat lacus
-                                        laoreet non curabitur gravida. Venenatis lectus magna fringilla urna porttitor
-                                        rhoncus dolor purus non.</p>
-                                </div>
-                                <i class="faq-toggle bi bi-chevron-right"></i>
-                            </div><!-- End Faq item-->
-
-                            <div class="faq-item">
-                                <h3>Feugiat scelerisque varius morbi enim nunc faucibus?</h3>
-                                <div class="faq-content">
-                                    <p>Dolor sit amet consectetur adipiscing elit pellentesque habitant morbi. Id
-                                        interdum velit laoreet id donec ultrices. Fringilla phasellus faucibus
-                                        scelerisque eleifend donec pretium. Est pellentesque elit ullamcorper dignissim.
-                                        Mauris ultrices eros in cursus turpis massa tincidunt dui.</p>
-                                </div>
-                                <i class="faq-toggle bi bi-chevron-right"></i>
-                            </div><!-- End Faq item-->
-
-                            <div class="faq-item">
-                                <h3>Dolor sit amet consectetur adipiscing elit pellentesque?</h3>
-                                <div class="faq-content">
-                                    <p>Eleifend mi in nulla posuere sollicitudin aliquam ultrices sagittis orci.
-                                        Faucibus pulvinar elementum integer enim. Sem nulla pharetra diam sit amet nisl
-                                        suscipit. Rutrum tellus pellentesque eu tincidunt. Lectus urna duis convallis
-                                        convallis tellus. Urna molestie at elementum eu facilisis sed odio morbi quis
-                                    </p>
-                                </div>
-                                <i class="faq-toggle bi bi-chevron-right"></i>
-                            </div><!-- End Faq item-->
-
-                            <div class="faq-item">
-                                <h3>Ac odio tempor orci dapibus. Aliquam eleifend mi in nulla?</h3>
-                                <div class="faq-content">
-                                    <p>Dolor sit amet consectetur adipiscing elit pellentesque habitant morbi. Id
-                                        interdum velit laoreet id donec ultrices. Fringilla phasellus faucibus
-                                        scelerisque eleifend donec pretium. Est pellentesque elit ullamcorper dignissim.
-                                        Mauris ultrices eros in cursus turpis massa tincidunt dui.</p>
-                                </div>
-                                <i class="faq-toggle bi bi-chevron-right"></i>
-                            </div><!-- End Faq item-->
-
-                            <div class="faq-item">
-                                <h3>Tempus quam pellentesque nec nam aliquam sem et tortor?</h3>
-                                <div class="faq-content">
-                                    <p>Molestie a iaculis at erat pellentesque adipiscing commodo. Dignissim suspendisse
-                                        in est ante in. Nunc vel risus commodo viverra maecenas accumsan. Sit amet nisl
-                                        suscipit adipiscing bibendum est. Purus gravida quis blandit turpis cursus in
-                                    </p>
-                                </div>
-                                <i class="faq-toggle bi bi-chevron-right"></i>
-                            </div><!-- End Faq item-->
-
-                            <div class="faq-item">
-                                <h3>Perspiciatis quod quo quos nulla quo illum ullam?</h3>
-                                <div class="faq-content">
-                                    <p>Enim ea facilis quaerat voluptas quidem et dolorem. Quis et consequatur non sed
-                                        in suscipit sequi. Distinctio ipsam dolore et.</p>
-                                </div>
-                                <i class="faq-toggle bi bi-chevron-right"></i>
-                            </div><!-- End Faq item-->
+                            <?php
+                            $sql = "SELECT id, question, answer FROM faq";
+                            $result = $conn->query($sql);
+                            ?>
+                            <div class="faq-container">
+                                <?php if ($result->num_rows > 0): ?>
+                                    <?php while ($row = $result->fetch_assoc()): ?>
+                                        <div class="faq-item">
+                                            <h3><?php echo htmlspecialchars($row['question']); ?></h3>
+                                            <div class="faq-content">
+                                                <p><?php echo htmlspecialchars($row['answer']); ?></p>
+                                            </div>
+                                            <i class="faq-toggle bi bi-chevron-right"></i>
+                                        </div>
+                                    <?php endwhile; ?>
+                                <?php else: ?>
+                                    <p>No FAQs available.</p>
+                                <?php endif; ?>
+                            </div>
 
                         </div>
 
@@ -743,7 +736,7 @@ $result = $conn->query($sql);
                                 <i class="bi bi-geo-alt flex-shrink-0"></i>
                                 <div>
                                     <h3>Address</h3>
-                                    <p>Pioneer Avenue, General Santos City, Philippines, 9500</p>
+                                    <p><?= $info['address'] ?></p>
                                 </div>
                             </div><!-- End Info Item -->
 
@@ -751,7 +744,7 @@ $result = $conn->query($sql);
                                 <i class="bi bi-telephone flex-shrink-0"></i>
                                 <div>
                                     <h3>Call Us</h3>
-                                    <p>+083 - 552 - 1234</p>
+                                    <p><?= $info['phone_number'] ?></p>
                                 </div>
                             </div><!-- End Info Item -->
 
@@ -759,7 +752,7 @@ $result = $conn->query($sql);
                                 <i class="bi bi-envelope flex-shrink-0"></i>
                                 <div>
                                     <h3>Email Us</h3>
-                                    <p>fitlogsync.official@gmail.com</p>
+                                    <p><?= $info['email'] ?></p>
                                 </div>
                             </div><!-- End Info Item -->
 
@@ -772,40 +765,43 @@ $result = $conn->query($sql);
                     </div>
 
                     <div class="col-lg-7">
-                        <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up"
-                            data-aos-delay="200">
+                        <form action="indexes/messages.php" method="post" class="php-email-form" data-aos="fade-up"
+                            data-aos-delay="200" id="contactForm">
                             <div class="row gy-4">
-
                                 <div class="col-md-6">
                                     <label for="name-field" class="pb-2">Your Name</label>
-                                    <input type="text" name="name" id="name-field" class="form-control" required="">
+                                    <input type="text" name="name" id="name-field" class="form-control">
+                                    <div class="error-message" id="name-error"><i class="bi bi-exclamation-circle"></i>
+                                        This field is required</div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="email-field" class="pb-2">Your Email</label>
-                                    <input type="email" class="form-control" name="email" id="email-field" required="">
+                                    <input type="text" class="form-control" name="email" id="email-field">
+                                    <div class="error-message" id="email-error"><i class="bi bi-exclamation-circle"></i>
+                                        Please enter a valid email address</div>
                                 </div>
 
                                 <div class="col-md-12">
                                     <label for="subject-field" class="pb-2">Subject</label>
-                                    <input type="text" class="form-control" name="subject" id="subject-field"
-                                        required="">
+                                    <input type="text" class="form-control" name="subject" id="subject-field">
+                                    <div class="error-message" id="subject-error"><i
+                                            class="bi bi-exclamation-circle"></i> This field is required</div>
                                 </div>
 
                                 <div class="col-md-12">
                                     <label for="message-field" class="pb-2">Message</label>
-                                    <textarea class="form-control" name="message" rows="10" id="message-field"
-                                        required=""></textarea>
+                                    <textarea class="form-control" name="message" rows="10"
+                                        id="message-field"></textarea>
+                                    <div class="error-message" id="message-error"><i
+                                            class="bi bi-exclamation-circle"></i> This field is required</div>
                                 </div>
 
                                 <div class="col-md-12 text-center">
-                                    <div class="loading">Loading</div>
-                                    <div class="error-message"></div>
+                                    <div class="error-message" id="form-error"></div>
                                     <div class="sent-message">Your message has been sent. Thank you!</div>
-
-                                    <button type="submit">Send Message</button>
+                                    <button type="submit" name="messageButton">Send Message</button>
                                 </div>
-
                             </div>
                         </form>
                     </div><!-- End Contact Form -->
@@ -821,7 +817,7 @@ $result = $conn->query($sql);
     <?php include 'layout/footer.php'; ?>
 
     <!-- Scroll Top -->
-    <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
+    <a id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
             class="bi bi-arrow-up-short"></i></a>
 
     <!-- Preloader -->
@@ -831,6 +827,69 @@ $result = $conn->query($sql);
         <div></div>
         <div></div>
     </div>
+
+    <script>document.getElementById('contactForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Clear previous errors
+            clearErrors();
+
+            // Validate inputs
+            let isValid = true;
+
+            const nameField = document.getElementById('name-field');
+            const emailField = document.getElementById('email-field');
+            const subjectField = document.getElementById('subject-field');
+            const messageField = document.getElementById('message-field');
+
+            if (nameField.value.trim() === '') {
+                showError(nameField, 'name-error');
+                isValid = false;
+            }
+
+            if (emailField.value.trim() === '' || !validateEmail(emailField.value.trim())) {
+                showError(emailField, 'email-error');
+                isValid = false;
+            }
+
+            if (subjectField.value.trim() === '') {
+                showError(subjectField, 'subject-error');
+                isValid = false;
+            }
+
+            if (messageField.value.trim() === '') {
+                showError(messageField, 'message-error');
+                isValid = false;
+            }
+
+            // If all inputs are valid, submit the form
+            if (isValid) {
+                this.submit();
+            }
+        });
+
+        function showError(inputField, errorId) {
+            inputField.classList.add('error');
+            document.getElementById(errorId).style.display = 'block';
+        }
+
+        function clearErrors() {
+            const errorMessages = document.querySelectorAll('.error-message');
+            errorMessages.forEach(function (error) {
+                error.style.display = 'none';
+            });
+
+            const inputFields = document.querySelectorAll('.form-control');
+            inputFields.forEach(function (input) {
+                input.classList.remove('error');
+            });
+        }
+
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+    </script>
 
     <!-- Vendor JS Files -->
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>

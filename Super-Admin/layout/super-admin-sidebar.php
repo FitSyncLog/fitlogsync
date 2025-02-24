@@ -28,29 +28,21 @@
     </li>
 
 
-    <li class="nav-item <?php if (in_array($current_page, ['manage-home.php', 'manage-facilities.php', 'manage-reviews.php', 'manage-instructors.php', 'manage-pricing.php', 'faqs.php', 'manage-contacts.php']))
+    <li class="nav-item <?php if (in_array($current_page, ['manage-home.php', 'manage-faqs.php', 'manage-contacts.php']))
         echo 'active'; ?>">
-        <a class="nav-link collapsed <?php if (in_array($current_page, ['manage-home.php', 'manage-facilities.php', 'manage-reviews.php', 'manage-instructors.php', 'manage-pricing.php', 'faqs.php', 'manage-contacts.php']))
+        <a class="nav-link collapsed <?php if (in_array($current_page, ['manage-home.php', 'manage-facilities.php', 'manage-faqs.php', 'manage-contacts.php']))
             echo ''; ?>" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true"
             aria-controls="collapseUtilities">
             <i class="fas fa-fw fa-wrench"></i>
             <span>Manage Landing Page</span>
         </a>
-        <div id="collapseUtilities" class="collapse <?php if (in_array($current_page, ['manage-home.php', 'manage-facilities.php', 'manage-reviews.php', 'manage-instructors.php', 'manage-pricing.php', 'faqs.php', 'manage-contacts.php']))
+        <div id="collapseUtilities" class="collapse <?php if (in_array($current_page, ['manage-home.php', 'manage-faqs.php', 'manage-contacts.php']))
             echo 'show'; ?>" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item <?php if ($current_page == 'manage-home.php')
                     echo 'active text-warning'; ?>" href="manage-home.php">Home</a>
-                <a class="collapse-item <?php if ($current_page == 'manage-facilities.php')
-                    echo 'active text-warning'; ?>" href="manage-facilities.php">Facilities</a>
-                <a class="collapse-item <?php if ($current_page == 'manage-reviews.php')
-                    echo 'active text-warning'; ?>" href="manage-reviews.php">Reviews</a>
-                <a class="collapse-item <?php if ($current_page == 'manage-instructors.php')
-                    echo 'active text-warning'; ?>" href="manage-instructors.php">Instructors</a>
-                <a class="collapse-item <?php if ($current_page == 'manage-pricing.php')
-                    echo 'active text-warning'; ?>" href="manage-pricing.php">Pricing</a>
-                <a class="collapse-item <?php if ($current_page == 'faqs.php')
-                    echo 'active text-warning'; ?>" href="faqs.php">F.A.Qs</a>
+                <a class="collapse-item <?php if ($current_page == 'manage-faqs.php')
+                    echo 'active text-warning'; ?>" href="manage-faqs.php">F.A.Qs</a>
                 <a class="collapse-item <?php if ($current_page == 'manage-contacts.php')
                     echo 'active text-warning'; ?>" href="manage-contacts.php">Contact</a>
             </div>
