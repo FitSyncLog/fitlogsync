@@ -100,6 +100,21 @@
   }
   ?>
 
+<?php
+  if (isset($_GET['accountBanned'])) {
+    $message = htmlspecialchars($_GET['accountBanned']);
+    echo "<script>
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: '{$message}',
+          showConfirmButton: false,
+          timer: 1500
+        });
+    </script>";
+  }
+  ?>
+
   <?php
   if (isset($_GET['LoginFirst'])) {
     $message = htmlspecialchars($_GET['LoginFirst']);

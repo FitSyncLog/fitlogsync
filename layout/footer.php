@@ -34,7 +34,7 @@ if ($result->num_rows > 0) {
                 <ul>
                     <li><i class="bi bi-chevron-right"></i> <a href="./#welcome">Home</a></li>
                     <li><i class="bi bi-chevron-right"></i> <a href="./#about">About us</a></li>
-                    <li><i class="bi bi-chevron-right"></i> <a href="./#facilities">Facilities</a></li>
+                    <li><i class="bi bi-chevron-right"></i> <a href="./#facilities">Facilities and Amenities</a></li>
                     <li><i class="bi bi-chevron-right"></i> <a href="./#instructors">Instructors</a></li>
                     <li><i class="bi bi-chevron-right"></i> <a href="./#pricing">Pricing</a></li>
                     <li><i class="bi bi-chevron-right"></i> <a href="./#contact">Contact</a></li>

@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result_new_message = mysqli_stmt_execute($stmt_new_message);
 
         if ($result_new_message) {
-            header("Location: ..?Success=Your message has been send, please wait for our reply.#contact");
+            header("Location: ..?Success=Your message has been send, please wait for our replyj.#contact");
             exit();
         } else {
             header("Location: ..?Failed=Unexpected error.#contact");

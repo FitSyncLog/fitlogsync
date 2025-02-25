@@ -58,14 +58,13 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                         <div class="row">
 
                             <?php
-
                             // Query to count the number of members
-                            $sql = "SELECT COUNT(*) AS total_members FROM user_roles WHERE role = 'Member'";
-                            $result = mysqli_query($conn, $sql);
+                            $sql_members = "SELECT COUNT(*) AS total_members FROM user_roles WHERE role = 'Member'";
+                            $result_members = mysqli_query($conn, $sql_members);
 
-                            if ($result) {
-                                $row = mysqli_fetch_assoc($result);
-                                $total_members = $row['total_members'];
+                            if ($result_members) {
+                                $row_members = mysqli_fetch_assoc($result_members);
+                                $total_members = $row_members['total_members'];
                             } else {
                                 $total_members = 0; // Fallback in case of an error
                             }
@@ -73,7 +72,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
 
                             <!-- Total Members -->
                             <div class="col-xl-3 col-md-6 mb-4">
-                                <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card border-left-warning shadow h-100 py-2">
                                     <div class="card-body">
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
@@ -82,6 +81,42 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                                                 </div>
                                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
                                                     <?php echo $total_members; ?>
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-user fa-2x text-gray-300"></i>
+                                                <!-- Changed icon to fa-user -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+
+                            <?php
+                            // Query to count the number of members
+                            $sql_instructor = "SELECT COUNT(*) AS total_members FROM user_roles WHERE role = 'Instructor'";
+                            $result_instructor = mysqli_query($conn, $sql_instructor);
+
+                            if ($result_instructor) {
+                                $row_instructor = mysqli_fetch_assoc($result_instructor);
+                                $total_instructor = $row_instructor['total_members'];
+                            } else {
+                                $total_instructor = 0; // Fallback in case of an error
+                            }
+                            ?>
+                            <!-- Total Members -->
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-left-warning shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                    Total Instructors
+                                                </div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                    <?php echo $total_instructor; ?>
                                                 </div>
                                             </div>
                                             <div class="col-auto">

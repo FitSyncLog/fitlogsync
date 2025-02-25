@@ -242,8 +242,8 @@ if ($result->num_rows > 0) {
 
             <!-- Section Title -->
             <div class="container section-title" data-aos="fade-up">
-                <h2>Facilities</h2>
-                <p><span>Check Our</span> <span class="description-title">Facilities</span></p>
+                <h2>Facilities and Amenities</h2>
+                <p><span>Check Our</span> <span class="description-title">Facilities and Amenities</span></p>
             </div><!-- End Section Title -->
 
             <div class="container">

@@ -27,6 +27,45 @@
         </a>
     </li>
 
+    <!-- Manage Instructor -->
+    <li class="nav-item <?php if ($current_page == 'manage-instructors.php')
+        echo 'active'; ?>">
+        <a class="nav-link <?php if ($current_page == 'manage-instructors.php')
+            echo 'bg-white text-dark'; ?>" href="manage-instructors.php">
+            <i class="fas fa-chalkboard-teacher <?php if ($current_page == 'manage-instructors.php')
+                echo 'text-dark'; ?>"></i>
+            <span>Manage Instructors</span>
+        </a>
+    </li>
+
+
+    <li class="nav-item <?php if (in_array($current_page, ['manage-members.php', 'edit-member.php', 'create-new-member.php', 'manage-active-members.php', 'manage-pending-members.php', 'manage-banned-members.php', 'manage-suspended-members.php']))
+        echo 'active'; ?>">
+        <a class="nav-link collapsed <?php if (in_array($current_page, ['manage-members.php', 'create-new-member.php', 'manage-active-members.php', 'manage-pending-members.php', 'manage-banned-members.php', 'manage-suspended-members.php']))
+            echo ''; ?>" href="manage-members.php" data-toggle="collapse" data-target="#collapseMembers"
+            aria-expanded="true" aria-controls="collapseMembers">
+            <i class="fas fa-fw fa-users"></i>
+            <span>Manage Members</span>
+        </a>
+        <div id="collapseMembers" class="collapse <?php if (in_array($current_page, ['manage-members.php', 'edit-member.php', 'create-new-member.php', 'manage-active-members.php', 'manage-pending-members.php', 'manage-banned-members.php', 'manage-suspended-members.php']))
+            echo 'show'; ?>" aria-labelledby="headingMembers" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item <?php if ($current_page == 'manage-members.php' || 'create-new-member.php')
+                    echo 'active text-warning'; ?>" href="manage-members.php">All Members</a>
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item <?php if ($current_page == 'manage-pending-members.php')
+                        echo 'active text-warning'; ?>" href="manage-pending-members.php">Pending Members</a>
+                    <a class="collapse-item <?php if ($current_page == 'manage-active-members.php')
+                        echo 'active text-warning'; ?>" href="manage-active-members.php">Active Members</a>
+                    <a class="collapse-item <?php if ($current_page == 'manage-banned-members.php')
+                        echo 'active text-warning'; ?>" href="manage-banned-members.php">Banned Members</a>
+                    <a class="collapse-item <?php if ($current_page == 'manage-suspended-members.php')
+                        echo 'active text-warning'; ?>" href="manage-suspended-members.php">Suspended Members</a>
+                </div>
+            </div>
+    </li>
+
+
 
     <li class="nav-item <?php if (in_array($current_page, ['manage-home.php', 'manage-faqs.php', 'manage-contacts.php']))
         echo 'active'; ?>">

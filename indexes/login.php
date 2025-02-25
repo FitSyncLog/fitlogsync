@@ -58,11 +58,22 @@ if (isset($_POST['login'])) {
                 $_SESSION['status'] = $row['status'];
                 $_SESSION['profile_image'] = $row['profile_image'];
 
+                $status = $row['status'];
+
                 // Redirect based on role
                 switch ($role) {
                     case 'Member':
-                        header("Location: ../Member/dashboard.php");
-                        exit;
+
+                        if ($status == "Banned") {
+                            header("Location: ../login.php?accountBanned=This account was banned, please visit the front desk. Thank you");
+                            exit;
+                        } else if ($status == "Suspended") {
+                            header("Location: ../login.php?accountBanned=This account was suspended, please visit the front desk. Thank you");
+                            exit;
+                        } else {
+                            header("Location: ../Member/dashboard.php");
+                            exit;
+                        }
                     case 'Instructor':
                         header("Location: ../Instructor/dashboard.php");
                         exit;

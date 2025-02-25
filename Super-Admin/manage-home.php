@@ -113,8 +113,8 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                 aria-labelledby="changeVideoModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="changeVideoModalLabel"><strong>Change Video</strong></h5>
+                        <div class="modal-header bg-warning text-white">
+                            <h5 class="modal-title" id="changeVideoModalLabel">Change Video</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>

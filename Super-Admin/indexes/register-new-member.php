@@ -1,6 +1,6 @@
 <?php
 session_start();
-require "db_con.php";
+require "../../indexes/db_con.php";
 
 // Enable error reporting
 error_reporting(E_ALL);
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     $contact_person = mb_convert_case(validate($_POST['contact_person'] ?? ''), MB_CASE_TITLE, "UTF-8");
     $contact_number = validate($_POST['contact_number'] ?? '');
     $relationship = validate($_POST['relationship'] ?? '');
-    $enrolled_by = "Online Registration";
+    $enrolled_by = $_SESSION['firstname'] . ' ' . $_SESSION['middlename'] . ' ' . $_SESSION['lastname'];
 
     $user_data = 'username=' . $username .
         '&lastname=' . $lastname .
@@ -124,27 +124,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     // Validate required fields
     if (empty($username) || empty($lastname) || empty($firstname) || empty($dateofbirth) || empty($gender) || empty($address) || empty($phonenumber) || empty($email) || empty($password) || empty($confirm_password)) {
         $error_message = "All fields are required except middle name.";
-        header("Location: ../register.php?error=" . urlencode($error_message));
+        header("Location: ../create-new-member.php?error=" . urlencode($error_message));
         exit();
     }
 
     // Validate email and phone number
     if (!isValidEmail($email)) {
         $error_message = "Invalid email address.";
-        header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
+        header("Location: ../create-new-member.php?error=" . urlencode($error_message) . "&" . $user_data);
         exit();
     }
 
     if (!isValidPhoneNumber($phonenumber)) {
         $error_message = "Phone number must be 11 digits and start with '09'.";
-        header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
+        header("Location: ../create-new-member.php?error=" . urlencode($error_message) . "&" . $user_data);
         exit();
     }
 
     // Validate password match
     if ($password !== $confirm_password) {
         $error_message = "Passwords do not match.";
-        header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
+        header("Location: ../create-new-member.php?error=" . urlencode($error_message) . "&" . $user_data);
         exit();
     }
 
@@ -159,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
     // Set registration date and status
     $registration_date = date('Y-m-d');
-    $status = "Pending";
+    $status = "Verified";
     $role = "Member";
 
     // Check if username already exists
@@ -170,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     $result_check_username = mysqli_stmt_get_result($stmt_check_username);
 
     if (mysqli_num_rows($result_check_username) > 0) {
-        header("Location: ../register.php?username_already_exist=Username already exists&" . $user_data);
+        header("Location: ../create-new-member.php?username_already_exist=Username already exists&" . $user_data);
         exit();
     }
 
@@ -182,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     $result_check_email = mysqli_stmt_get_result($stmt_check_email);
 
     if (mysqli_num_rows($result_check_email) > 0) {
-        header("Location: ../register.php?email_already_taken=Email is already taken.&" . $user_data);
+        header("Location: ../create-new-member.php?email_already_taken=Email is already taken.&" . $user_data);
         exit();
     }
 
@@ -197,13 +197,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     } while (mysqli_num_rows($result_check_account) > 0);
 
     // Insert data into the users table
-    $sql_new_user = "INSERT INTO users (username, firstname, middlename, lastname, date_of_birth, password, gender, phone_number, email, address, enrolled_by verification_code, v_code_expiration, status, registration_date, account_number)
+    $sql_new_user = "INSERT INTO users (username, firstname, middlename, lastname, date_of_birth, password, gender, phone_number, email, address, enrolled_by, verification_code, v_code_expiration, status, registration_date, account_number)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt_new_user_query = mysqli_prepare($conn, $sql_new_user);
 
     if ($stmt_new_user_query === false) {
         $error_message = "Failed to prepare the SQL statement.";
-        header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
+        header("Location: ../create-new-member.php?error=" . urlencode($error_message) . "&" . $user_data);
         exit();
     }
 
@@ -220,7 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         if ($stmt_medical_background === false) {
             $error_message = "Failed to prepare the SQL statement for medical background.";
-            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
+            header("Location: ../create-new-member.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
@@ -229,7 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         if (!$result_medical_background) {
             $error_message = "Failed to insert medical background data.";
-            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
+            header("Location: ../create-new-member.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
@@ -240,7 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         if ($stmt_waiver_agreements === false) {
             $error_message = "Failed to prepare the SQL statement for waiver agreements.";
-            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
+            header("Location: ../create-new-member.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
@@ -249,7 +249,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         if (!$result_waiver_agreements) {
             $error_message = "Failed to insert waiver agreements data.";
-            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
+            header("Location: ../create-new-member.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
@@ -260,7 +260,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         if ($stmt_emergency_contact === false) {
             $error_message = "Failed to prepare the SQL statement for emergency contact.";
-            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
+            header("Location: ../create-new-member.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
@@ -269,7 +269,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         if (!$result_emergency_contact) {
             $error_message = "Failed to insert emergency contact data.";
-            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
+            header("Location: ../create-new-member.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
@@ -280,7 +280,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         if ($stmt_user_role === false) {
             $error_message = "Failed to prepare the SQL statement for user role.";
-            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
+            header("Location: ../create-new-member.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
@@ -289,23 +289,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         if (!$result_user_role) {
             $error_message = "Failed to insert user role data.";
-            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
+            header("Location: ../create-new-member.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
         // Registration successful
-        header("Location: ../login.php?registrationSuccess=Registration successful!");
+        header("Location: ../create-new-member.php?Success=Successfully created a new member!");
         exit();
     } else {
         // Registration failed
-        header("Location: ../login.php?registrationFailed=Database error!");
+        header("Location: ../create-new-member.php?Failed=Database error!");
         exit();
     }
 
     mysqli_stmt_close($stmt_new_user_query);
     mysqli_close($conn);
 } else {
-    header("Location: ../register.php?register=Please fill out the form below.");
+    header("Location: ../../login.php?register=Please fill out the form below.");
     exit();
 }
 ?>

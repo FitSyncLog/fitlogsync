@@ -162,7 +162,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                                     aria-labelledby="editFAQModalLabel<?php echo $id; ?>" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered modal-lg">
                                         <div class="modal-content">
-                                            <div class="modal-header">
+                                            <div class="modal-header bg-warning text-white">
                                                 <h5 class="modal-title" id="editFAQModalLabel<?php echo $id; ?>">Edit FAQ</h5>
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
@@ -197,7 +197,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                                     aria-labelledby="deleteFAQModalLabel<?php echo $id; ?>" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered modal-lg">
                                         <div class="modal-content">
-                                            <div class="modal-header">
+                                            <div class="modal-header bg-danger text-white">
                                                 <h5 class="modal-title" id="deleteFAQModalLabel<?php echo $id; ?>">Delete FAQ</h5>
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
@@ -238,7 +238,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
         <div class="modal fade" id="addFAQModal" tabindex="-1" aria-labelledby="addFAQModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="modal-header bg-warning text-white">
                         <h5 class="modal-title" id="addFAQModalLabel">Add FAQ</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -270,7 +270,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
         </a>
 
         <script src="../vendor/jquery/jquery.min.js"></script>
-        <script src="../vendor/bootstrap/js/boitstrap.bundle.min.js"></script>
+        <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
         <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
         <script src="../js/sb-admin-2.min.js"></script>
         <script src="../vendor/chart.js/Chart.min.js"></script>

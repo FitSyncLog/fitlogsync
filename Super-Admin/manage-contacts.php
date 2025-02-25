@@ -173,8 +173,8 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                             aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="addressModalLabel"><strong>Edit Address</strong></h5>
+                                    <div class="modal-header bg-warning text-white">
+                                        <h5 class="modal-title" id="addressModalLabel">Edit Address</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
@@ -218,8 +218,8 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                             aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="phoneModalLabel"><strong>Edit Phone Number</strong></h5>
+                                    <div class="modal-header bg-warning text-white">
+                                        <h5 class="modal-title" id="phoneModalLabel">Edit Phone Number</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
@@ -266,8 +266,8 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                             aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="emailModalLabel"><strong>Edit Email</strong></h5>
+                                    <div class="modal-header bg-warning text-white">
+                                        <h5 class="modal-title" id="emailModalLabel">Edit Email</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
@@ -311,8 +311,8 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                             aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="twitterModalLabel"><strong>Edit Twitter Link</strong>
+                                    <div class="modal-header bg-warning text-white">
+                                        <h5 class="modal-title" id="twitterModalLabel">Edit Twitter Link
                                         </h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
@@ -358,8 +358,8 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                             aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="facebookModalLabel"><strong>Edit Facebook Link</strong>
+                                    <div class="modal-header bg-warning text-white">
+                                        <h5 class="modal-title" id="facebookModalLabel">Edit Facebook Link
                                         </h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
@@ -405,9 +405,9 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                             aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="instagramModalLabel"><strong>Edit Instagram
-                                                Link</strong></h5>
+                                    <div class="modal-header bg-warning text-white">
+                                        <h5 class="modal-title" id="instagramModalLabel">Edit Instagram
+                                                Link</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
@@ -451,8 +451,8 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                             aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="youtubeModalLabel"><strong>Edit YouTube Link</strong>
+                                    <div class="modal-header bg-warning text-white">
+                                        <h5 class="modal-title" id="youtubeModalLabel">Edit YouTube Link
                                         </h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
@@ -497,8 +497,8 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                             aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="tiktokModalLabel"><strong>Edit TikTok Link</strong></h5>
+                                    <div class="modal-header bg-warning text-white">
+                                        <h5 class="modal-title" id="tiktokModalLabel">Edit TikTok Link</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
