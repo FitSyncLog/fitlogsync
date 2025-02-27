@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
-import '../login_screen.dart';
-import '../profile_screen.dart'; // Import the ProfileScreen
+import '../../auth/login_screen.dart';
+import '../profile/profile_screen.dart'; // Import the ProfileScreen
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'dashboard.dart';
+import '../views/member/dashboard.dart';
 import 'dart:convert';
 import 'dart:ui';
-import 'admin/admin_dashboard.dart';
-import 'instructor/instructor_dashboard.dart';
-import 'front_desk/front_desk_dashboard.dart';
+import '../views/super_admin/super_admin_dashboard.dart';
+import '../views/admin/admin_dashboard.dart';
+import '../views/instructor/instructor_dashboard.dart';
+import '../views/front_desk/front_desk_dashboard.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '/controller/auth_controller.dart';
 
@@ -127,7 +128,12 @@ class _LoginScreenState extends State<LoginScreen> {
         }
 
         if (mounted) {
-          if (responseData["roles"] != null && responseData["roles"].contains("Admin")) {
+          if (responseData["roles"] != null && responseData["roles"].contains("Super Admin")) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const SuperAdminDashboardScreen()),
+            );
+          } else if (responseData["roles"] != null && responseData["roles"].contains("Admin")) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),

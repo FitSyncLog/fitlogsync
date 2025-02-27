@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '/main.dart'; // Import MyApp from main.dart
-import 'profile_screen.dart'; // Import the ProfileScreen
+import '../profile/profile_screen.dart'; // Import the ProfileScreen
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
