@@ -15,7 +15,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
     $result_update_status = mysqli_stmt_execute($stmt_update_status);
 
     if ($result_update_status) {
-        header("Location: ../manage-members.php?Success=Status successfully updated");
+        header("Location: ../manage-members.php?Success=Account Status successfully updated to " . $status);
         exit();
     } else {
         header("Location: ../manage-members.php?Failed=Failed to update status");

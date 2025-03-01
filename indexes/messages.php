@@ -4,10 +4,12 @@ session_start();
 include "db_con.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    date_default_timezone_set("Asia/Manila");
     $name = $_POST['name'] ?? '';
     $email = $_POST['email'] ?? '';
     $subject = $_POST['subject'] ?? '';
     $message = $_POST['message'] ?? '';
+    $date_and_time = date("Y-m-d H:i:s");
 
 
     if (empty($name)) {
@@ -24,9 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     } else {
 
-        $sql_new_message = "INSERT INTO messages (name, email, subject, message) VALUES (?, ?, ?, ?)";
+        $sql_new_message = "INSERT INTO messages (name, email, subject, message, date_and_time) VALUES (?, ?, ?, ?, ?)";
         $stmt_new_message = mysqli_prepare($conn, $sql_new_message);
-        mysqli_stmt_bind_param($stmt_new_message, "ssss", $name, $email, $subject, $message);
+        mysqli_stmt_bind_param($stmt_new_message, "sssss", $name, $email, $subject, $message, $date_and_time);
         $result_new_message = mysqli_stmt_execute($stmt_new_message);
 
         if ($result_new_message) {

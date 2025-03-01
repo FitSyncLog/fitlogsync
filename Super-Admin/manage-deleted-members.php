@@ -11,7 +11,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>Manage All Members | FiT-LOGSYNC</title>
+        <title>Manage Deleted Members | FiT-LOGSYNC</title>
         <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
         <link
             href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
@@ -66,7 +66,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                     <?php include 'layout/super-admin-navbar.php'; ?>
                     <div class="container-fluid">
                         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                            <h1 class="h3 mb-0 text-gray-800">Manage All Members</h1>
+                            <h1 class="h3 mb-0 text-gray-800">Manage Deleted Members</h1>
                             <a class="btn btn-warning" href="create-new-member.php">Add New Member</a>
                         </div>
 
@@ -80,7 +80,6 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                                                 <th class="text-center">Name</th>
                                                 <th class="text-center">Gender</th>
                                                 <th class="text-center">Date of Birth</th>
-                                                <th class="text-center">Account Status</th>
                                                 <th class="text-center">Subscription Status</th>
                                                 <th class="text-center">Registration Date</th>
                                                 <th class="text-center">Action</th>
@@ -88,7 +87,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                                         </thead>
 
                                         <?php
-                                        $query = "SELECT users.* FROM users JOIN user_roles ON users.user_id = user_roles.user_id WHERE user_roles.role = 'Member' AND users.status !='Delete'";
+                                        $query = "SELECT users.* FROM users JOIN user_roles ON users.user_id = user_roles.user_id WHERE user_roles.role = 'Member' AND users.status = 'Delete'";
                                         $result = mysqli_query($conn, $query);
 
                                         if (!$result) {
@@ -119,29 +118,6 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                                                         $dob = $row['date_of_birth'];
                                                         echo htmlspecialchars(date("F j, Y", strtotime($dob)));
                                                         ?>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <?php
-                                                        $status = htmlspecialchars($row['status']);
-                                                        $badgeClass = '';
-
-                                                        switch ($status) {
-                                                            case 'Active':
-                                                                $badgeClass = 'badge-success';
-                                                                break;
-                                                            case 'Pending':
-                                                                $badgeClass = 'badge-warning';
-                                                                break;
-                                                            case 'Suspended':
-                                                            case 'Banned':
-                                                                $badgeClass = 'badge-danger';
-                                                                break;
-                                                            default:
-                                                                $badgeClass = 'badge-light';
-                                                        }
-                                                        ?>
-                                                        <span
-                                                            class="badge <?php echo $badgeClass; ?>"><?php echo $status; ?></span>
                                                     </td>
                                                     <td class="text-center">
                                                         <?php

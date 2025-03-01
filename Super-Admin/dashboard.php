@@ -1,13 +1,13 @@
 <?php
 session_start();
 include "../indexes/db_con.php";
+
 if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
     ?>
     <!DOCTYPE html>
     <html lang="en">
 
     <head>
-
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -26,7 +26,6 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
         <link href="../css/sb-admin-2.min.css" rel="stylesheet">
 
         <link rel="icon" type="image/x-icon" href="../assets/fitlogsync.ico">
-
     </head>
 
     <body id="page-top">
@@ -42,33 +41,21 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                 <!-- Main Content -->
                 <div id="content">
 
-
                     <?php include 'layout/super-admin-navbar.php'; ?>
 
                     <!-- Begin Page Content -->
                     <div class="container-fluid">
 
-
                         <!-- Page Heading -->
                         <div class="d-sm-flex align-items-center justify-content-between mb-4">
                             <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+                            <div class="text-right">
+                                <p class="text-gray-600" id="currentDateTime"></p>
+                            </div>
                         </div>
 
                         <!-- Content Row -->
                         <div class="row">
-
-                            <?php
-                            // Query to count the number of members
-                            $sql_members = "SELECT COUNT(*) AS total_members FROM user_roles WHERE role = 'Member'";
-                            $result_members = mysqli_query($conn, $sql_members);
-
-                            if ($result_members) {
-                                $row_members = mysqli_fetch_assoc($result_members);
-                                $total_members = $row_members['total_members'];
-                            } else {
-                                $total_members = 0; // Fallback in case of an error
-                            }
-                            ?>
 
                             <!-- Total Members -->
                             <div class="col-xl-3 col-md-6 mb-4">
@@ -79,34 +66,24 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                                     Total Members
                                                 </div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                    <?php echo $total_members; ?>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-members">
+                                                    <?php
+                                                    $sql_members = "SELECT COUNT(*) AS total_members FROM user_roles WHERE role = 'Member'";
+                                                    $result_members = mysqli_query($conn, $sql_members);
+                                                    $row_members = mysqli_fetch_assoc($result_members);
+                                                    echo $row_members['total_members'];
+                                                    ?>
                                                 </div>
                                             </div>
                                             <div class="col-auto">
                                                 <i class="fas fa-user fa-2x text-gray-300"></i>
-                                                <!-- Changed icon to fa-user -->
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            
-
-                            <?php
-                            // Query to count the number of members
-                            $sql_instructor = "SELECT COUNT(*) AS total_members FROM user_roles WHERE role = 'Instructor'";
-                            $result_instructor = mysqli_query($conn, $sql_instructor);
-
-                            if ($result_instructor) {
-                                $row_instructor = mysqli_fetch_assoc($result_instructor);
-                                $total_instructor = $row_instructor['total_members'];
-                            } else {
-                                $total_instructor = 0; // Fallback in case of an error
-                            }
-                            ?>
-                            <!-- Total Members -->
+                            <!-- Total Instructors -->
                             <div class="col-xl-3 col-md-6 mb-4">
                                 <div class="card border-left-warning shadow h-100 py-2">
                                     <div class="card-body">
@@ -115,13 +92,70 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
                                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                                     Total Instructors
                                                 </div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                    <?php echo $total_instructor; ?>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-instructor">
+                                                    <?php
+                                                    $sql_instructor = "SELECT COUNT(*) AS total_members FROM user_roles WHERE role = 'Instructor'";
+                                                    $result_instructor = mysqli_query($conn, $sql_instructor);
+                                                    $row_instructor = mysqli_fetch_assoc($result_instructor);
+                                                    echo $row_instructor['total_members'];
+                                                    ?>
                                                 </div>
                                             </div>
                                             <div class="col-auto">
-                                                <i class="fas fa-user fa-2x text-gray-300"></i>
-                                                <!-- Changed icon to fa-user -->
+                                                <i class="fas fa-chalkboard-teacher fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Active Members Today -->
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-left-warning shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                    Active Subscription Today
+                                                </div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="active-member">
+                                                    <?php
+                                                    $current_date = date("Y-m-d");
+                                                    $sub_query = "SELECT user_id FROM subscription WHERE starting_date <= '$current_date' AND expiration_date >= '$current_date'";
+                                                    $sub_result = mysqli_query($conn, $sub_query);
+                                                    echo mysqli_num_rows($sub_result);
+                                                    ?>
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Total Visit -->
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-left-warning shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                    Total Visit
+                                                </div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-visit">
+                                                    <?php
+                                                    $today = date("Y-m-d");
+                                                    $query = "SELECT COUNT(*) AS total_in FROM attendance_log WHERE transaction_type = 'IN' AND DATE(transaction_time) = '$today'";
+                                                    $result = mysqli_query($conn, $query);
+                                                    $row = mysqli_fetch_assoc($result);
+                                                    echo $row['total_in'];
+                                                    ?>
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-shoe-prints fa-2x text-gray-300"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -145,6 +179,50 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
             <i class="fas fa-angle-up"></i>
         </a>
 
+        <!-- JavaScript for Dynamic Date and Time -->
+        <script>
+            function updateDateTime() {
+                const now = new Date();
+                const options = {
+                    weekday: 'long', year: 'numeric', month: 'long',
+                    day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
+                };
+                const formattedDate = now.toLocaleDateString('en-US', options);
+                document.getElementById('currentDateTime').innerText = formattedDate;
+            }
+
+            // Initial call
+            updateDateTime();
+
+            // Update every second
+            setInterval(updateDateTime, 1000);
+        </script>
+
+        <!-- JavaScript for Live Updates -->
+        <script>
+            function fetchDashboardData() {
+                fetch('fetch_dashboard_data.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.error) {
+                            // Update the DOM with new data
+                            document.getElementById('total-members').innerText = data.total_members;
+                            document.getElementById('total-instructor').innerText = data.total_instructor;
+                            document.getElementById('active-member').innerText = data.activeMember;
+                            document.getElementById('total-visit').innerText = data.totalVisit;
+                        } else {
+                            console.error(data.error);
+                        }
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            }
+
+            setInterval(fetchDashboardData, 1000);
+
+            // Initial fetch
+            fetchDashboardData();
+        </script>
+
         <!-- Bootstrap core JavaScript-->
         <script src="../vendor/jquery/jquery.min.js"></script>
         <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -161,7 +239,6 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Super Admin') {
         <!-- Page level custom scripts -->
         <script src="../js/demo/chart-area-demo.js"></script>
         <script src="../js/demo/chart-pie-demo.js"></script>
-
 
     </body>
 

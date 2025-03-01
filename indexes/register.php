@@ -1,6 +1,7 @@
 <?php
 session_start();
 require "db_con.php";
+require "../phpqrcode/qrlib.php"; // Include the QR code library
 
 // Enable error reporting
 error_reporting(E_ALL);
@@ -37,9 +38,9 @@ function generateAccountNumber($conn)
     $random = str_pad(mt_rand(0, 9999), 4, '0', STR_PAD_LEFT);
 
     // Get the last increment number for the current month
-    $sql = "SELECT MAX(SUBSTRING(account_number, 13, 4)) AS last_increment 
-            FROM users 
-            WHERE SUBSTRING(account_number, 1, 4) = ? 
+    $sql = "SELECT MAX(SUBSTRING(account_number, 13, 4)) AS last_increment
+            FROM users
+            WHERE SUBSTRING(account_number, 1, 4) = ?
             AND SUBSTRING(account_number, 5, 4) = ?";
     $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "ss", $year, $monthFormatted);
@@ -197,7 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     } while (mysqli_num_rows($result_check_account) > 0);
 
     // Insert data into the users table
-    $sql_new_user = "INSERT INTO users (username, firstname, middlename, lastname, date_of_birth, password, gender, phone_number, email, address, enrolled_by verification_code, v_code_expiration, status, registration_date, account_number)
+    $sql_new_user = "INSERT INTO users (username, firstname, middlename, lastname, date_of_birth, password, gender, phone_number, email, address, enrolled_by, verification_code, v_code_expiration, status, registration_date, account_number)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt_new_user_query = mysqli_prepare($conn, $sql_new_user);
 
@@ -292,6 +293,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
             header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
+
+        
+        // Generate QR code with higher resolution
+        $qrCodePath = "../qr_codes/{$accountNumber}.png";
+        $moduleSize = 50; // Size of each module in pixels (adjust as needed)
+        QRcode::png($accountNumber, $qrCodePath, 'L', $moduleSize, 2);
 
         // Registration successful
         header("Location: ../login.php?registrationSuccess=Registration successful!");

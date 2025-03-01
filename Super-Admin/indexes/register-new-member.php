@@ -1,6 +1,7 @@
 <?php
 session_start();
 require "../../indexes/db_con.php";
+require "../../phpqrcode/qrlib.php";
 
 // Enable error reporting
 error_reporting(E_ALL);
@@ -159,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
     // Set registration date and status
     $registration_date = date('Y-m-d');
-    $status = "Verified";
+    $status = "Pending";
     $role = "Member";
 
     // Check if username already exists
@@ -292,6 +293,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
             header("Location: ../create-new-member.php?error=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
+
+        $qrCodePath = "../../qr_codes/{$accountNumber}.png";
+        $moduleSize = 50; 
+        QRcode::png($accountNumber, $qrCodePath, 'L', $moduleSize, 2);
 
         // Registration successful
         header("Location: ../create-new-member.php?Success=Successfully created a new member!");

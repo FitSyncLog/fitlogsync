@@ -269,7 +269,7 @@ if ($result->num_rows > 0) {
                                 <i class="bi bi-wifi"></i>
                             </div>
                             <a class="stretched-link">
-                                <h3>Free Wi-Fi</h3>
+                                <h3>Free Wi-Fi Access</h3>
                             </a>
                             <p>Stay connected while you work out! Enjoy complimentary high-speed Wi-Fi throughout the
                                 gym, perfect for streaming music, following workout videos, or staying in touch.
@@ -325,7 +325,7 @@ if ($result->num_rows > 0) {
                                 <i class="bi bi-flower1"></i>
                             </div>
                             <a class="stretched-link">
-                                <h3>Yoga Area</h3>
+                                <h3>Dedicated Yoga Area</h3>
                             </a>
                             <p>Find your balance and inner peace with our Yoga classes, designed to improve flexibility,
                                 strength, and mindfulness. Suitable for all levels, from beginners to seasoned yogis.
@@ -340,10 +340,39 @@ if ($result->num_rows > 0) {
                                 <i class="bi bi-lightning"></i>
                             </div>
                             <a class="stretched-link">
-                                <h3>Boxing Ring</h3>
+                                <h3>Professional Boxing Ring</h3>
                             </a>
                             <p>Unleash your power in our Boxing sessions! Build strength, improve endurance, and master
                                 techniques while burning calories in a high-energy environment.
+                            </p>
+                            <a class="stretched-link"></a>
+                        </div>
+                    </div><!-- End Service Item -->
+
+                    <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
+                        <div class="service-item position-relative">
+                            <div class="icon">
+                                <i class="bi bi-hourglass-split"></i>
+                            </div>
+                            <a class="stretched-link">
+                                <h3>Unlimited Gym Access</h3>
+                            </a>
+                            <p>Enjoy the freedom to work out anytime during operating hours with no limits on your
+                                visits.
+                            </p>
+                            <a class="stretched-link"></a>
+                        </div>
+                    </div><!-- End Service Item -->
+
+                    <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
+                        <div class="service-item position-relative">
+                            <div class="icon">
+                                <i class="bi bi-person-check"></i>
+                            </div>
+                            <a class="stretched-link">
+                                <h3>Professional & Friendly Staff</h3>
+                            </a>
+                            <p>Our certified trainers and approachable staff are here to guide and support you every step of the way.
                             </p>
                             <a class="stretched-link"></a>
                         </div>

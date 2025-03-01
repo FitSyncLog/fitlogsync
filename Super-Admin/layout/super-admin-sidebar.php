@@ -39,15 +39,15 @@
     </li>
 
 
-    <li class="nav-item <?php if (in_array($current_page, ['manage-members.php', 'edit-member.php', 'create-new-member.php', 'manage-active-members.php', 'manage-pending-members.php', 'manage-banned-members.php', 'manage-suspended-members.php']))
+    <li class="nav-item <?php if (in_array($current_page, ['manage-members.php', 'edit-member.php', 'create-new-member.php', 'manage-active-members.php', 'manage-pending-members.php', 'manage-banned-members.php', 'manage-suspended-members.php', 'manage-deleted-members.php']))
         echo 'active'; ?>">
-        <a class="nav-link collapsed <?php if (in_array($current_page, ['manage-members.php', 'create-new-member.php', 'manage-active-members.php', 'manage-pending-members.php', 'manage-banned-members.php', 'manage-suspended-members.php']))
+        <a class="nav-link collapsed <?php if (in_array($current_page, ['manage-members.php', 'create-new-member.php', 'manage-active-members.php', 'manage-pending-members.php', 'manage-banned-members.php', 'manage-suspended-members.php', 'manage-deleted-members.php']))
             echo ''; ?>" href="manage-members.php" data-toggle="collapse" data-target="#collapseMembers"
             aria-expanded="true" aria-controls="collapseMembers">
             <i class="fas fa-fw fa-users"></i>
             <span>Manage Members</span>
         </a>
-        <div id="collapseMembers" class="collapse <?php if (in_array($current_page, ['manage-members.php', 'edit-member.php', 'create-new-member.php', 'manage-active-members.php', 'manage-pending-members.php', 'manage-banned-members.php', 'manage-suspended-members.php']))
+        <div id="collapseMembers" class="collapse <?php if (in_array($current_page, ['manage-members.php', 'edit-member.php', 'create-new-member.php', 'manage-active-members.php', 'manage-pending-members.php', 'manage-banned-members.php', 'manage-suspended-members.php', 'manage-deleted-members.php']))
             echo 'show'; ?>" aria-labelledby="headingMembers" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item <?php if ($current_page == 'manage-members.php' || 'create-new-member.php')
@@ -61,6 +61,8 @@
                         echo 'active text-warning'; ?>" href="manage-banned-members.php">Banned Members</a>
                     <a class="collapse-item <?php if ($current_page == 'manage-suspended-members.php')
                         echo 'active text-warning'; ?>" href="manage-suspended-members.php">Suspended Members</a>
+                    <a class="collapse-item <?php if ($current_page == 'manage-deleted-members.php')
+                        echo 'active text-warning'; ?>" href="manage-deleted-members.php">Deleted Members</a>
                 </div>
             </div>
     </li>
@@ -70,12 +72,12 @@
     <li class="nav-item <?php if (in_array($current_page, ['manage-home.php', 'manage-faqs.php', 'manage-contacts.php']))
         echo 'active'; ?>">
         <a class="nav-link collapsed <?php if (in_array($current_page, ['manage-home.php', 'manage-facilities.php', 'manage-faqs.php', 'manage-contacts.php']))
-            echo ''; ?>" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true"
-            aria-controls="collapseUtilities">
+            echo ''; ?>" href="#" data-toggle="collapse" data-target="#collapseHelpMessages" aria-expanded="true"
+            aria-controls="collapseHelpMessages">
             <i class="fas fa-fw fa-wrench"></i>
             <span>Manage Landing Page</span>
         </a>
-        <div id="collapseUtilities" class="collapse <?php if (in_array($current_page, ['manage-home.php', 'manage-faqs.php', 'manage-contacts.php']))
+        <div id="collapseHelpMessages" class="collapse <?php if (in_array($current_page, ['manage-home.php', 'manage-faqs.php', 'manage-contacts.php']))
             echo 'show'; ?>" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item <?php if ($current_page == 'manage-home.php')
@@ -86,7 +88,29 @@
                     echo 'active text-warning'; ?>" href="manage-contacts.php">Contact</a>
             </div>
         </div>
+    </li>
 
+    <li class="nav-item <?php if (in_array($current_page, ['manage-all-help-messages.php', 'manage-read-help-messages.php', 'manage-unread-help-messages.php', 'manage-replied-help-messages.php']))
+        echo 'active'; ?>">
+        <a class="nav-link collapsed <?php if (in_array($current_page, ['manage-all-help-messages.php', 'manage-facilities.php', 'manage-read-help-messages.php', 'manage-unread-help-messages.php', 'manage-replied-help-messages.php']))
+            echo ''; ?>" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true"
+            aria-controls="collapseUtilities">
+            <i class="fa fa-envelope"></i>
+            <span>Manage Help Messages</span>
+        </a>
+        <div id="collapseUtilities" class="collapse <?php if (in_array($current_page, ['manage-all-help-messages.php', 'manage-read-help-messages.php', 'manage-unread-help-messages.php', 'manage-replied-help-messages.php']))
+            echo 'show'; ?>" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item <?php if ($current_page == 'manage-all-help-messages.php')
+                    echo 'active text-warning'; ?>" href="manage-all-help-messages.php">All Messages</a>
+                <a class="collapse-item <?php if ($current_page == 'manage-read-help-messages.php')
+                    echo 'active text-warning'; ?>" href="manage-read-help-messages.php">Read Messages</a>
+                <a class="collapse-item <?php if ($current_page == 'manage-unread-help-messages.php')
+                    echo 'active text-warning'; ?>" href="manage-unread-help-messages.php">Undread Messages</a>
+                <a class="collapse-item <?php if ($current_page == 'manage-replied-help-messages.php')
+                    echo 'active text-warning'; ?>" href="manage-replied-help-messages.php">Replied Messages</a>
+            </div>
+        </div>
     </li>
 
     <!-- Sidebar Toggler (Sidebar) -->
