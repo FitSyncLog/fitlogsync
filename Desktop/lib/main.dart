@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'views/login_screen.dart';
-import 'views/dashboard.dart';
+import 'auth/login_screen.dart';
+import 'views/member/dashboard.dart';
+import 'views/super_admin/super_admin_dashboard.dart';
 import 'views/admin/admin_dashboard.dart';
 import 'views/front_desk/front_desk_dashboard.dart';
 import 'views/instructor/instructor_dashboard.dart';
@@ -22,7 +23,9 @@ class MyApp extends StatelessWidget {
     if (rolesJson != null) {
       List<String> roles = List<String>.from(jsonDecode(rolesJson));
 
-      if (roles.contains("Admin")) {
+      if (roles.contains("Super Admin")) {
+        return const SuperAdminDashboardScreen();
+      } else if (roles.contains("Admin")) {
         return const AdminDashboardScreen();
       } else if (roles.contains("Instructor")) {
         return const InstructorDashboardScreen();

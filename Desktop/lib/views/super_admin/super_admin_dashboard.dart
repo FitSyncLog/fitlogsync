@@ -3,36 +3,52 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 import '../../auth/login_screen.dart';
 import '../profile/profile_screen.dart';
-import '../front_desk/front_desk_creating_members.dart';
+import 'super_admin_manage_members.dart';
+import 'super_admin_manage_instructors.dart';
+import '../../controller/super_admin/user_counts_controller.dart';
 
-class FrontDeskDashboardScreen extends StatefulWidget {
-  const FrontDeskDashboardScreen({super.key});
+class SuperAdminDashboardScreen extends StatefulWidget {
+  const SuperAdminDashboardScreen({super.key});
 
   @override
-  State<FrontDeskDashboardScreen> createState() =>
-      _FrontDeskDashboardScreenState();
+  State<SuperAdminDashboardScreen> createState() =>
+      _SuperAdminDashboardScreenState();
 }
 
-class _FrontDeskDashboardScreenState extends State<FrontDeskDashboardScreen> {
+class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen> {
   final FlutterSecureStorage storage = const FlutterSecureStorage();
-  bool _isLoggingOut = false;
+  final UserCountsController userCountsController = UserCountsController();
   String username = "Loading...";
   String email = "Loading...";
+  int memberCount = 0;
+  int instructorCount = 0;
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
+    _fetchCounts();
   }
 
   Future<void> _loadUserData() async {
     String? storedUsername = await storage.read(key: "username");
     String? storedEmail = await storage.read(key: "email");
-
     setState(() {
       username = storedUsername ?? "Unknown User";
       email = storedEmail ?? "Unknown Email";
     });
+  }
+
+  Future<void> _fetchCounts() async {
+    try {
+      final data = await userCountsController.fetchUserCounts();
+      setState(() {
+        memberCount = data.members;
+        instructorCount = data.instructors;
+      });
+    } catch (e) {
+      print("Error fetching counts: $e");
+    }
   }
 
   void _showLogoutDialog() {
@@ -93,20 +109,33 @@ class _FrontDeskDashboardScreenState extends State<FrontDeskDashboardScreen> {
     );
   }
 
-  void _navigateToCreateMember() {
+  void _navigateToManageMembers() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const CreateMemberScreen()),
+      MaterialPageRoute(
+        builder: (context) => const SuperAdminManageMembersScreen(),
+      ),
+    );
+  }
+
+  void _navigateToManageInstructors() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SuperAdminManageInstructorsScreen(),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<bool>(
-      future: _isAuthorized(context, "Front Desk"),
+      future: _isAuthorized(context, "Super Admin"),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
 
         if (snapshot.data == false) {
@@ -137,30 +166,20 @@ class _FrontDeskDashboardScreenState extends State<FrontDeskDashboardScreen> {
         }
 
         return Scaffold(
-          appBar: AppBar(
-            title: const Text("Font Desk Dashboard"),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.notifications),
-                onPressed: () {},
-              ),
-              IconButton(icon: const Icon(Icons.settings), onPressed: () {}),
-            ],
-          ),
+          appBar: AppBar(title: const Text("Super Admin Dashboard")),
           drawer: Drawer(
             child: ListView(
-              padding: EdgeInsets.zero,
               children: [
                 DrawerHeader(
                   decoration: const BoxDecoration(
                     color: Color.fromRGBO(255, 179, 0, 1),
                   ),
-                  child: GestureDetector(
-                    onTap: _navigateToProfile,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const CircleAvatar(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: _navigateToProfile,
+                        child: const CircleAvatar(
                           radius: 30,
                           backgroundColor: Colors.white,
                           child: Icon(
@@ -169,79 +188,64 @@ class _FrontDeskDashboardScreenState extends State<FrontDeskDashboardScreen> {
                             color: Color.fromRGBO(255, 179, 0, 1),
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        Text(
-                          username,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        username,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
                         ),
-                        Text(
-                          email,
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 14,
-                          ),
+                      ),
+                      Text(
+                        email,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
                 ListTile(
-                  leading: const Icon(Icons.dashboard),
-                  title: const Text("Dashboard"),
-                  onTap: () {},
-                ),
-                ListTile(
                   leading: const Icon(Icons.people),
-                  title: const Text("Members"),
-                  onTap: () => _navigateToCreateMember(),
+                  title: const Text("Manage Members"),
+                  onTap: _navigateToManageMembers,
                 ),
                 ListTile(
-                  leading: const Icon(Icons.analytics),
-                  title: const Text("Analytics"),
-                  onTap: () {},
-                ),
-                ListTile(
-                  leading: const Icon(Icons.settings),
-                  title: const Text("Settings"),
-                  onTap: () {},
+                  leading: const Icon(Icons.person),
+                  title: const Text("Manage Instructors"),
+                  onTap: _navigateToManageInstructors,
                 ),
                 ListTile(
                   leading: const Icon(Icons.logout),
                   title: const Text("Logout"),
-                  onTap: _showLogoutDialog,
+                  onTap: _showLogoutDialog, // Implement logout logic
                 ),
               ],
             ),
           ),
           body: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(
+              12.0,
+            ), // Less padding to reduce overall spacing
             child: GridView.count(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              children: const [
+              crossAxisCount: 4,
+              crossAxisSpacing: 12, // Reduced spacing between cards
+              mainAxisSpacing: 12,
+              childAspectRatio: 3.5, // Adjusted for a more compact look
+              children: [
                 DashboardCard(
-                  title: "Users",
-                  value: "1,234",
+                  title: "Total Members",
+                  value: "$memberCount",
                   icon: Icons.people,
+                  onTap: _navigateToManageMembers,
                 ),
                 DashboardCard(
-                  title: "Revenue",
-                  value: "\$12,345",
-                  icon: Icons.monetization_on,
-                ),
-                DashboardCard(
-                  title: "Orders",
-                  value: "567",
-                  icon: Icons.shopping_cart,
-                ),
-                DashboardCard(
-                  title: "Feedback",
-                  value: "89",
-                  icon: Icons.feedback,
+                  title: "Total Instructors",
+                  value: "$instructorCount",
+                  icon: Icons.person,
+                  onTap: _navigateToManageInstructors,
                 ),
               ],
             ),
@@ -256,40 +260,66 @@ class DashboardCard extends StatelessWidget {
   final String title;
   final String value;
   final IconData icon;
+  final VoidCallback onTap;
 
   const DashboardCard({
     super.key,
     required this.title,
     required this.value,
     required this.icon,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: const Color.fromRGBO(255, 179, 0, 1)),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        elevation: 3,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: const BorderSide(
+            color: Color.fromRGBO(255, 179, 0, 1),
+            width: 1.5,
+          ),
+        ),
+        child: SizedBox(
+          height: 30, // Reduced height to make the card smaller
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      title.toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 10, // Slightly smaller font
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueGrey,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      value,
+                      style: const TextStyle(
+                        fontSize: 18, // Reduced font size for better fit
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                Icon(
+                  icon,
+                  size: 24, // Smaller icon
+                  color: Colors.blueGrey.shade300,
+                ),
+              ],
             ),
-            const SizedBox(height: 5),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-                color: Color.fromRGBO(255, 179, 0, 1),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
