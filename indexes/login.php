@@ -6,7 +6,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-function sendMail($newEmail, $verificationCode)
+function sendMail($email, $otpCode)
 {
     require("PHPMailer/PHPMailer.php");
     require("PHPMailer/SMTP.php");
@@ -24,7 +24,7 @@ function sendMail($newEmail, $verificationCode)
         $mail->Port = 587;
 
         $mail->setFrom('fitlogsync.official@gmail.com', 'FiT-LOGSYNC');
-        $mail->addAddress($newEmail);
+        $mail->addAddress($email);
 
         $mail->isHTML(true);
         $mail->Subject = 'One Time Password | FiT-LOGSYNC';
@@ -89,7 +89,7 @@ function sendMail($newEmail, $verificationCode)
             <img src='{$headerImageURL}' alt='FitLogSync Header' class='header-img'>
             <h3>Hello, Lowie Jay!</h3>
             <p>Your Fit-LOGSYNC Login OTP Code is:</p>
-            <h1 class='otp-code'>{$verificationCode}</h1>
+            <h1 class='otp-code'>{$otpCode}</h1>
             <h5>Valid for 15 mins. NEVER share this code with others.</h5>
             <hr>
             <p>Come Shop With Us</p>
@@ -108,8 +108,6 @@ function sendMail($newEmail, $verificationCode)
     }
 }
 
-
-
 if (isset($_POST['login'])) {
 
     function validate($data)
@@ -125,10 +123,6 @@ if (isset($_POST['login'])) {
 
     $user_data = 'email=' . $email;
 
-    $newEmail = "lowie.jaymier@gmail.com";
-    $verificationCode = "123123123";
-    sendMail($newEmail, $verificationCode);
-
     // Select account based on email
     $sql = "SELECT * FROM users WHERE email=?";
     $stmt = mysqli_prepare($conn, $sql);
@@ -142,85 +136,89 @@ if (isset($_POST['login'])) {
         // Verify the password
         if (password_verify($password, $row['password'])) {
             $user_id = $row['user_id'];
-            // Store user data in session
 
-            $role_sql = "SELECT role FROM user_roles WHERE user_id = ?";
-            $role_stmt = mysqli_prepare($conn, $role_sql);
-            mysqli_stmt_bind_param($role_stmt, "i", $user_id);
-            mysqli_stmt_execute($role_stmt);
-            $role_result = mysqli_stmt_get_result($role_stmt);
+            // Check if 2FA is enabled
+            if ($row['two_factor_authentication'] == 1) {
+                // Generate OTP
+                $otpCode = rand(100000, 999999);
+                $otpExpiration = date('Y-m-d H:i:s', strtotime('+15 minutes'));
 
-            if (mysqli_num_rows($role_result) === 1) {
-                $role_row = mysqli_fetch_assoc($role_result);
-                $role = $role_row['role'];
-                $_SESSION['role'] = $role;
+                // Update user record with OTP and expiration
+                $updateSql = "UPDATE users SET otp_code = ?, otp_code_expiration = ? WHERE user_id = ?";
+                $updateStmt = mysqli_prepare($conn, $updateSql);
+                mysqli_stmt_bind_param($updateStmt, "ssi", $otpCode, $otpExpiration, $user_id);
+                mysqli_stmt_execute($updateStmt);
 
-                $_SESSION['user_id'] = $user_id;
-                $_SESSION['username'] = $row['username'];
-                $_SESSION['firstname'] = $row['firstname'];
-                $_SESSION['middlename'] = $row['middlename'];
-                $_SESSION['lastname'] = $row['lastname'];
-                $_SESSION['date_of_birth'] = $row['date_of_birth'];
-                $_SESSION['gender'] = $row['gender'];
-                $_SESSION['phone_number'] = $row['phone_number'];
-                $_SESSION['email'] = $row['email'];
-                $_SESSION['address'] = $row['address'];
-                $_SESSION['enrolled_by'] = $row['enrolled_by'];
-                $_SESSION['status'] = $row['status'];
-                $_SESSION['profile_image'] = $row['profile_image'];
-                $_SESSION['account_number'] = $row['account_number'];
-
-                $status = $row['status'];
-
-                // Redirect based on role
-                switch ($role) {
-                    case 'Member':
-
-                        if ($status == "Banned") {
-                            header("Location: ../login.php?accountBanned=This account was banned, please visit the front desk. Thank you");
-                            exit;
-                        } else if ($status == "Suspended") {
-                            header("Location: ../login.php?accountBanned=This account was suspended, please visit the front desk. Thank you");
-                            exit;
-                        } else {
-                            header("Location: ../Member/dashboard.php");
-                            exit;
-                        }
-                    case 'Instructor':
-                        header("Location: ../Instructor/dashboard.php");
-                        exit;
-                    case 'Front Desk':
-                        header("Location: ../Front-Desk/dashboard.php");
-                        exit;
-                    case 'Admin':
-                        header("Location: ../Admin/dashboard.php");
-                        exit;
-                    case 'Super Admin':
-                        header("Location: ../Super-Admin/dashboard.php");
-                        exit;
-                    default:
-                        // Handle unexpected roles
-                        header("Location: ../login.php?UnexpectedRole=Role not recognized&$user_data");
-                        exit;
+                // Send OTP via email
+                if (sendMail($email, $otpCode)) {
+                    // Redirect to OTP verification page
+                    $_SESSION['user_id'] = $user_id;
+                    header("Location: ../login-verification.php");
+                    exit();
+                } else {
+                    header("Location: ../login.php?UnexpectedError=Failed to send OTP. Please try again.&$user_data");
+                    exit();
                 }
-
             } else {
-                // Role not found
-                header("Location: ../login.php?UnexpectedError=Unexpected Error, please try again later&$user_data");
-                exit;
+                // Proceed with normal login
+                $role_sql = "SELECT role FROM user_roles WHERE user_id = ?";
+                $role_stmt = mysqli_prepare($conn, $role_sql);
+                mysqli_stmt_bind_param($role_stmt, "i", $user_id);
+                mysqli_stmt_execute($role_stmt);
+                $role_result = mysqli_stmt_get_result($role_stmt);
+
+                if (mysqli_num_rows($role_result) === 1) {
+                    $role_row = mysqli_fetch_assoc($role_result);
+                    $role = $role_row['role'];
+                    $_SESSION['role'] = $role;
+
+
+                    // Redirect based on role
+                    switch ($role) {
+                        case 'Member':
+                            if ($status == "Banned") {
+                                header("Location: ../login.php?accountBanned=This account was banned, please visit the front desk. Thank you");
+                                exit;
+                            } else if ($status == "Suspended") {
+                                header("Location: ../login.php?accountBanned=This account was suspended, please visit the front desk. Thank you");
+                                exit;
+                            } else {
+                                header("Location: ../Member/dashboard.php");
+                                exit;
+                            }
+                        case 'Instructor':
+                            header("Location: ../Instructor/dashboard.php");
+                            exit;
+                        case 'Front Desk':
+                            header("Location: ../Front-Desk/dashboard.php");
+                            exit;
+                        case 'Admin':
+                            header("Location: ../Admin/dashboard.php");
+                            exit;
+                        case 'Super Admin':
+                            header("Location: ../Super-Admin/dashboard.php");
+                            exit;
+                        default:
+                            // Handle unexpected roles
+                            header("Location: ../login.php?UnexpectedRole=Role not recognized&$user_data");
+                            exit;
+                    }
+                } else {
+                    // Role not found
+                    header("Location: ../login.php?UnexpectedError=Unexpected Error, please try again later&$user_data");
+                    exit;
+                }
             }
         } else {
             // Incorrect password
             header("Location: ../login.php?incorrectPassword=Incorrect Username or Password&$user_data");
             exit;
         }
-
     } else {
         // Email not found
         header("Location: ../login.php?EmailisnotRegistered=Email Address is not found.&$user_data");
         exit;
     }
-
 } else {
     // Redirect if login form is not submitted
     header("Location: ../login.php");
