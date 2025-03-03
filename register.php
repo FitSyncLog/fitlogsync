@@ -140,7 +140,8 @@
                                                 <option value="">Select Gender</option>
                                                 <option value="Male" <?php echo (isset($_GET['gender']) && $_GET['gender'] === 'Male' ? 'selected' : ''); ?>>Male</option>
                                                 <option value="Female" <?php echo (isset($_GET['gender']) && $_GET['gender'] === 'Female' ? 'selected' : ''); ?>>Female</option>
-                                                <option value="Prefer not to say" <?php echo (isset($_GET['gender']) && $_GET['gender'] === 'Prefer not to say' ? 'selected' : ''); ?>>Prefer not to say</option>
+                                                <option value="Prefer not to say" <?php echo (isset($_GET['gender']) && $_GET['gender'] === 'Prefer not to say' ? 'selected' : ''); ?>>Prefer
+                                                    not to say</option>
                                             </select>
                                             <label for="gender">Gender</label>
                                             <div class="error-message" id="genderError"></div>
@@ -498,7 +499,7 @@
                                                 name="waiver_rules" <?php echo (isset($_GET['waiver_rules']) ? 'checked' : ''); ?>>
                                             <label class="form-check-label" for="waiver_rules">I agree to the <a
                                                     href="rule_and_policy.php" target="_blank"><strong>Rules and
-                                                    Policy</strong></a>.</label>
+                                                        Policy</strong></a>.</label>
                                             <div class="error-message" id="waiver_rulesError"></div>
                                         </div>
                                     </div>
@@ -509,7 +510,7 @@
                                                 name="waiver_liability" <?php echo (isset($_GET['waiver_liability']) ? 'checked' : ''); ?>>
                                             <label class="form-check-label" for="waiver_liability">I agree to the <a
                                                     href="liability_waiver.php" target="_blank"><strong>Liability
-                                                    Waiver</strong></a>.</label>
+                                                        Waiver</strong></a>.</label>
                                             <div class="error-message" id="waiver_liabilityError"></div>
                                         </div>
                                     </div>
@@ -520,7 +521,8 @@
                                                 name="waiver_cancel" <?php echo (isset($_GET['waiver_cancel']) ? 'checked' : ''); ?>>
                                             <label class="form-check-label" for="waiver_cancel">I agree to the <a
                                                     href="cancellation_and_refund_policy.php"
-                                                    target="_blank"><strong>Cancellation and Refund Policy</strong></a>.</label>
+                                                    target="_blank"><strong>Cancellation and Refund
+                                                        Policy</strong></a>.</label>
                                             <div class="error-message" id="waiver_cancelError"></div>
                                         </div>
                                     </div>
@@ -854,3 +856,12 @@
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+

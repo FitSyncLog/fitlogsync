@@ -27,7 +27,7 @@ function sendMail($email, $otpCode)
         $mail->addAddress($email);
 
         $mail->isHTML(true);
-        $mail->Subject = 'One Time Password | FiT-LOGSYNC';
+        $mail->Subject = 'Enable Two Factor Authentication | FiT-LOGSYNC';
 
         // Publicly Hosted Image URLs (Replace with actual URLs)
         $headerImageURL = "https://rmmccomsoc.org/fitlogsync-email-header.png";
@@ -87,7 +87,7 @@ function sendMail($email, $otpCode)
     <body>
         <div class='container'>
             <img src='{$headerImageURL}' alt='FitLogSync Header' class='header-img'>
-            <h3>Hello, Lowie Jay!</h3>
+            <h3>Hello!</h3>
             <p>Your Fit-LOGSYNC Login OTP Code is:</p>
             <h1 class='otp-code'>{$otpCode}</h1>
             <h5>Valid for 15 mins. NEVER share this code with others.</h5>
@@ -141,6 +141,8 @@ if (isset($_POST['login'])) {
             if ($row['two_factor_authentication'] == 1) {
                 // Generate OTP
                 $otpCode = rand(100000, 999999);
+                date_default_timezone_set('Asia/Manila');
+
                 $otpExpiration = date('Y-m-d H:i:s', strtotime('+15 minutes'));
 
                 // Update user record with OTP and expiration
@@ -171,6 +173,31 @@ if (isset($_POST['login'])) {
                     $role_row = mysqli_fetch_assoc($role_result);
                     $role = $role_row['role'];
                     $_SESSION['role'] = $role;
+
+                    $data_sql = "SELECT * FROM users WHERE user_id = ?";
+                    $data_stmt = mysqli_prepare($conn, $data_sql);
+                    mysqli_stmt_bind_param($data_stmt, "i", $user_id);
+                    mysqli_stmt_execute($data_stmt);
+                    $data_result = mysqli_stmt_get_result($data_stmt);
+
+                    $row_data = mysqli_fetch_assoc($data_result);
+
+                    $_SESSION['user_id'] = $user_id;
+                    $_SESSION['username'] = $row_data['username'];
+                    $_SESSION['firstname'] = $row_data['firstname'];
+                    $_SESSION['middlename'] = $row_data['middlename'];
+                    $_SESSION['lastname'] = $row_data['lastname'];
+                    $_SESSION['date_of_birth'] = $row_data['date_of_birth'];
+                    $_SESSION['gender'] = $row_data['gender'];
+                    $_SESSION['phone_number'] = $row_data['phone_number'];
+                    $_SESSION['email'] = $row_data['email'];
+                    $_SESSION['address'] = $row_data['address'];
+                    $_SESSION['enrolled_by'] = $row_data['enrolled_by'];
+                    $_SESSION['status'] = $row_data['status'];
+                    $_SESSION['profile_image'] = $row_data['profile_image'];
+                    $_SESSION['account_number'] = $row_data['account_number'];
+
+                    $status = $row_data['status'];
 
 
                     // Redirect based on role

@@ -100,13 +100,28 @@
   }
   ?>
 
-<?php
+  <?php
   if (isset($_GET['accountBanned'])) {
     $message = htmlspecialchars($_GET['accountBanned']);
     echo "<script>
         Swal.fire({
           position: 'center',
           icon: 'error',
+          title: '{$message}',
+          showConfirmButton: false,
+          timer: 1500
+        });
+    </script>";
+  }
+  ?>
+
+  <?php
+  if (isset($_GET['SessionExpired'])) {
+    $message = htmlspecialchars($_GET['SessionExpired']);
+    echo "<script>
+        Swal.fire({
+          position: 'center',
+          icon: 'question',
           title: '{$message}',
           showConfirmButton: false,
           timer: 1500
@@ -153,6 +168,20 @@
   <?php
   if (isset($_GET['incorrectPassword'])) {
     $message = htmlspecialchars($_GET['incorrectPassword']);
+    echo "<script>
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: '{$message}',
+          showConfirmButton: true
+        });
+    </script>";
+  }
+  ?>
+
+<?php
+  if (isset($_GET['error'])) {
+    $message = htmlspecialchars($_GET['error']);
     echo "<script>
         Swal.fire({
           position: 'center',
@@ -308,7 +337,7 @@
   <script src="assets/js/main.js"></script>
 
   <script>
-    document.getElementById('loginForm').addEventListener('submit', function(event) {
+    document.getElementById('loginForm').addEventListener('submit', function (event) {
       let isValid = true;
 
       // Email Validation
