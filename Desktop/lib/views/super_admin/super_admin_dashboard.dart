@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
+import 'dart:async';
 import '../../auth/login_screen.dart';
 import '../profile/profile_screen.dart';
 import 'super_admin_manage_members.dart';
@@ -18,6 +19,7 @@ class SuperAdminDashboardScreen extends StatefulWidget {
 class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen> {
   final FlutterSecureStorage storage = const FlutterSecureStorage();
   final UserCountsController userCountsController = UserCountsController();
+  Timer? _sessionTimer;
   String username = "Loading...";
   String email = "Loading...";
   int memberCount = 0;
@@ -28,6 +30,7 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen> {
     super.initState();
     _loadUserData();
     _fetchCounts();
+    _startSessionTimer();
   }
 
   Future<void> _loadUserData() async {
@@ -49,6 +52,28 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen> {
     } catch (e) {
       print("Error fetching counts: $e");
     }
+  }
+
+  void _startSessionTimer() async {
+    _sessionTimer = Timer.periodic(const Duration(minutes: 1), (timer) async {
+      String? expiresAtStr = await storage.read(key: "expires_at");
+
+      if (expiresAtStr == null) {
+        _logout();
+        return;
+      }
+
+      DateTime expiresAt = DateTime.parse(expiresAtStr);
+      if (DateTime.now().isAfter(expiresAt)) {
+        _logout();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _sessionTimer?.cancel();
+    super.dispose();
   }
 
   void _showLogoutDialog() {

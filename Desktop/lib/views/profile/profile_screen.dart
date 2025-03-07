@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '/controller/profile/profile_controller.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -19,13 +20,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
   TextEditingController _dateOfBirthController = TextEditingController();
+  TextEditingController _contactPersonController = TextEditingController();
+  TextEditingController _contactNumberController = TextEditingController();
+  // Remove the relationship controller as we'll use dropdown instead
   String? _selectedGender;
+  String? _selectedRelationship;
 
   final List<String> _genders = ["Male", "Female", "Prefer not to say"];
+  final List<String> _relationships = ["Parent", "Sibling", "Spouse", "Friend", "Relative", "Other"];
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _hasChanges = false;
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  final ProfileController _profileController = ProfileController();
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -34,45 +42,86 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadUserData() async {
-    String? username = await _storage.read(key: "username");
-    String? email = await _storage.read(key: "email");
-    String? firstName = await _storage.read(key: "firstname");
-    String? middleName = await _storage.read(key: "middlename");
-    String? lastName = await _storage.read(key: "lastname");
-    String? phoneNumber = await _storage.read(key: "phone_number");
-    String? address = await _storage.read(key: "address");
-    String? dateOfBirth = await _storage.read(key: "date_of_birth");
-    String? gender = await _storage.read(key: "gender");
-
     setState(() {
-      _usernameController.text = username ?? "Unknown";
-      _emailController.text = email ?? "Unknown";
-      _firstNameController.text = firstName ?? "Unknown";
-      _middleNameController.text = middleName ?? "Unknown";
-      _lastNameController.text = lastName ?? "Unknown";
-      _phoneNumberController.text = phoneNumber ?? "Unknown";
-      _addressController.text = address ?? "Unknown";
-      _dateOfBirthController.text = dateOfBirth ?? "";
-
-      // Ensure gender is valid
-      _selectedGender = _genders.contains(gender) ? gender : null;
+      _isLoading = true;
     });
+
+    try {
+      // Get profile data from secure storage
+      final profileData = await _profileController.getUserProfileFromStorage();
+
+      setState(() {
+        _usernameController.text = profileData['username'] ?? "";
+        _emailController.text = profileData['email'] ?? "";
+        _firstNameController.text = profileData['firstname'] ?? "";
+        _middleNameController.text = profileData['middlename'] ?? "";
+        _lastNameController.text = profileData['lastname'] ?? "";
+        _phoneNumberController.text = profileData['phone_number'] ?? "";
+        _addressController.text = profileData['address'] ?? "";
+        _dateOfBirthController.text = profileData['date_of_birth'] ?? "";
+        _contactPersonController.text = profileData['emergency_contact_person'] ?? "";
+        _contactNumberController.text = profileData['emergency_contact_number'] ?? "";
+        
+        // Ensure gender is valid
+        _selectedGender = _genders.contains(profileData['gender']) 
+                           ? profileData['gender'] 
+                           : null;
+                           
+        // Ensure relationship is valid
+        _selectedRelationship = _relationships.contains(profileData['emergency_relationship']) 
+                               ? profileData['emergency_relationship'] 
+                               : null;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading profile: ${e.toString()}'))
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _saveUserData() async {
-    await _storage.write(key: "username", value: _usernameController.text);
-    await _storage.write(key: "email", value: _emailController.text);
-    await _storage.write(key: "firstname", value: _firstNameController.text);
-    await _storage.write(key: "middlename", value: _middleNameController.text);
-    await _storage.write(key: "lastname", value: _lastNameController.text);
-    await _storage.write(key: "date_of_birth", value: _dateOfBirthController.text);
-    await _storage.write(key: "gender", value: _selectedGender ?? "Unknown");
-    await _storage.write(key: "phone_number", value: _phoneNumberController.text);
-    await _storage.write(key: "address", value: _addressController.text);
-    // Optionally, update the user data on the server
     setState(() {
-      _hasChanges = false;
+      _isLoading = true;
     });
+
+    try {
+      await _profileController.updateProfileFromScreen(
+        context,
+        _usernameController,
+        _emailController,
+        _firstNameController,
+        _middleNameController,
+        _lastNameController,
+        _phoneNumberController,
+        _addressController,
+        _dateOfBirthController,
+        _selectedGender,
+        _passwordController,
+        _confirmPasswordController,
+        _contactPersonController,
+        _contactNumberController,
+        _selectedRelationship, // Pass selected relationship instead of controller
+      );
+
+      setState(() {
+        _hasChanges = false;
+        // Clear password fields after successful update
+        _passwordController.clear();
+        _confirmPasswordController.clear();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error saving profile: ${e.toString()}'))
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   void _togglePasswordVisibility(bool isConfirmPassword) {
@@ -94,119 +143,139 @@ class _ProfileScreenState extends State<ProfileScreen> {
         appBar: AppBar(
           title: const Text("Profile"),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.save),
-              onPressed: _saveUserData,
-            ),
+            if (_isLoading)
+              const Padding(
+                padding: EdgeInsets.all(10.0),
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2.0,
+                ),
+              )
+            else
+              IconButton(
+                icon: const Icon(Icons.save),
+                onPressed: _hasChanges ? _saveUserData : null,
+              ),
           ],
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      const CircleAvatar(
-                        radius: 50,
-                        backgroundColor: Color.fromRGBO(255, 179, 0, 1),
-                        child: Icon(Icons.person, size: 60, color: Colors.white),
-                      ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: 200, // Adjust the width to your preference
-                        child: TextFormField(
-                          controller: _usernameController,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                          decoration: const InputDecoration(
-                            border: UnderlineInputBorder(),
-                            hintText: "Edit Username",
-                          ),
-                          onChanged: (text) {
-                            setState(() {
-                              _hasChanges = true;
-                            });
-                          },
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            const CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Color.fromRGBO(255, 179, 0, 1),
+                              child: Icon(Icons.person, size: 60, color: Colors.white),
+                            ),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              width: 200, // Adjust the width to your preference
+                              child: TextFormField(
+                                controller: _usernameController,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                                decoration: const InputDecoration(
+                                  border: UnderlineInputBorder(),
+                                  hintText: "Edit Username",
+                                ),
+                                onChanged: (text) {
+                                  setState(() {
+                                    _hasChanges = true;
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Personal Information",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color.fromRGBO(255, 179, 0, 1)),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 4,
+                          child: _buildProfileField("First Name", Icons.person, _firstNameController),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          flex: 3,
+                          child: _buildProfileField("Middle Name", Icons.person, _middleNameController),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          flex: 4,
+                          child: _buildProfileField("Last Name", Icons.person, _lastNameController),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 4,
+                          child: _buildDateField("Date of Birth", Icons.calendar_today, _dateOfBirthController),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          flex: 3,
+                          child: _buildGenderDropdown(),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          flex: 4,
+                          child: _buildProfileField("Phone Number", Icons.phone, _phoneNumberController),
+                        ),
+                      ],
+                    ),
+                    _buildProfileField("Address", Icons.location_on, _addressController),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Emergency Contact",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color.fromRGBO(255, 179, 0, 1)),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildProfileField("Contact Person", Icons.person, _contactPersonController),
+                    _buildProfileField("Contact Number", Icons.phone, _contactNumberController),
+                    _buildRelationshipDropdown(), // Add the relationship dropdown here
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Account Information",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color.fromRGBO(255, 179, 0, 1)),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildProfileField("Email", Icons.email, _emailController),
+                    _buildProfileFieldWithVisibility(
+                      "Password",
+                      Icons.lock,
+                      _passwordController,
+                      _obscurePassword,
+                      isConfirmPassword: false,
+                    ),
+                    _buildProfileFieldWithVisibility(
+                      "Confirm Password",
+                      Icons.lock,
+                      _confirmPasswordController,
+                      _obscureConfirmPassword,
+                      isConfirmPassword: true,
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
-              const Text(
-                "Personal Information",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 4,
-                    child: _buildProfileField("First Name", Icons.person, _firstNameController),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    flex: 3,
-                    child: _buildProfileField("Middle Name", Icons.person, _middleNameController),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    flex: 4,
-                    child: _buildProfileField("Last Name", Icons.person, _lastNameController),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 4,
-                    child: _buildDateField("Date of Birth", Icons.calendar_today, _dateOfBirthController),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    flex: 3,
-                    child: _buildGenderDropdown(),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    flex: 4,
-                    child: _buildProfileField("Phone Number", Icons.phone, _phoneNumberController),
-                  ),
-                ],
-              ),
-              _buildProfileField("Address", Icons.location_on, _addressController),
-              const SizedBox(height: 20),
-              const Text(
-                "Account Information",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              _buildProfileField("Email", Icons.email, _emailController),
-              _buildProfileFieldWithVisibility(
-                "Password",
-                Icons.lock,
-                _passwordController,
-                _obscurePassword,
-                isConfirmPassword: false,
-              ),
-              _buildProfileFieldWithVisibility(
-                "Confirm Password",
-                Icons.lock,
-                _confirmPasswordController,
-                _obscureConfirmPassword,
-                isConfirmPassword: true,
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -361,6 +430,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onChanged: (String? newValue) {
                 setState(() {
                   _selectedGender = newValue;
+                  _hasChanges = true;
+                });
+              },
+              isExpanded: true,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // New method for relationship dropdown
+  Widget _buildRelationshipDropdown() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                labelText: "Relationship",
+                prefixIcon: Icon(Icons.family_restroom, color: Colors.grey),
+                border: InputBorder.none,
+              ),
+              value: _selectedRelationship,
+              items: _relationships.map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedRelationship = newValue;
                   _hasChanges = true;
                 });
               },
