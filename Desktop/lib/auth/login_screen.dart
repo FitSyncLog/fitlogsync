@@ -9,44 +9,7 @@ import '../views/instructor/instructor_dashboard.dart';
 import '../views/front_desk/front_desk_dashboard.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '/controller/auth_controller.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  final FlutterSecureStorage storage = const FlutterSecureStorage();
-
-  Future<bool> _isLoggedIn() async {
-    String? email = await storage.read(key: "email");
-    return email != null;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: _isLoggedIn(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Login Form',
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          ),
-          home: snapshot.data == true
-              ? const DashboardScreen()
-              : const LoginScreen(),
-        );
-      },
-    );
-  }
-}
+import 'email_verification_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -81,9 +44,14 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _login() async {
+    // Validate inputs
     setState(() {
-      _emailError = _emailController.text.isEmpty ? 'Please enter your email' : null;
-      _passwordError = _passwordController.text.isEmpty ? 'Please enter your password' : null;
+      _emailError =
+          _emailController.text.isEmpty ? 'Please enter your email' : null;
+      _passwordError =
+          _passwordController.text.isEmpty
+              ? 'Please enter your password'
+              : null;
     });
 
     if (_emailError != null || _passwordError != null) {
@@ -93,82 +61,101 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final responseData = await _authController.login(_emailController.text, _passwordController.text);
+      // Store password temporarily for potential OTP verification
+      await storage.write(key: "password", value: _passwordController.text);
+
+      // Login request
+      final responseData = await _authController.login(
+        _emailController.text,
+        _passwordController.text,
+      );
+
+      // Debug log
+      print("Login response: $responseData");
 
       if (responseData["success"] == true) {
-        await storage.write(key: "email", value: _emailController.text);
-        if (responseData.containsKey("username")) {
-          await storage.write(key: "username", value: responseData["username"]);
-        }
-        if (responseData.containsKey("firstname")) {
-          await storage.write(key: "firstname", value: responseData["firstname"]);
-        }
-        if (responseData.containsKey("middlename")) {
-          await storage.write(key: "middlename", value: responseData["middlename"]);
-        }
-        if (responseData.containsKey("lastname")) {
-          await storage.write(key: "lastname", value: responseData["lastname"]);
-        }
-        if (responseData.containsKey("phone_number")) {
-          await storage.write(key: "phone_number", value: responseData["phone_number"]);
-        }
-        if (responseData.containsKey("address")) {
-          await storage.write(key: "address", value: responseData["address"]);
-        }
-        if (responseData.containsKey("date_of_birth")) {
-          await storage.write(key: "date_of_birth", value: responseData["date_of_birth"]);
-        }
-        if (responseData.containsKey("gender")) {
-          await storage.write(key: "gender", value: responseData["gender"]);
-        }
+        // Store user data in secure storage
+        await _authController.storeUserData(responseData);
 
-        if (responseData.containsKey("roles") && responseData["roles"] != null) {
-          List<dynamic> roles = responseData["roles"];
-          await storage.write(key: "roles", value: jsonEncode(roles));
-        }
-
-        if (mounted) {
-          if (responseData["roles"] != null && responseData["roles"].contains("Super Admin")) {
+        // Check if OTP verification is required
+        if (responseData["otp_required"] == true) {
+          // Navigate to OTP verification screen
+          if (mounted) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const SuperAdminDashboardScreen()),
+              MaterialPageRoute(
+                builder: (context) => EmailVerificationScreen(),
+              ),
             );
-          } else if (responseData["roles"] != null && responseData["roles"].contains("Admin")) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
-            );
-          } else if (responseData["roles"] != null && responseData["roles"].contains("Front Desk")) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const FrontDeskDashboardScreen()),
-            );
-          } else if (responseData["roles"] != null && responseData["roles"].contains("Instructor")) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const InstructorDashboardScreen()),
-            );
-          } else if (responseData["roles"] != null && responseData["roles"].contains("Member")) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const DashboardScreen()),
-            );
-          }else {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Account not found')));
           }
+        } else {
+          // OTP not required, navigate to dashboard based on role
+          final roles = await _authController.getUserRoles();
+          _navigateToDashboard(roles);
         }
       } else {
+        // Login failed
         setState(() {
-          _passwordError = responseData["message"] ?? 'Incorrect email or password';
+          _passwordError = responseData["message"] ?? 'Invalid credentials';
         });
       }
     } catch (e) {
+      print("Login Error: $e");
+
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login failed: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Login failed: $e')));
       }
     }
 
     setState(() => _isLoading = false);
+  }
+
+  void _navigateToDashboard(List<dynamic> roles) {
+    if (roles.contains("Super Admin")) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const SuperAdminDashboardScreen(),
+        ),
+      );
+    } else if (roles.contains("Admin")) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
+      );
+    } else if (roles.contains("Front Desk")) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const FrontDeskDashboardScreen(),
+        ),
+      );
+    } else if (roles.contains("Instructor")) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const InstructorDashboardScreen(),
+        ),
+      );
+    } else if (roles.contains("Member")) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const DashboardScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No valid role found for this account')),
+      );
+    }
+  }
+
+  void _navigateToEmailVerification(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => EmailVerificationScreen()),
+    );
   }
 
   @override
@@ -237,7 +224,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       prefixIcon: const Icon(Icons.lock),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                         ),
                         onPressed: _togglePasswordVisibility,
                       ),
@@ -253,17 +242,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.amber.shade600,
                       ),
-                      child: _isLoading
-                          ? const CircularProgressIndicator(
-                              color: Colors.black,
-                            )
-                          : const Text(
-                              'Login',
-                              style: TextStyle(
-                                fontSize: 18,
+                      child:
+                          _isLoading
+                              ? const CircularProgressIndicator(
                                 color: Colors.black,
+                              )
+                              : const Text(
+                                'Login',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
                     ),
                   ),
                 ],
@@ -278,9 +268,10 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
-                  onPressed: () => _launchURL(
-                    'http://localhost/fitlogsync/rule_and_policy.php',
-                  ),
+                  onPressed:
+                      () => _launchURL(
+                        'http://localhost/fitlogsync/rule_and_policy.php',
+                      ),
                   child: const Text(
                     'Terms and Conditions',
                     style: TextStyle(color: Colors.white),
@@ -288,9 +279,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const Text('|', style: TextStyle(color: Colors.white)),
                 TextButton(
-                  onPressed: () => _launchURL(
-                    'http://localhost/fitlogsync/liability_waiver.php',
-                  ),
+                  onPressed:
+                      () => _launchURL(
+                        'http://localhost/fitlogsync/liability_waiver.php',
+                      ),
                   child: const Text(
                     'Waiver',
                     style: TextStyle(color: Colors.white),
@@ -298,9 +290,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const Text('|', style: TextStyle(color: Colors.white)),
                 TextButton(
-                  onPressed: () => _launchURL(
-                    'http://localhost/fitlogsync/cancellation_and_refund_policy.php',
-                  ),
+                  onPressed:
+                      () => _launchURL(
+                        'http://localhost/fitlogsync/cancellation_and_refund_policy.php',
+                      ),
                   child: const Text(
                     'Membership',
                     style: TextStyle(color: Colors.white),
@@ -308,9 +301,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const Text('|', style: TextStyle(color: Colors.white)),
                 TextButton(
-                  onPressed: () => _launchURL(
-                    'http://localhost/fitlogsync/forgot-password.php',
-                  ),
+                  onPressed:
+                      () => _launchURL(
+                        'http://localhost/fitlogsync/forgot-password.php',
+                      ),
                   child: const Text(
                     'Forgot Password?',
                     style: TextStyle(color: Colors.white),
