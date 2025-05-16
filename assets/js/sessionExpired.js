@@ -1,9 +1,9 @@
-let inactivityTime = 1800000; // 5 seconds
+let inactivityTime = 600*1000; 
 
 function logoutUser() {
     fetch('../indexes/logout.php') // Ensure correct path to logout.php
         .then(() => {
-            window.location.href = "../login.php?SessionExpired=Your session has expired. Please login again.";
+            window.location.href = "login.php?SessionExpired=Your session has expired. Please login again.";
         });
 }
 

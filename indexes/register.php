@@ -83,6 +83,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     $q8 = validate($_POST['q8'] ?? '');
     $q9 = validate($_POST['q9'] ?? '');
     $q10 = validate($_POST['q10'] ?? '');
+    $security_question1 = validate($_POST['security_question1'] ?? '');
+    $security_answer1 = validate($_POST['security_answer1'] ?? '');
+    $security_question2 = validate($_POST['security_question2'] ?? '');
+    $security_answer2 = validate($_POST['security_answer2'] ?? '');
+    $security_question3 = validate($_POST['security_question3'] ?? '');
+    $security_answer3 = validate($_POST['security_answer3'] ?? '');
     $waiver_rules = isset($_POST['waiver_rules']);
     $waiver_liability = isset($_POST['waiver_liability']);
     $waiver_cancel = isset($_POST['waiver_cancel']);
@@ -90,6 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     $contact_number = validate($_POST['contact_number'] ?? '');
     $relationship = validate($_POST['relationship'] ?? '');
     $enrolled_by = "Online Registration";
+
 
     $user_data = 'username=' . $username .
         '&lastname=' . $lastname .
@@ -115,6 +122,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         '&q8=' . $q8 .
         '&q9=' . $q9 .
         '&q10=' . $q10 .
+        '&security_question1=' . $security_question1 .
+        '&security_answer1=' . $security_answer1 .
+        '&security_question2=' . $security_question2 .
+        '&security_answer2=' . $security_answer2 .
+        '&security_question3=' . $security_question3 .
+        '&security_answer3=' . $security_answer3 .
         '&waiver_rules=' . $waiver_rules .
         '&waiver_liability=' . $waiver_liability .
         '&waiver_cancel=' . $waiver_cancel .
@@ -149,19 +162,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         exit();
     }
 
+    // Validate security questions
+    if (
+        empty($security_question1) || empty($security_answer1) ||
+        empty($security_question2) || empty($security_answer2) ||
+        empty($security_question3) || empty($security_answer3)
+    ) {
+        $error_message = "All security questions and answers are required.";
+        header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
+        exit();
+    }
+
+    // Check for duplicate questions
+    if (
+        $security_question1 === $security_question2 ||
+        $security_question1 === $security_question3 ||
+        $security_question2 === $security_question3
+    ) {
+        $error_message = "You must select different security questions.";
+        header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
+        exit();
+    }
+
     // Hash the password
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     // Generate verification code and expiration
-    $verification_code = "123456";
+    $otp_code = "123456";
     $datetime = new DateTime('now');
     $datetime->modify('+10 minutes');
-    $v_code_expiration = $datetime->format('Y-m-d H:i:s');
+    $otp_code_expiration = $datetime->format('Y-m-d H:i:s');
 
     // Set registration date and status
     $registration_date = date('Y-m-d');
     $status = "Pending";
-    $role = "Member";
+    $role_id = 5;
 
     // Check if username already exists
     $sql_check_username = "SELECT * FROM users WHERE username=?";
@@ -198,7 +233,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     } while (mysqli_num_rows($result_check_account) > 0);
 
     // Insert data into the users table
-    $sql_new_user = "INSERT INTO users (username, firstname, middlename, lastname, date_of_birth, password, gender, phone_number, email, address, enrolled_by, verification_code, v_code_expiration, status, registration_date, account_number)
+    $sql_new_user = "INSERT INTO users (username, firstname, middlename, lastname, date_of_birth, password, gender, phone_number, email, address, enrolled_by, otp_code, otp_code_expiration, status, registration_date, account_number)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt_new_user_query = mysqli_prepare($conn, $sql_new_user);
 
@@ -208,7 +243,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         exit();
     }
 
-    mysqli_stmt_bind_param($stmt_new_user_query, "ssssssssssssssss", $username, $firstname, $middlename, $lastname, $dateofbirth, $hashed_password, $gender, $phonenumber, $email, $address, $enrolled_by, $verification_code, $v_code_expiration, $status, $registration_date, $accountNumber);
+
+
+    mysqli_stmt_bind_param($stmt_new_user_query, "ssssssssssssssss", $username, $firstname, $middlename, $lastname, $dateofbirth, $hashed_password, $gender, $phonenumber, $email, $address, $enrolled_by, $otp_code, $otp_code_expiration, $status, $registration_date, $accountNumber);
     $result_new_user_query = mysqli_stmt_execute($stmt_new_user_query);
 
     if ($result_new_user_query) {
@@ -254,6 +291,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
             exit();
         }
 
+        // Insert security questions data into the security_questions table
+        $sql_security_questions = "INSERT INTO security_questions (user_id, sq1, sq1_res, sq2, sq2_res, sq3, sq3_res)
+VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $stmt_security_questions = mysqli_prepare($conn, query: $sql_security_questions);
+
+        if ($stmt_security_questions === false) {
+            $error_message = "Failed to prepare the SQL statement for security questions.";
+            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
+            exit();
+        }
+
+        mysqli_stmt_bind_param($stmt_security_questions, "issssss", $user_id, $security_question1, $security_answer1, $security_question2, $security_answer2, $security_question3, $security_answer3);
+        $result_security_questions = mysqli_stmt_execute($stmt_security_questions);
+
+        if (!$result_security_questions) {
+            $error_message = "Failed to insert security questions data.";
+            header("Location: ../register.php?error=" . urlencode($error_message) . "&" . $user_data);
+            exit();
+        }
+
         // Insert emergency contact data into the emergency_contacts table
         $sql_emergency_contact = "INSERT INTO emergency_contacts (user_id, contact_person, contact_number, relationship)
                 VALUES (?, ?, ?, ?)";
@@ -275,7 +332,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         }
 
         // Insert user role data into the user_role table
-        $sql_user_role = "INSERT INTO user_roles (user_id, role)
+        $sql_user_role = "INSERT INTO user_roles (user_id, role_id)
                 VALUES (?, ?)";
         $stmt_user_role = mysqli_prepare($conn, $sql_user_role);
 
@@ -285,7 +342,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
             exit();
         }
 
-        mysqli_stmt_bind_param($stmt_user_role, "is", $user_id, $role);
+        mysqli_stmt_bind_param($stmt_user_role, "ii", $user_id, $role_id);
         $result_user_role = mysqli_stmt_execute($stmt_user_role);
 
         if (!$result_user_role) {
@@ -294,10 +351,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
             exit();
         }
 
-        
+
         // Generate QR code with higher resolution
         $qrCodePath = "../qr_codes/{$accountNumber}.png";
-        $moduleSize = 50; // Size of each module in pixels (adjust as needed)
+        $moduleSize = 100; // Size of each module in pixels (adjust as needed)
         QRcode::png($accountNumber, $qrCodePath, 'L', $moduleSize, 2);
 
         // Registration successful

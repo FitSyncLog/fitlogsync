@@ -23,6 +23,8 @@ if ($result->num_rows > 0) {
 }
 ?>
 
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -49,10 +51,10 @@ if ($result->num_rows > 0) {
 
     <!-- Main CSS File -->
     <link href="assets/css/main.css" rel="stylesheet">
-
+    <script src="assets/css/sweetalert2.min.css"></script>
+    <script src="assets/js/sweetalert2.all.min.js"></script>
     <link rel="icon" type="image/x-icon" href="assets/fitlogsync.ico">
     <link rel="stylesheet" href="assets/css/sweetalert2.min.css">
-    <script src="assets/js/sweetalert2.all.min.js"></script>
 
     <style>
         .error-message {
@@ -73,6 +75,8 @@ if ($result->num_rows > 0) {
     </style>
 
 </head>
+
+
 
 <body class="index-page">
 
@@ -104,6 +108,8 @@ if ($result->num_rows > 0) {
     }
     ?>
 
+
+
     <?php include 'layout/index_header.php'; ?>
 
     <main class="main">
@@ -119,7 +125,7 @@ if ($result->num_rows > 0) {
                         <h1>Welcome to <span>FiT-LOGSYNC</span></h1>
                         <p>Fitness Gym Membership and Attendance Log Management System</p>
                         <div class="d-flex">
-                            <a href="register.php" class="btn-get-started">Register Now</a>
+                            <a href="login.php" class="btn-get-started">Login</a>
                             <a href="<?php echo htmlspecialchars($home_video); ?>"
                                 class="glightbox btn-watch-video d-flex align-items-center"><i
                                     class="bi bi-play-circle"></i><span>Watch Video</span></a>
@@ -372,7 +378,8 @@ if ($result->num_rows > 0) {
                             <a class="stretched-link">
                                 <h3>Professional & Friendly Staff</h3>
                             </a>
-                            <p>Our certified trainers and approachable staff are here to guide and support you every step of the way.
+                            <p>Our certified trainers and approachable staff are here to guide and support you every
+                                step of the way.
                             </p>
                             <a class="stretched-link"></a>
                         </div>
@@ -536,7 +543,7 @@ if ($result->num_rows > 0) {
                         <div class="team-member">
                             <div class="member-img">
                                 <img src="assets/img/team/team-1.jpg" class="img-fluid" alt="">
-                                <div class="social">
+                                <div class="social d-flex justify-content-center align-items-center gap-3">
                                     <a href=""><i class="bi bi-twitter-x"></i></a>
                                     <a href=""><i class="bi bi-facebook"></i></a>
                                     <a href=""><i class="bi bi-instagram"></i></a>
@@ -554,7 +561,7 @@ if ($result->num_rows > 0) {
                         <div class="team-member">
                             <div class="member-img">
                                 <img src="assets/img/team/team-2.jpg" class="img-fluid" alt="">
-                                <div class="social">
+                                <div class="social d-flex justify-content-center align-items-center gap-3">
                                     <a href=""><i class="bi bi-twitter-x"></i></a>
                                     <a href=""><i class="bi bi-facebook"></i></a>
                                     <a href=""><i class="bi bi-instagram"></i></a>
@@ -572,7 +579,7 @@ if ($result->num_rows > 0) {
                         <div class="team-member">
                             <div class="member-img">
                                 <img src="assets/img/team/team-3.jpg" class="img-fluid" alt="">
-                                <div class="social">
+                                <div class="social d-flex justify-content-center align-items-center gap-3">
                                     <a href=""><i class="bi bi-twitter-x"></i></a>
                                     <a href=""><i class="bi bi-facebook"></i></a>
                                     <a href=""><i class="bi bi-instagram"></i></a>
@@ -590,7 +597,7 @@ if ($result->num_rows > 0) {
                         <div class="team-member">
                             <div class="member-img">
                                 <img src="assets/img/team/team-4.jpg" class="img-fluid" alt="">
-                                <div class="social">
+                                <div class="social d-flex justify-content-center align-items-center gap-3">
                                     <a href=""><i class="bi bi-twitter-x"></i></a>
                                     <a href=""><i class="bi bi-facebook"></i></a>
                                     <a href=""><i class="bi bi-instagram"></i></a>
@@ -642,13 +649,13 @@ if ($result->num_rows > 0) {
 
                     <div class="col-xl-3 col-lg-6" data-aos="fade-up" data-aos-delay="200">
                         <div class="pricing-item featured">
-                            <h3>Business</h3>
-                            <h4><sup>$</sup>19<span> / month</span></h4>
+                            <h3>Free</h3>
+                            <h4><sup>$</sup>0<span> / month</span></h4>
                             <ul>
                                 <li>Aida dere</li>
                                 <li>Nec feugiat nisl</li>
                                 <li>Nulla at volutpat dola</li>
-                                <li>Pharetra massa</li>
+                                <li class="na">Pharetra massa</li>
                                 <li class="na">Massa ultricies mi</li>
                             </ul>
                             <div class="btn-wrap">

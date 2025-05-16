@@ -12,13 +12,11 @@ if (!in_array($type, ['username', 'email'])) {
     exit();
 }
 
-// Prepare and execute the query
 $stmt = $conn->prepare("SELECT * FROM users WHERE $type = ?");
 $stmt->bind_param("s", $value);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Check if the value exists
 $exists = $result->num_rows > 0;
 
 // Return the result as JSON

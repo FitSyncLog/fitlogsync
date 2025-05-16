@@ -69,7 +69,6 @@ if ($result->num_rows > 0) {
                     <li><a href="./#contact">Contact</a></li>
 
                     <?php if ($current_page === 'login.php'): ?>
-                        <li><a href="./register.php" class="btn btn-warning py-2 px-4">Register</a></li>
                     <?php else: ?>
                         <li><a href="./login.php" class="btn btn-warning py-2 px-4">Login</a></li>
                     <?php endif; ?>

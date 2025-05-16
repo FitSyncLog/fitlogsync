@@ -1,7 +1,7 @@
 <?php
 session_start();
 include "../indexes/db_con.php";
-if (isset($_SESSION['role']) && $_SESSION['role'] === 'Member') {
+if (isset($_SESSION['role_id']) && $_SESSION['role_id'] === 5) {
     ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -63,7 +63,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'Member') {
                             if (isset($_SESSION['role'])) {
                                 echo "Welcome " . htmlspecialchars($_SESSION['role']);
                             } else {
-                                echo "Welcome Guest";
+                                echo "Welcome Member";
                             }
                             ?>
                         </h4>

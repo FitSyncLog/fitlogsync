@@ -193,6 +193,23 @@
   }
   ?>
 
+<?php
+  if (isset($_GET['logout'])) {
+    $message = htmlspecialchars($_GET['logout']);
+    echo "<script>
+        Swal.fire({
+          position: 'center',
+          icon: 'success',
+          title: '{$message}',
+          showConfirmButton: false,
+          timer: 1500
+        });
+    </script>";
+  }
+  ?>
+
+
+
   <?php include 'layout/index_header.php'; ?>
 
   <section class="hero section light-background py-3 py-md-5 py-xl-8">

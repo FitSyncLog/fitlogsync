@@ -26,7 +26,6 @@
     <script src="assets/js/jquery-3.6.0.min.js"></script>
     <script src="assets/js/jquery-ui.js"></script>
 
-
     <!-- Main CSS File -->
     <link href="assets/css/main.css" rel="stylesheet">
     <style>
@@ -270,11 +269,6 @@
                                     </div>
                                 </div>
 
-
-
-
-
-
                                 <!-- Medical Background -->
                                 <hr class="my-4">
                                 <h5 class="text-warning text-center"><strong>Medical Background</strong></h5>
@@ -488,6 +482,97 @@
                                     </div>
                                 </div>
 
+                                <!-- Security Questions -->
+                                <hr class="my-4">
+                                <h5 class="text-warning text-center"><strong>Security Questions</strong></h5>
+                                <div class="row g-3">
+                                    <!-- Security Question 1 -->
+                                    <div class="col-md-4">
+                                        <div class="form-floating">
+                                            <select class="form-select" id="security_question1"
+                                                name="security_question1" onchange="updateQuestionOptions()">
+                                                <option value="">Select Security Question 1</option>
+                                                <option value="What is your mother’s maiden name?" <?php echo (isset($_GET['security_question1']) && $_GET['security_question1'] === 'What is your mother’s maiden name?' ? 'selected' : ''); ?>>What is your mother's maiden name?</option>
+                                                <option value="In what city were you born?" <?php echo (isset($_GET['security_question1']) && $_GET['security_question1'] === 'In what city were you born?' ? 'selected' : ''); ?>>In what city were you born?</option>
+                                                <option value="What is your father's middle name?" <?php echo (isset($_GET['security_question1']) && $_GET['security_question1'] === 'What is your father middle name?' ? 'selected' : ''); ?>>What is your father's middle name?</option>
+                                                <option value="What was your childhood nickname?" <?php echo (isset($_GET['security_question1']) && $_GET['security_question1'] === 'What was your childhood nickname?' ? 'selected' : ''); ?>>What was your childhood nickname?</option>
+                                                <option value="What is your grandmother's first name?" <?php echo (isset($_GET['security_question1']) && $_GET['security_question1'] === 'What is your grandmother first name?' ? 'selected' : ''); ?>>What is your grandmother's first name?
+                                                </option>
+                                                <option value="What was the name of your first school?" <?php echo (isset($_GET['security_question1']) && $_GET['security_question1'] === 'What was the name of your first school?' ? 'selected' : ''); ?>>What was the name of your first
+                                                    school?</option>
+                                                <option value="What is the name of your first pet?" <?php echo (isset($_GET['security_question1']) && $_GET['security_question1'] === 'What is the name of your first pet?' ? 'selected' : ''); ?>>What is the name of your first pet?</option>
+                                                <option value="What was the make and model of your first car?" <?php echo (isset($_GET['security_question1']) && $_GET['security_question1'] === 'What was the make and model of your first car?' ? 'selected' : ''); ?>>What was the make and model of
+                                                    your first car?</option>
+                                                <option value="What was the name of your childhood best friend?" <?php echo (isset($_GET['security_question1']) && $_GET['security_question1'] === 'What was the name of your childhood best friend?' ? 'selected' : ''); ?>>What was the name of your
+                                                    childhood best friend?</option>
+                                                <option value="In what city did your parents meet?" <?php echo (isset($_GET['security_question1']) && $_GET['security_question1'] === 'In what city did your parents meet?' ? 'selected' : ''); ?>>In what city did your parents meet?</option>
+                                                <option value="What is your favorite book?" <?php echo (isset($_GET['security_question1']) && $_GET['security_question1'] === 'What is your favorite book?' ? 'selected' : ''); ?>>What is your favorite book?</option>
+                                                <option value="What was the first concert you attended?" <?php echo (isset($_GET['security_question1']) && $_GET['security_question1'] === 'What was the first concert you attended?' ? 'selected' : ''); ?>>What was the first concert you
+                                                    attended?</option>
+                                                <option value="What is your favorite movie?" <?php echo (isset($_GET['security_question1']) && $_GET['security_question1'] === 'What is your favorite movie?' ? 'selected' : ''); ?>>What is your favorite movie?</option>
+                                                <option value="What is your favorite food?" <?php echo (isset($_GET['security_question1']) && $_GET['security_question1'] === 'What is your favorite food?' ? 'selected' : ''); ?>>What is your favorite food?</option>
+                                                <option value="What is your favorite childhood TV show?" <?php echo (isset($_GET['security_question1']) && $_GET['security_question1'] === 'What is your favorite childhood TV show?' ? 'selected' : ''); ?>>What is your favorite childhood TV
+                                                    show?</option>
+                                            </select>
+                                            <label for="security_question1">Security Question 1</label>
+                                            <div class="error-message" id="security_question1Error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="security_answer1"
+                                                name="security_answer1" placeholder="Answer for Security Question 1"
+                                                value="<?php echo htmlspecialchars($_GET['security_answer1'] ?? ''); ?>">
+                                            <label for="security_answer1">Answer for Security Question 1</label>
+                                            <div class="error-message" id="security_answer1Error"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Security Question 2 -->
+                                    <div class="col-md-4">
+                                        <div class="form-floating">
+                                            <select class="form-select" id="security_question2"
+                                                name="security_question2" onchange="updateQuestionOptions()">
+                                                <option value="">Select Security Question 2</option>
+                                                <!-- Options will be populated by JavaScript -->
+                                            </select>
+                                            <label for="security_question2">Security Question 2</label>
+                                            <div class="error-message" id="security_question2Error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="security_answer2"
+                                                name="security_answer2" placeholder="Answer for Security Question 2"
+                                                value="<?php echo htmlspecialchars($_GET['security_answer2'] ?? ''); ?>">
+                                            <label for="security_answer2">Answer for Security Question 2</label>
+                                            <div class="error-message" id="security_answer2Error"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Security Question 3 -->
+                                    <div class="col-md-4">
+                                        <div class="form-floating">
+                                            <select class="form-select" id="security_question3"
+                                                name="security_question3" onchange="updateQuestionOptions()">
+                                                <option value="">Select Security Question 3</option>
+                                                <!-- Options will be populated by JavaScript -->
+                                            </select>
+                                            <label for="security_question3">Security Question 3</label>
+                                            <div class="error-message" id="security_question3Error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="security_answer3"
+                                                name="security_answer3" placeholder="Answer for Security Question 3"
+                                                value="<?php echo htmlspecialchars($_GET['security_answer3'] ?? ''); ?>">
+                                            <label for="security_answer3">Answer for Security Question 3</label>
+                                            <div class="error-message" id="security_answer3Error"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Waiver/Agreements -->
                                 <hr class="my-4">
                                 <h5 class="text-warning text-center"><strong>Waiver and Agreements</strong></h5>
@@ -553,6 +638,81 @@
     <script src="assets/js/main.js"></script>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const allQuestions = [
+                "What is your mother’s maiden name?",
+                "In what city were you born?",
+                "What is your father's middle name?",
+                "What was your childhood nickname?",
+                "What is your grandmother's first name?",
+                "What was the name of your first school?",
+                "What is the name of your first pet?",
+                "What was the make and model of your first car?",
+                "What was the name of your childhood best friend?",
+                "In what city did your parents meet?",
+                "What is your favorite book?",
+                "What was the first concert you attended?",
+                "What is your favorite movie?",
+                "What is your favorite food?",
+                "What is your favorite childhood TV show?"
+            ];
+
+            function updateQuestionOptions() {
+                const question1 = document.getElementById('security_question1').value;
+                const question2 = document.getElementById('security_question2').value;
+                const question3 = document.getElementById('security_question3').value;
+
+                // Get all selected questions
+                const selectedQuestions = [question1, question2, question3];
+
+                // Update options for question 2
+                updateQuestionDropdown('security_question2', selectedQuestions, question2);
+
+                // Update options for question 3
+                updateQuestionDropdown('security_question3', selectedQuestions, question3);
+            }
+
+            function updateQuestionDropdown(dropdownId, selectedQuestions, currentValue) {
+                const dropdown = document.getElementById(dropdownId);
+
+                // Clear the dropdown
+                dropdown.innerHTML = '<option value="">Select Security Question</option>';
+
+                // Add available options
+                allQuestions.forEach(question => {
+                    // Only add if not selected in other dropdowns and not the current value of this dropdown
+                    if (!selectedQuestions.includes(question) || question === currentValue) {
+                        const option = document.createElement('option');
+                        option.value = question;
+                        option.textContent = question;
+                        if (question === currentValue) {
+                            option.selected = true;
+                        }
+                        dropdown.appendChild(option);
+                    }
+                });
+            }
+
+            // Initialize the dropdowns on page load
+            updateQuestionOptions();
+
+            // Add event listeners to update options when a question is selected
+            document.getElementById('security_question1').addEventListener('change', updateQuestionOptions);
+            document.getElementById('security_question2').addEventListener('change', updateQuestionOptions);
+            document.getElementById('security_question3').addEventListener('change', updateQuestionOptions);
+
+            // If there are previously selected values from GET parameters, set them
+            <?php if (isset($_GET['security_question2'])): ?>
+                document.getElementById('security_question2').value = "<?php echo htmlspecialchars($_GET['security_question2']); ?>";
+            <?php endif; ?>
+            <?php if (isset($_GET['security_question3'])): ?>
+                document.getElementById('security_question3').value = "<?php echo htmlspecialchars($_GET['security_question3']); ?>";
+            <?php endif; ?>
+
+            // Update the options after setting the values
+            updateQuestionOptions();
+        });
+
         document.getElementById('registrationForm').addEventListener('submit', function (event) {
             let isValid = true;
 
@@ -570,6 +730,24 @@
             const contact_person = document.getElementById('contact_person');
             const contact_number = document.getElementById('contact_number');
             const relationship = document.getElementById('relationship');
+            // Security Questions
+            const allQuestions = [
+                "What is your mother's maiden name?",
+                "In what city were you born?",
+                "What is your father's middle name?",
+                "What was your childhood nickname?",
+                "What is your grandmother's first name?",
+                "What was the name of your first school?",
+                "What is the name of your first pet?",
+                "What was the make and model of your first car?",
+                "What was the name of your childhood best friend?",
+                "In what city did your parents meet?",
+                "What is your favorite book?",
+                "What was the first concert you attended?",
+                "What is your favorite movie?",
+                "What is your favorite food?",
+                "What is your favorite childhood TV show?"
+            ];
 
             const fields = [{
                 element: username,
@@ -674,6 +852,50 @@
             if (contact_number.value && !/^09\d{9}$/.test(contact_number.value)) {
                 document.getElementById('contact_numberError').innerHTML = `<i class="bi bi-exclamation-circle"></i> Phone Number must be 11 digits and start with "09"`;
                 contact_number.classList.add('error');
+                isValid = false;
+            }
+
+            // Security Questions Validation
+            const securityFields = [
+                { element: document.getElementById('security_question1'), errorId: 'security_question1Error', message: 'Security Question 1 is required' },
+                { element: document.getElementById('security_answer1'), errorId: 'security_answer1Error', message: 'Answer for Security Question 1 is required' },
+                { element: document.getElementById('security_question2'), errorId: 'security_question2Error', message: 'Security Question 2 is required' },
+                { element: document.getElementById('security_answer2'), errorId: 'security_answer2Error', message: 'Answer for Security Question 2 is required' },
+                { element: document.getElementById('security_question3'), errorId: 'security_question3Error', message: 'Security Question 3 is required' },
+                { element: document.getElementById('security_answer3'), errorId: 'security_answer3Error', message: 'Answer for Security Question 3 is required' }
+            ];
+
+            securityFields.forEach(field => {
+                if (!field.element.value) {
+                    document.getElementById(field.errorId).innerHTML = `<i class="bi bi-exclamation-circle"></i> ${field.message}`;
+                    field.element.classList.add('error');
+                    isValid = false;
+                } else {
+                    document.getElementById(field.errorId).innerHTML = '';
+                    field.element.classList.remove('error');
+                }
+            });
+
+            // Check for duplicate questions
+            const question1 = document.getElementById('security_question1').value;
+            const question2 = document.getElementById('security_question2').value;
+            const question3 = document.getElementById('security_question3').value;
+
+            if (question1 && question2 && question1 === question2) {
+                document.getElementById('security_question2Error').innerHTML = `<i class="bi bi-exclamation-circle"></i> You must select different security questions`;
+                document.getElementById('security_question2').classList.add('error');
+                isValid = false;
+            }
+
+            if (question1 && question3 && question1 === question3) {
+                document.getElementById('security_question3Error').innerHTML = `<i class="bi bi-exclamation-circle"></i> You must select different security questions`;
+                document.getElementById('security_question3').classList.add('error');
+                isValid = false;
+            }
+
+            if (question2 && question3 && question2 === question3) {
+                document.getElementById('security_question3Error').innerHTML = `<i class="bi bi-exclamation-circle"></i> You must select different security questions`;
+                document.getElementById('security_question3').classList.add('error');
                 isValid = false;
             }
 
@@ -856,12 +1078,3 @@
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-

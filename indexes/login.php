@@ -163,7 +163,7 @@ if (isset($_POST['login'])) {
                 }
             } else {
                 // Proceed with normal login
-                $role_sql = "SELECT role FROM user_roles WHERE user_id = ?";
+                $role_sql = "SELECT role_id FROM user_roles WHERE user_id = ?";
                 $role_stmt = mysqli_prepare($conn, $role_sql);
                 mysqli_stmt_bind_param($role_stmt, "i", $user_id);
                 mysqli_stmt_execute($role_stmt);
@@ -171,8 +171,8 @@ if (isset($_POST['login'])) {
 
                 if (mysqli_num_rows($role_result) === 1) {
                     $role_row = mysqli_fetch_assoc($role_result);
-                    $role = $role_row['role'];
-                    $_SESSION['role'] = $role;
+                    $role_id = $role_row['role_id'];
+                    $_SESSION['role_id'] = $role_id;
 
                     $data_sql = "SELECT * FROM users WHERE user_id = ?";
                     $data_stmt = mysqli_prepare($conn, $data_sql);
@@ -196,40 +196,23 @@ if (isset($_POST['login'])) {
                     $_SESSION['status'] = $row_data['status'];
                     $_SESSION['profile_image'] = $row_data['profile_image'];
                     $_SESSION['account_number'] = $row_data['account_number'];
+                    $_SESSION['login'] = true;
 
                     $status = $row_data['status'];
 
 
-                    // Redirect based on role
-                    switch ($role) {
-                        case 'Member':
-                            if ($status == "Banned") {
-                                header("Location: ../login.php?accountBanned=This account was banned, please visit the front desk. Thank you");
-                                exit;
-                            } else if ($status == "Suspended") {
-                                header("Location: ../login.php?accountBanned=This account was suspended, please visit the front desk. Thank you");
-                                exit;
-                            } else {
-                                header("Location: ../Member/dashboard.php");
-                                exit;
-                            }
-                        case 'Instructor':
-                            header("Location: ../Instructor/dashboard.php");
-                            exit;
-                        case 'Front Desk':
-                            header("Location: ../Front-Desk/dashboard.php");
-                            exit;
-                        case 'Admin':
-                            header("Location: ../Admin/dashboard.php");
-                            exit;
-                        case 'Super Admin':
-                            header("Location: ../Super-Admin/dashboard.php");
-                            exit;
-                        default:
-                            // Handle unexpected roles
-                            header("Location: ../login.php?UnexpectedRole=Role not recognized&$user_data");
-                            exit;
+
+                    if ($status == "Banned") {
+                        header("Location: ../login.php?accountBanned=This account was banned, please visit the front desk. Thank you");
+                        exit;
+                    } else if ($status == "Suspended") {
+                        header("Location: ../login.php?accountBanned=This account was suspended, please visit the front desk. Thank you");
+                        exit;
+                    } else {
+                        header("Location: ../dashboard.php");
+                        exit;
                     }
+
                 } else {
                     // Role not found
                     header("Location: ../login.php?UnexpectedError=Unexpected Error, please try again later&$user_data");
