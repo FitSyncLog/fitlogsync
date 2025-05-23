@@ -70,28 +70,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     $email = validate($_POST['email'] ?? '');
     $password = validate($_POST['password'] ?? '');
     $confirm_password = validate($_POST['confirm_password'] ?? '');
-    $medical_conditions = validate($_POST['medical_conditions'] ?? '');
-    $current_medications = validate($_POST['current_medications'] ?? '');
-    $previous_injuries = validate($_POST['previous_injuries'] ?? '');
-    $q1 = validate($_POST['q1'] ?? '');
-    $q2 = validate($_POST['q2'] ?? '');
-    $q3 = validate($_POST['q3'] ?? '');
-    $q4 = validate($_POST['q4'] ?? '');
-    $q5 = validate($_POST['q5'] ?? '');
-    $q6 = validate($_POST['q6'] ?? '');
-    $q7 = validate($_POST['q7'] ?? '');
-    $q8 = validate($_POST['q8'] ?? '');
-    $q9 = validate($_POST['q9'] ?? '');
-    $q10 = validate($_POST['q10'] ?? '');
     $security_question1 = validate($_POST['security_question1'] ?? '');
     $security_answer1 = validate($_POST['security_answer1'] ?? '');
     $security_question2 = validate($_POST['security_question2'] ?? '');
     $security_answer2 = validate($_POST['security_answer2'] ?? '');
     $security_question3 = validate($_POST['security_question3'] ?? '');
     $security_answer3 = validate($_POST['security_answer3'] ?? '');
-    $waiver_rules = isset($_POST['waiver_rules']);
-    $waiver_liability = isset($_POST['waiver_liability']);
-    $waiver_cancel = isset($_POST['waiver_cancel']);
     $contact_person = mb_convert_case(validate($_POST['contact_person'] ?? ''), MB_CASE_TITLE, "UTF-8");
     $contact_number = validate($_POST['contact_number'] ?? '');
     $relationship = validate($_POST['relationship'] ?? '');
@@ -108,28 +92,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         '&email=' . $email .
         '&password=' . $password .
         '&confirm_password=' . $confirm_password .
-        '&medical_conditions=' . $medical_conditions .
-        '&current_medications=' . $current_medications .
-        '&previous_injuries=' . $previous_injuries .
-        '&q1=' . $q1 .
-        '&q2=' . $q2 .
-        '&q3=' . $q3 .
-        '&q4=' . $q4 .
-        '&q5=' . $q5 .
-        '&q6=' . $q6 .
-        '&q7=' . $q7 .
-        '&q8=' . $q8 .
-        '&q9=' . $q9 .
-        '&q10=' . $q10 .
         '&security_question1=' . $security_question1 .
         '&security_answer1=' . $security_answer1 .
         '&security_question2=' . $security_question2 .
         '&security_answer2=' . $security_answer2 .
         '&security_question3=' . $security_question3 .
         '&security_answer3=' . $security_answer3 .
-        '&waiver_rules=' . $waiver_rules .
-        '&waiver_liability=' . $waiver_liability .
-        '&waiver_cancel=' . $waiver_cancel .
         '&contact_person=' . $contact_person .
         '&contact_number=' . $contact_number .
         '&relationship=' . $relationship;
@@ -137,27 +105,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     // Validate required fields
     if (empty($username) || empty($lastname) || empty($firstname) || empty($dateofbirth) || empty($gender) || empty($address) || empty($phonenumber) || empty($email) || empty($password) || empty($confirm_password)) {
         $error_message = "All fields are required except middle name.";
-        header("Location: ../create-new-member.php?Failed=" . urlencode($error_message));
+        header("Location: ../create-new-front-desk.php?Failed=" . urlencode($error_message));
         exit();
     }
 
     // Validate email and phone number
     if (!isValidEmail($email)) {
         $error_message = "Invalid email address.";
-        header("Location: ../create-new-member.php?Failed=" . urlencode($error_message) . "&" . $user_data);
+        header("Location: ../create-new-front-desk.php?Failed=" . urlencode($error_message) . "&" . $user_data);
         exit();
     }
 
     if (!isValidPhoneNumber($phonenumber)) {
         $error_message = "Phone number must be 11 digits and start with '09'.";
-        header("Location: ../create-new-member.php?Failed=" . urlencode($error_message) . "&" . $user_data);
+        header("Location: ../create-new-front-desk.php?Failed=" . urlencode($error_message) . "&" . $user_data);
         exit();
     }
 
     // Validate password match
     if ($password !== $confirm_password) {
         $error_message = "Passwords do not match.";
-        header("Location: ../create-new-member.php?Failed=" . urlencode($error_message) . "&" . $user_data);
+        header("Location: ../create-new-front-desk.php?Failed=" . urlencode($error_message) . "&" . $user_data);
         exit();
     }
 
@@ -182,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     $result_check_username = mysqli_stmt_get_result($stmt_check_username);
 
     if (mysqli_num_rows($result_check_username) > 0) {
-        header("Location: ../create-new-member.php?username_already_exist=Username already exists&" . $user_data);
+        header("Location: ../create-new-front-desk.php?username_already_exist=Username already exists&" . $user_data);
         exit();
     }
 
@@ -194,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     $result_check_email = mysqli_stmt_get_result($stmt_check_email);
 
     if (mysqli_num_rows($result_check_email) > 0) {
-        header("Location: ../create-new-member.php?email_already_taken=Email is already taken.&" . $user_data);
+        header("Location: ../create-new-front-desk.php?email_already_taken=Email is already taken.&" . $user_data);
         exit();
     }
 
@@ -215,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
     if ($stmt_new_user_query === false) {
         $error_message = "Failed to prepare the SQL statement.";
-        header("Location: ../create-new-member.php?Failed=" . urlencode($error_message) . "&" . $user_data);
+        header("Location: ../create-new-front-desk.php?Failed=" . urlencode($error_message) . "&" . $user_data);
         exit();
     }
 
@@ -225,45 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     if ($result_new_user_query) {
         $user_id = mysqli_insert_id($conn);
 
-        // Insert medical background and PAR-Q data into the medical_backgrounds table
-        $sql_medical_background = "INSERT INTO medical_backgrounds (user_id, medical_conditions, current_medications, previous_injuries, par_q_1, par_q_2, par_q_3, par_q_4, par_q_5, par_q_6, par_q_7, par_q_8, par_q_9, par_q_10)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt_medical_background = mysqli_prepare($conn, $sql_medical_background);
-
-        if ($stmt_medical_background === false) {
-            $error_message = "Failed to prepare the SQL statement for medical background.";
-            header("Location: ../create-new-member.php?Failed=" . urlencode($error_message) . "&" . $user_data);
-            exit();
-        }
-
-        mysqli_stmt_bind_param($stmt_medical_background, "isssssssssssss", $user_id, $medical_conditions, $current_medications, $previous_injuries, $q1, $q2, $q3, $q4, $q5, $q6, $q7, $q8, $q9, $q10);
-        $result_medical_background = mysqli_stmt_execute($stmt_medical_background);
-
-        if (!$result_medical_background) {
-            $error_message = "Failed to insert medical background data.";
-            header("Location: ../create-new-member.php?Failed=" . urlencode($error_message) . "&" . $user_data);
-            exit();
-        }
-
-        // Insert waiver/agreement data into the waiver_agreements table
-        $sql_waiver_agreements = "INSERT INTO waivers (user_id, rules_and_policy, liability_waiver, cancellation_and_refund_policy)
-                VALUES (?, ?, ?, ?)";
-        $stmt_waiver_agreements = mysqli_prepare($conn, $sql_waiver_agreements);
-
-        if ($stmt_waiver_agreements === false) {
-            $error_message = "Failed to prepare the SQL statement for waiver agreements.";
-            header("Location: ../create-new-member.php?Failed=" . urlencode($error_message) . "&" . $user_data);
-            exit();
-        }
-
-        mysqli_stmt_bind_param($stmt_waiver_agreements, "isss", $user_id, $waiver_rules, $waiver_liability, $waiver_cancel);
-        $result_waiver_agreements = mysqli_stmt_execute($stmt_waiver_agreements);
-
-        if (!$result_waiver_agreements) {
-            $error_message = "Failed to insert waiver agreements data.";
-            header("Location: ../create-new-member.php?Failed=" . urlencode($error_message) . "&" . $user_data);
-            exit();
-        }
+        
 
         // Insert emergency contact data into the emergency_contacts table
         $sql_emergency_contact = "INSERT INTO emergency_contacts (user_id, contact_person, contact_number, relationship)
@@ -272,7 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         if ($stmt_emergency_contact === false) {
             $error_message = "Failed to prepare the SQL statement for emergency contact.";
-            header("Location: ../create-new-member.php?Failed=" . urlencode($error_message) . "&" . $user_data);
+            header("Location: ../create-new-front-desk.php?Failed=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
@@ -281,13 +211,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         if (!$result_emergency_contact) {
             $error_message = "Failed to insert emergency contact data.";
-            header("Location: ../create-new-member.php?Failed=" . urlencode($error_message) . "&" . $user_data);
+            header("Location: ../create-new-front-desk.php?Failed=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
         // Insert security questions data into the security_questions table
-        $sql_security_questions = "INSERT INTO security_questions (user_id, sq1, sq1_res, sq2, sq2_res, sq3, sq3_res)
-VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $sql_security_questions = "INSERT INTO security_questions (user_id, sq1, sq1_res, sq2, sq2_res, sq3, sq3_res) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt_security_questions = mysqli_prepare($conn, query: $sql_security_questions);
 
         if ($stmt_security_questions === false) {
@@ -306,7 +235,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?)";
         }
 
 
-        $role_id = 5;
+        $role_id = 3; // Assuming role_id for front desk is 3
         // Insert user role data into the user_role table
         $sql_user_role = "INSERT INTO user_roles (user_id, role_id)
                 VALUES (?, ?)";
@@ -314,7 +243,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         if ($stmt_user_role === false) {
             $error_message = "Failed to prepare the SQL statement for user role.";
-            header("Location: ../create-new-member.php?Failed=" . urlencode($error_message) . "&" . $user_data);
+            header("Location: ../create-new-front-desk.php?Failed=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
@@ -323,20 +252,20 @@ VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         if (!$result_user_role) {
             $error_message = "Failed to insert user role data.";
-            header("Location: ../create-new-member.php?Failed=" . urlencode($error_message) . "&" . $user_data);
+            header("Location: ../create-new-front-desk.php?Failed=" . urlencode($error_message) . "&" . $user_data);
             exit();
         }
 
-        $qrCodePath = "../qr_codes/{$accountNumber}.png";
+        $qrCodePath = "../../qr_codes/{$accountNumber}.png";
         $moduleSize = 50;
         QRcode::png($accountNumber, $qrCodePath, 'L', $moduleSize, 2);
 
         // Registration successful
-        header("Location: ../manage-members.php?Success=Successfully created a new member!");
+        header("Location: ../manage-front-desk.php?Success=Successfully created a new front desk officer!");
         exit();
     } else {
         // Registration failed
-        header("Location: ../create-new-member.php?Failed=Database error!");
+        header("Location: ../create-new-front-desk.php?Failed=Database error!");
         exit();
     }
 

@@ -7,7 +7,7 @@ if (!isset($_SESSION['login'])) {
     exit();
 }
 // Prepare the query to check permissions
-$page_name = "manage-members.php";
+$page_name = "manage-front-desk.php";
 $role_id = $_SESSION['role_id'];
 $query = "SELECT * FROM permissions WHERE page_name = ? AND role_id = ? AND permission = 1";
 $stmt = $conn->prepare($query);
@@ -24,7 +24,7 @@ if ($result->num_rows > 0) {
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>Manage All Members | FiT-LOGSYNC</title>
+        <title>Manage Front Desk | FiT-LOGSYNC</title>
         <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
         <link
             href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
@@ -82,8 +82,8 @@ if ($result->num_rows > 0) {
                     <?php include 'layout/navbar.php'; ?>
                     <div class="container-fluid">
                         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                            <h1 class="h3 mb-0 text-gray-800">Manage All Members</h1>
-                            <a class="btn btn-warning" href="create-new-member.php">Add New Member</a>
+                            <h1 class="h3 mb-0 text-gray-800">Manage Front Desk</h1>
+                            <a class="btn btn-warning" href="create-new-front-desk.php">Add Front Desk</a>
                         </div>
 
                         <div class="card shadow mb-4">
@@ -92,19 +92,15 @@ if ($result->num_rows > 0) {
                                     <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                         <thead>
                                             <tr>
-                                                <th class="text-center">Account Number</th>
                                                 <th class="text-center">Name</th>
                                                 <th class="text-center">Gender</th>
                                                 <th class="text-center">Date of Birth</th>
-                                                <th class="text-center">Account Status</th>
-                                                <th class="text-center">Subscription Status</th>
-                                                <th class="text-center">Registration Date</th>
                                                 <th class="text-center">Action</th>
                                             </tr>
                                         </thead>
 
                                         <?php
-                                        $query = "SELECT users.*  FROM users  JOIN user_roles ON users.user_id = user_roles.user_id  WHERE user_roles.role_id = 5  AND users.status != 'Deleted'";
+                                        $query = "SELECT users.*  FROM users  JOIN user_roles ON users.user_id = user_roles.user_id  WHERE user_roles.role_id = 3  AND users.status != 'Deleted'";
                                         $result = mysqli_query($conn, $query);
 
                                         if (!$result) {
@@ -115,16 +111,6 @@ if ($result->num_rows > 0) {
                                         <tbody>
                                             <?php while ($row = mysqli_fetch_assoc($result)): ?>
                                                 <tr>
-                                                    <td class="text-center">
-                                                        <?php
-                                                        $account_number = $row['account_number'];
-                                                        $formatted_account = substr($account_number, 0, 4) . '-' .
-                                                            substr($account_number, 4, 4) . '-' .
-                                                            substr($account_number, 8, 4) . '-' .
-                                                            substr($account_number, 12, 4);
-                                                        echo htmlspecialchars($formatted_account);
-                                                        ?>
-                                                    </td>
 
                                                     <td class="text-center">
                                                         <?php echo htmlspecialchars($row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']); ?>
@@ -134,39 +120,6 @@ if ($result->num_rows > 0) {
                                                         <?php
                                                         $dob = $row['date_of_birth'];
                                                         echo htmlspecialchars(date("F j, Y", strtotime($dob)));
-                                                        ?>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <?php
-                                                        $status = htmlspecialchars($row['status']);
-                                                        $badgeClass = '';
-
-                                                        switch ($status) {
-                                                            case 'Active':
-                                                                $badgeClass = 'badge-success';
-                                                                break;
-                                                            case 'Pending':
-                                                                $badgeClass = 'badge-warning';
-                                                                break;
-                                                            case 'Suspended':
-                                                            case 'Banned':
-                                                                $badgeClass = 'badge-danger';
-                                                                break;
-                                                            default:
-                                                                $badgeClass = 'badge-light';
-                                                        }
-                                                        ?>
-                                                        <span
-                                                            class="badge <?php echo $badgeClass; ?>"><?php echo $status; ?></span>
-                                                    </td>
-                                                    <td class="text-center">
-
-                                                    </td>
-
-                                                    <td class="text-center">
-                                                        <?php
-                                                        $reg_date = $row['registration_date'];
-                                                        echo htmlspecialchars(date("F j, Y", strtotime($reg_date)));
                                                         ?>
                                                     </td>
                                                     <td class="text-center">
@@ -227,6 +180,13 @@ if ($result->num_rows > 0) {
                                                                     <div class="row">
                                                                         <div class="col-md-6">
                                                                             <p><strong>Account Number:</strong>
+                                                                                <?php
+                                                                                $account_number = $row['account_number'];
+                                                                                $formatted_account = substr($account_number, 0, 4) . '-' .
+                                                                                    substr($account_number, 4, 4) . '-' .
+                                                                                    substr($account_number, 8, 4) . '-' .
+                                                                                    substr($account_number, 12, 4);
+                                                                                ?>
                                                                                 <?php echo htmlspecialchars($formatted_account); ?>
                                                                             </p>
                                                                             <p><strong>Last Name:</strong>
@@ -253,7 +213,10 @@ if ($result->num_rows > 0) {
                                                                                 <?php echo htmlspecialchars($row['status']); ?>
                                                                             </p>
                                                                             <p><strong>Registration Date:</strong>
-                                                                                <?php echo htmlspecialchars(date("F j, Y", strtotime($reg_date))); ?>
+                                                                                <?php
+                                                                                $reg_date = $row['registration_date'];
+                                                                                echo htmlspecialchars(date("F j, Y", strtotime($reg_date)));
+                                                                                ?>
                                                                             </p>
                                                                             <p><strong>Email:</strong>
                                                                                 <?php echo htmlspecialchars($row['email']); ?>
@@ -296,168 +259,52 @@ if ($result->num_rows > 0) {
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <hr>
-                                                                <!-- Medical Background -->
-                                                                <?php
-                                                                $medical_backgrounds_query = "SELECT * FROM medical_backgrounds WHERE user_id = {$row['user_id']}";
-                                                                $medical_backgrounds_result = mysqli_query($conn, $medical_backgrounds_query);
 
-                                                                if (!$medical_backgrounds_result) {
+
+                                                                <hr>
+                                                                <?php
+                                                                $security_questions_query = "SELECT * FROM security_questions WHERE user_id = {$row['user_id']}";
+                                                                $security_questions_result = mysqli_query($conn, $security_questions_query);
+
+                                                                if (!$security_questions_result) {
                                                                     die("Query Failed: " . mysqli_error($conn));
                                                                 }
-                                                                $medical_backgrounds_row = mysqli_fetch_assoc($medical_backgrounds_result);
+                                                                $security_questions_row = mysqli_fetch_assoc($security_questions_result);
 
                                                                 ?>
 
+                                                                <!-- Personal Information -->
                                                                 <div class="section">
                                                                     <h5 class="text-center text-warning"><strong><i
-                                                                                class="fas fa-notes-medical"></i> Medical
-                                                                            Background</strong></h5>
+                                                                                class="fas fa-solid fa-question"></i> Security
+                                                                            Questions</strong></h5>
                                                                     <div class="row">
                                                                         <div class="col-md-12">
-                                                                            <p><strong>Medical Conditions:</strong>
-                                                                                <?php echo htmlspecialchars($medical_backgrounds_row['medical_conditions']); ?>
+                                                                            <strong>Security Question 1:</strong>
+                                                                            <?php echo htmlspecialchars($security_questions_row['sq1']); ?>
+                                                                            <p><strong>Answer:</strong>
+                                                                                <?php echo htmlspecialchars($security_questions_row['sq1_res']); ?>
                                                                             </p>
-                                                                            <p><strong>Current Medications:</strong>
-                                                                                <?php echo htmlspecialchars($medical_backgrounds_row['current_medications']); ?>
+                                                                        </div>
+                                                                        <div class="col-md-12">
+                                                                            <strong>Security Question 2:</strong>
+                                                                            <?php echo htmlspecialchars($security_questions_row['sq2']); ?>
+                                                                            <p><strong>Answer:</strong>
+                                                                                <?php echo htmlspecialchars($security_questions_row['sq2_res']); ?>
                                                                             </p>
-                                                                            <p><strong>Previous Injuries:</strong>
-                                                                                <?php echo htmlspecialchars($medical_backgrounds_row['previous_injuries']); ?>
+                                                                        </div>
+                                                                        <div class="col-md-12">
+                                                                            <strong>Security Question 3:</strong>
+                                                                            <?php echo htmlspecialchars($security_questions_row['sq3']); ?>
+                                                                            <p><strong>Answer:</strong>
+                                                                                <?php echo htmlspecialchars($security_questions_row['sq3_res']); ?>
                                                                             </p>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                                 <hr>
-                                                                <!-- Physical Activity Readiness Questions (PAR-Q) -->
-                                                                <div class="section">
-                                                                    <h5 class="text-center text-warning"><strong><i
-                                                                                class="fas fa-running"></i> Physical Activity
-                                                                            Readiness Questions (PAR-Q)</strong></h5>
-                                                                    <div class="row">
-                                                                        <div class="col-md-12">
-                                                                            <strong>Q1:</strong> Has your doctor ever said that
-                                                                            you have a heart condition and that you should only
-                                                                            do physical activity recommended by a doctor?
-                                                                            <p><strong>Answer:</strong>
-                                                                                <?php echo htmlspecialchars($medical_backgrounds_row['par_q_1']); ?>
-                                                                            </p>
-                                                                        </div>
-                                                                        <div class="col-md-12">
-                                                                            <strong>Q2:</strong> Do you feel pain in your chest
-                                                                            when you perform physical activity?
-                                                                            <p><strong>Answer:</strong>
-                                                                                <?php echo htmlspecialchars($medical_backgrounds_row['par_q_2']); ?>
-                                                                            </p>
-                                                                        </div>
-                                                                        <div class="col-md-12">
-                                                                            <strong>Q3:</strong> In the past month, have you had
-                                                                            chest pain when you were not doing physical
-                                                                            activity?
-                                                                            <p><strong>Answer:</strong>
-                                                                                <?php echo htmlspecialchars($medical_backgrounds_row['par_q_3']); ?>
-                                                                            </p>
-                                                                        </div>
-                                                                        <div class="col-md-12">
-                                                                            <strong>Q4:</strong> Do you lose your balance
-                                                                            because of dizziness or do you ever lose
-                                                                            consciousness?
-                                                                            <p><strong>Answer:</strong>
-                                                                                <?php echo htmlspecialchars($medical_backgrounds_row['par_q_4']); ?>
-                                                                            </p>
-                                                                        </div>
-                                                                        <div class="col-md-12">
-                                                                            <strong>Q5:</strong> Do you have a bone or joint
-                                                                            problem that could be worsened by a change in your
-                                                                            physical activity?
-                                                                            <p><strong>Answer:</strong>
-                                                                                <?php echo htmlspecialchars($medical_backgrounds_row['par_q_5']); ?>
-                                                                            </p>
-                                                                        </div>
-                                                                        <div class="col-md-12">
-                                                                            <strong>Q6:</strong> Is your doctor currently
-                                                                            prescribing any medication for your blood pressure
-                                                                            or heart condition?
-                                                                            <p><strong>Answer:</strong>
-                                                                                <?php echo htmlspecialchars($medical_backgrounds_row['par_q_6']); ?>
-                                                                            </p>
-                                                                        </div>
-                                                                        <div class="col-md-12">
-                                                                            <strong>Q7:</strong> Do you have any chronic medical
-                                                                            conditions that may affect your ability to exercise
-                                                                            safely?
-                                                                            <p><strong>Answer:</strong>
-                                                                                <?php echo htmlspecialchars($medical_backgrounds_row['par_q_7']); ?>
-                                                                            </p>
-                                                                        </div>
-                                                                        <div class="col-md-12">
-                                                                            <strong>Q8:</strong> Are you pregnant or have you
-                                                                            given birth in the last 6 months?
-                                                                            <p><strong>Answer:</strong>
-                                                                                <?php echo htmlspecialchars($medical_backgrounds_row['par_q_8']); ?>
-                                                                            </p>
-                                                                        </div>
-                                                                        <div class="col-md-12">
-                                                                            <strong>Q9:</strong> Do you have any recent injuries
-                                                                            or surgeries that may limit your physical activity?
-                                                                            <p><strong>Answer:</strong>
-                                                                                <?php echo htmlspecialchars($medical_backgrounds_row['par_q_9']); ?>
-                                                                            </p>
-                                                                        </div>
-                                                                        <div class="col-md-12">
-                                                                            <strong>Q10:</strong> Do you know of any other
-                                                                            reason why you should not do physical activity?
-                                                                            <p><strong>Answer:</strong>
-                                                                                <?php echo htmlspecialchars($medical_backgrounds_row['par_q_10']); ?>
-                                                                            </p>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
 
-                                                                <hr>
-                                                                <!-- Waiver/Agreements -->
-                                                                <?php
-                                                                $waivers_query = "SELECT * FROM waivers WHERE user_id = {$row['user_id']}";
-                                                                $waivers_result = mysqli_query($conn, $waivers_query);
 
-                                                                if (!$waivers_result) {
-                                                                    die("Query Failed: " . mysqli_error($conn));
-                                                                }
-                                                                $waivers_row = mysqli_fetch_assoc($waivers_result);
-
-                                                                ?>
-
-                                                                <div class="section">
-                                                                    <h5 class="text-center text-warning"><strong><i
-                                                                                class="fas fa-file-signature"></i> Waiver and
-                                                                            Agreements</strong></h5>
-                                                                    <div class="row">
-                                                                        <div class="col-md-12">
-                                                                            <label
-                                                                                style="pointer-events: none; cursor: default;">
-                                                                                <input type="checkbox" <?php echo ($waivers_row['rules_and_policy'] == '1') ? 'checked' : ''; ?>
-                                                                                    style="accent-color: #F6C23E; pointer-events: none; opacity: 1;">
-                                                                                <strong>Agree to the Rules and Policy</strong>
-                                                                            </label>
-                                                                        </div>
-                                                                        <div class="col-md-12">
-                                                                            <label
-                                                                                style="pointer-events: none; cursor: default;">
-                                                                                <input type="checkbox" <?php echo ($waivers_row['liability_waiver'] == '1') ? 'checked' : ''; ?>
-                                                                                    style="accent-color: #F6C23E; pointer-events: none; opacity: 1;">
-                                                                                <strong>Agree to the Liability Waiver</strong>
-                                                                            </label>
-                                                                        </div>
-                                                                        <div class="col-md-12">
-                                                                            <label
-                                                                                style="pointer-events: none; cursor: default;">
-                                                                                <input type="checkbox" <?php echo ($waivers_row['cancellation_and_refund_policy'] == '1') ? 'checked' : ''; ?>
-                                                                                    style="accent-color: #F6C23E; pointer-events: none; opacity: 1;">
-                                                                                <strong>Agree to the Cancellation and Refund
-                                                                                    Policy</strong>
-                                                                            </label>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
                                                             </div>
                                                             <div class="modal-footer"
                                                                 style="display: flex; justify-content: center; gap: 10px;">

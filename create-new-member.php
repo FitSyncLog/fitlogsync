@@ -725,6 +725,80 @@ if ($result->num_rows > 0) {
         <script src="assets/js/main.js"></script>
 
         <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const allQuestions = [
+                    "What is your mother’s maiden name?",
+                    "In what city were you born?",
+                    "What is your father's middle name?",
+                    "What was your childhood nickname?",
+                    "What is your grandmother's first name?",
+                    "What was the name of your first school?",
+                    "What is the name of your first pet?",
+                    "What was the make and model of your first car?",
+                    "What was the name of your childhood best friend?",
+                    "In what city did your parents meet?",
+                    "What is your favorite book?",
+                    "What was the first concert you attended?",
+                    "What is your favorite movie?",
+                    "What is your favorite food?",
+                    "What is your favorite childhood TV show?"
+                ];
+
+                function updateQuestionOptions() {
+                    const question1 = document.getElementById('security_question1').value;
+                    const question2 = document.getElementById('security_question2').value;
+                    const question3 = document.getElementById('security_question3').value;
+
+                    // Get all selected questions
+                    const selectedQuestions = [question1, question2, question3];
+
+                    // Update options for question 2
+                    updateQuestionDropdown('security_question2', selectedQuestions, question2);
+
+                    // Update options for question 3
+                    updateQuestionDropdown('security_question3', selectedQuestions, question3);
+                }
+
+                function updateQuestionDropdown(dropdownId, selectedQuestions, currentValue) {
+                    const dropdown = document.getElementById(dropdownId);
+
+                    // Clear the dropdown
+                    dropdown.innerHTML = '<option value="">Select Security Question</option>';
+
+                    // Add available options
+                    allQuestions.forEach(question => {
+                        // Only add if not selected in other dropdowns and not the current value of this dropdown
+                        if (!selectedQuestions.includes(question) || question === currentValue) {
+                            const option = document.createElement('option');
+                            option.value = question;
+                            option.textContent = question;
+                            if (question === currentValue) {
+                                option.selected = true;
+                            }
+                            dropdown.appendChild(option);
+                        }
+                    });
+                }
+
+                // Initialize the dropdowns on page load
+                updateQuestionOptions();
+
+                // Add event listeners to update options when a question is selected
+                document.getElementById('security_question1').addEventListener('change', updateQuestionOptions);
+                document.getElementById('security_question2').addEventListener('change', updateQuestionOptions);
+                document.getElementById('security_question3').addEventListener('change', updateQuestionOptions);
+
+                // If there are previously selected values from GET parameters, set them
+                <?php if (isset($_GET['security_question2'])): ?>
+                    document.getElementById('security_question2').value = "<?php echo htmlspecialchars($_GET['security_question2']); ?>";
+                <?php endif; ?>
+                <?php if (isset($_GET['security_question3'])): ?>
+                    document.getElementById('security_question3').value = "<?php echo htmlspecialchars($_GET['security_question3']); ?>";
+                <?php endif; ?>
+
+                // Update the options after setting the values
+                updateQuestionOptions();
+            });
             document.getElementById('registrationForm').addEventListener('submit', function (event) {
                 let isValid = true;
 

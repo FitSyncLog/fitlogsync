@@ -1,3 +1,37 @@
+<?php
+include 'indexes/db_con.php';
+
+$email = trim($_GET['email'] ?? '');
+$token = trim($_GET['token'] ?? '');  
+
+// Debug output
+error_log("Verifying token for email: $email");
+error_log("Token length: " . strlen($token));
+
+$stmt = $conn->prepare("SELECT * FROM password_resets WHERE email = ? AND token = ?");
+$stmt->bind_param("ss", $email, $token);
+
+if (!$stmt->execute()) {
+    error_log("Execute failed: " . $stmt->error);
+}
+
+$result = $stmt->get_result();
+$emailToDisplay = '';
+
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    error_log("Token match found. DB token length: " . strlen($row['token']));
+    $emailToDisplay = htmlspecialchars($email);
+} else {
+    error_log("No match found. Possible reasons:");
+    error_log("- Email doesn't exist");
+    error_log("- Token mismatch");
+    error_log("- Token truncated in DB (stored length: " . strlen($row['token'] ?? '') . ")");
+}
+
+$stmt->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -54,131 +88,6 @@
 </head>
 
 <body>
-
-    <?php
-    if (isset($_GET['registrationSuccess'])) {
-        $message = htmlspecialchars($_GET['registrationSuccess']);
-        echo "<script>
-        Swal.fire({
-          position: 'center',
-          icon: 'success',
-          title: '{$message}',
-          showConfirmButton: false,
-          timer: 1500
-        });
-    </script>";
-    }
-    ?>
-
-    <?php
-    if (isset($_GET['registrationFailed'])) {
-        $message = htmlspecialchars($_GET['registrationFailed']);
-        echo "<script>
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: '{$message}',
-          showConfirmButton: false,
-          timer: 1500
-        });
-    </script>";
-    }
-    ?>
-
-    <?php
-    if (isset($_GET['UnexpectedError'])) {
-        $message = htmlspecialchars($_GET['UnexpectedError']);
-        echo "<script>
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: '{$message}',
-          showConfirmButton: false,
-          timer: 1500
-        });
-    </script>";
-    }
-    ?>
-
-    <?php
-    if (isset($_GET['accountBanned'])) {
-        $message = htmlspecialchars($_GET['accountBanned']);
-        echo "<script>
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: '{$message}',
-          showConfirmButton: false,
-          timer: 1500
-        });
-    </script>";
-    }
-    ?>
-
-    <?php
-    if (isset($_GET['SessionExpired'])) {
-        $message = htmlspecialchars($_GET['SessionExpired']);
-        echo "<script>
-        Swal.fire({
-          position: 'center',
-          icon: 'question',
-          title: '{$message}',
-          showConfirmButton: false,
-          timer: 1500
-        });
-    </script>";
-    }
-    ?>
-
-    <?php
-    if (isset($_GET['LoginFirst'])) {
-        $message = htmlspecialchars($_GET['LoginFirst']);
-        echo "<script>
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: '{$message}',
-          showConfirmButton: false,
-          timer: 1500
-        });
-    </script>";
-    }
-    ?>
-
-    <?php
-    if (isset($_GET['EmailisnotRegistered'])) {
-        $message = htmlspecialchars($_GET['EmailisnotRegistered']);
-        echo "<script>
-      Swal.fire({
-        position: 'center',
-        icon: 'error',
-        title: '{$message}',
-        showConfirmButton: true,
-        confirmButtonText: 'Register Now',
-        confirmButtonColor: '#ffc107',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.location.href = 'register.php';
-        }
-      });
-  </script>";
-    }
-    ?>
-
-    <?php
-    if (isset($_GET['incorrectPassword'])) {
-        $message = htmlspecialchars($_GET['incorrectPassword']);
-        echo "<script>
-        Swal.fire({
-          position: 'center',
-          icon: 'error',
-          title: '{$message}',
-          showConfirmButton: true
-        });
-    </script>";
-    }
-    ?>
-
     <?php
     if (isset($_GET['error'])) {
         $message = htmlspecialchars($_GET['error']);
@@ -187,29 +96,12 @@
           position: 'center',
           icon: 'error',
           title: '{$message}',
-          showConfirmButton: true
-        });
-    </script>";
-    }
-    ?>
-
-    <?php
-    if (isset($_GET['logout'])) {
-        $message = htmlspecialchars($_GET['logout']);
-        echo "<script>
-        Swal.fire({
-          position: 'center',
-          icon: 'success',
-          title: '{$message}',
           showConfirmButton: false,
           timer: 1500
         });
     </script>";
     }
     ?>
-
-
-
     <?php include 'layout/index_header.php'; ?>
 
     <section class="hero section light-background py-3 py-md-5 py-xl-8">
@@ -224,27 +116,56 @@
                                 <div class="col-12">
                                     <div class="mb-4">
                                         <h3><strong>Enter security code</strong></h3>
-                                        <p>Please check your email for a message with your code. Your code is 6 numbers long.</p>
+                                        <p>Please check your email for a message with your code. Your code is 6 numbers
+                                            long.</p>
+                                        <h5>We sent your code to:</h5>
+                                        <p><?php echo htmlspecialchars($emailToDisplay); ?></p>
+
                                         <hr>
                                     </div>
                                 </div>
                             </div>
 
-                            <form id="loginForm" action="indexes/login.php" method="POST">
+                            <form id="loginForm" action="indexes/reset-password-verification.php" method="POST">
                                 <div class="row gy-3 overflow-hidden">
                                     <div class="col-12">
                                         <div class="form-floating">
-                                            <input type="text" class="form-control" id="email" name="email"
-                                                placeholder="Email"
-                                                value="<?php echo htmlspecialchars($_GET['email'] ?? ''); ?>">
-                                            <label for="email">Email</label>
+                                            <input type="text" class="form-control" id="resetCode" name="resetCode"
+                                                placeholder="Reset Code">
+                                            <label for="Reset Code">Reset Code</label>
                                             <div class="error-message" id="emailError"></div>
                                         </div>
                                     </div>
+                                    <hr>
+                                    <div class="col-12">
+                                        <div class="form-floating position-relative">
+                                            <input type="password" class="form-control" id="newPassword"
+                                                name="newPassword" placeholder="New Password">
+                                            <label for="New Password">New Password</label>
+                                            <div class="error-message" id="newPasswordError"></div>
+                                            <i class="bi bi-eye-slash position-absolute top-50 translate-middle-y"
+                                                id="toggleNewPassword" style="right: 10px; cursor: pointer;"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-floating position-relative">
+                                            <input type="password" class="form-control" id="retypenewPassword"
+                                                name="retypenewPassword" placeholder="Retype New Password">
+                                            <label for="Retype New Password">Retype New Password</label>
+                                            <div class="error-message" id="retypenewPasswordError"></div>
+                                            <i class="bi bi-eye-slash position-absolute top-50 translate-middle-y"
+                                                id="toggleRetypeNewPassword" style="right: 10px; cursor: pointer;"></i>
+                                        </div>
+                                    </div>
+
+                                    <input type="hidden" name="email" value="<?php echo htmlspecialchars($emailToDisplay); ?>">
+
+                                    <input type="hidden" name="token" value="<?php echo $token ?>">
+
                                     <div class="col-12">
                                         <div class="d-grid">
                                             <button class="btn btn-warning btn-lg" type="submit"
-                                                name="login">Login</button>
+                                                name="reset">Continue</button>
                                         </div>
                                     </div>
                                 </div>
@@ -253,6 +174,7 @@
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </section>
 
@@ -275,44 +197,110 @@
         document.getElementById('loginForm').addEventListener('submit', function (event) {
             let isValid = true;
 
-            // Get the email and password fields
-            const email = document.getElementById('email');
-            const password = document.getElementById('password');
-
-            // Get the error message elements
-            const emailError = document.getElementById('emailError');
-            const passwordError = document.getElementById('passwordError');
+            // Reset Code Validation
+            const resetCode = document.getElementById('resetCode');
+            const resetCodeError = document.getElementById('emailError');
 
             // Reset error messages and styles
-            emailError.innerHTML = '';
-            email.classList.remove('error');
-            passwordError.innerHTML = '';
-            password.classList.remove('error');
+            resetCodeError.innerHTML = '';
+            resetCode.classList.remove('error');
 
-            // Validate email
-            if (!email.value) {
-                emailError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Email is required`;
-                email.classList.add('error');
+            // Validate reset code
+            if (!resetCode.value) {
+                resetCodeError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Reset code is required`;
+                resetCode.classList.add('error');
                 isValid = false;
-            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-                emailError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Please enter a valid email address`;
-                email.classList.add('error');
+            } else if (!/^\d{6}$/.test(resetCode.value)) {
+                resetCodeError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Please enter a valid 6-digit reset code`;
+                resetCode.classList.add('error');
                 isValid = false;
             }
 
-            // Validate password
-            if (!password.value) {
-                passwordError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Password is required`;
-                password.classList.add('error');
+            // New Password Validation
+            const newPassword = document.getElementById('newPassword');
+            const newPasswordError = document.getElementById('newPasswordError');
+
+            // Reset error messages and styles
+            newPasswordError.innerHTML = '';
+            newPassword.classList.remove('error');
+
+            // Validate new password
+            if (!newPassword.value) {
+                newPasswordError.innerHTML = `<i class="bi bi-exclamation-circle"></i> New password is required`;
+                newPassword.classList.add('error');
                 isValid = false;
+            } else if (newPassword.value.length < 8) {
+                newPasswordError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Password must be at least 8 characters long`;
+              newPasswordError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Password must contain at least one uppercase letter`;
+                newPassword.classList.add('error');
+                i  newPassword.classList.add('error');
+                isValid = false;
+            } else if (!/[A-Z]/.test(newPassword.value)) {
+                sValid = false;
+            } else if (!/[0-9]/.test(newPassword.value)) {
+                newPasswordError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Password must contain at least one numeric character`;
+                newPassword.classList.add('error');
+                isValid = false;
+            } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword.value)) {
+                newPasswordError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Password must contain at least one special character`;
+                newPassword.classList.add('error');
+                isValid = false;
+            } else {
+                newPasswordError.innerHTML = '';
+                newPassword.classList.remove('error');
+            }
+
+            // Retype New Password Validation
+            const retypenewPassword = document.getElementById('retypenewPassword');
+            const retypenewPasswordError = document.getElementById('retypenewPasswordError');
+
+            // Reset error messages and styles
+            retypenewPasswordError.innerHTML = '';
+            retypenewPassword.classList.remove('error');
+
+            // Validate retype new password
+            if (!retypenewPassword.value) {
+                retypenewPasswordError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Retype new password is required`;
+                retypenewPassword.classList.add('error');
+                isValid = false;
+            } else if (newPassword.value !== retypenewPassword.value) {
+                retypenewPasswordError.innerHTML = `<i class="bi bi-exclamation-circle"></i> Passwords do not match`;
+                retypenewPassword.classList.add('error');
+                isValid = false;
+            } else {
+                retypenewPasswordError.innerHTML = '';
+                retypenewPassword.classList.remove('error');
             }
 
             // Prevent form submission if validation fails
             if (!isValid) {
-                event.preventDefault();
+                event.preventDefault(); // Prevent the form from submitting
             }
         });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleNewPassword = document.getElementById('toggleNewPassword');
+            const newPassword = document.getElementById('newPassword');
+            const toggleRetypeNewPassword = document.getElementById('toggleRetypeNewPassword');
+            const retypenewPassword = document.getElementById('retypenewPassword');
+
+            toggleNewPassword.addEventListener('click', function () {
+                const type = newPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+                newPassword.setAttribute('type', type);
+                this.classList.toggle('bi-eye');
+                this.classList.toggle('bi-eye-slash');
+            });
+
+            toggleRetypeNewPassword.addEventListener('click', function () {
+                const type = retypenewPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+                retypenewPassword.setAttribute('type', type);
+                this.classList.toggle('bi-eye');
+                this.classList.toggle('bi-eye-slash');
+            });
+        });
+
     </script>
+
 
 
     <!-- Vendor JS Files -->
@@ -328,38 +316,6 @@
 
     <!-- Main JS File -->
     <script src="assets/js/main.js"></script>
-
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function (event) {
-            let isValid = true;
-
-            // Email Validation
-            const email = document.getElementById('email');
-            if (!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-                document.getElementById('emailError').innerHTML = `<i class="bi bi-exclamation-circle"></i> Please enter a valid email address`;
-                email.classList.add('error');
-                isValid = false;
-            } else {
-                document.getElementById('emailError').innerHTML = '';
-                email.classList.remove('error');
-            }
-
-            // Password Validation
-            const password = document.getElementById('password');
-            if (!password.value) {
-                document.getElementById('passwordError').innerHTML = `<i class="bi bi-exclamation-circle"></i> Password is required`;
-                password.classList.add('error');
-                isValid = false;
-            } else {
-                document.getElementById('passwordError').innerHTML = '';
-                password.classList.remove('error');
-            }
-
-            if (!isValid) {
-                event.preventDefault();
-            }
-        });
-    </script>
 
 </body>
 

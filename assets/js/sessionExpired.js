@@ -1,10 +1,21 @@
-let inactivityTime = 600*1000; 
+let inactivityTime = 600 * 1000; // 10 minutes in milliseconds
 
 function logoutUser() {
-    fetch('../indexes/logout.php') // Ensure correct path to logout.php
-        .then(() => {
-            window.location.href = "login.php?SessionExpired=Your session has expired. Please login again.";
-        });
+    // Make an AJAX call to destroy the session
+    fetch('destroy_session.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log(data); // Log the response from the server
+        window.location.href = "login.php?SessionExpired=Your session has expired. Please login again.";
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 }
 
 function resetTimer() {

@@ -34,6 +34,72 @@ if ($result->num_rows > 0) {
         <link rel="stylesheet" href="assets/css/sweetalert2.min.css">
         <script src="assets/js/sweetalert2.all.min.js"></script>
         <script src="assets/js/sessionExpired.js"></script>
+        <style>
+            .card-container {
+                perspective: 1000px;
+                width: 300px;
+                height: 200px;
+                margin: 0 auto;
+            }
+
+            .card {
+                width: 100%;
+                height: 100%;
+                position: relative;
+                transform-style: preserve-3d;
+                transition: transform 1s;
+            }
+
+            .card-container:hover .card {
+                transform: rotateY(180deg);
+            }
+
+            .card-front,
+            .card-back {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                backface-visibility: hidden;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .card-front {
+                background: linear-gradient(135deg, #FFC107,rgb(235, 183, 27));
+                color: white;
+            }
+
+            .card-back {
+                background: linear-gradient(135deg,rgb(14, 14, 14),rgb(19, 19, 19));
+                color: white;
+                transform: rotateY(180deg);
+            }
+
+            .card-front h2,
+            .card-back h2 {
+                margin: 0;
+                font-size: 24px;
+            }
+
+            .card-front p,
+            .card-back p {
+                margin: 5px 0;
+                font-size: 16px;
+            }
+
+            .qr-code {
+                margin-top: 20px;
+            }
+
+            .qr-code img {
+                width: 100px;
+                height: 100px;
+            }
+        </style>
     </head>
 
     <body id="page-top">
@@ -78,62 +144,144 @@ if ($result->num_rows > 0) {
 
                         <!-- Content Row -->
                         <div class="row">
+                            <?php
+                            $role_id = $_SESSION['role_id'];
 
-                            <!-- Total Members -->
-                            <div class="col-xl-3 col-md-6 mb-4">
-                                <div class="card border-left-warning shadow h-100 py-2">
-                                    <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
-                                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                    Total Members
-                                                </div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-members">
-                                                    <?php
-                                                    $sql_members = "SELECT COUNT(*) AS total_members
+                            if ($role_id == 1 || $role_id == 2 || $role_id == 3) {
+                                ?>
+                                <!-- Total Members -->
+                                <div class="col-xl-3 col-md-6 mb-4">
+                                    <div class="card border-left-warning shadow h-100 py-2">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                        Total Members
+                                                    </div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-members">
+                                                        <?php
+                                                        $sql_members = "SELECT COUNT(*) AS total_members
                                                 FROM user_roles
                                                 WHERE role_id = 5";
-                                                    $result_members = mysqli_query($conn, $sql_members);
-                                                    $row_members = mysqli_fetch_assoc($result_members);
-                                                    echo $row_members['total_members'];
-                                                    ?>
+                                                        $result_members = mysqli_query($conn, $sql_members);
+                                                        $row_members = mysqli_fetch_assoc($result_members);
+                                                        echo $row_members['total_members'];
+                                                        ?>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <i class="fas fa-user fa-2x text-gray-300"></i>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-user fa-2x text-gray-300"></i>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                                <?php
+                            }
+                            ?>
 
-                            <!-- Total Instructor -->
-                            <div class="col-xl-3 col-md-6 mb-4">
-                                <div class="card border-left-warning shadow h-100 py-2">
-                                    <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
-                                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                    Total Instructors
+                            <?php
+                            $role_id = $_SESSION['role_id'];
+
+                            if ($role_id == 1 || $role_id == 2 || $role_id == 3) {
+                                ?>
+                                <!-- Total Front Desk -->
+                                <div class="col-xl-3 col-md-6 mb-4">
+                                    <div class="card border-left-warning shadow h-100 py-2">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                        Total Front Desk
+                                                    </div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-members">
+                                                        <?php
+                                                        $sql_members = "SELECT COUNT(*) AS total_members
+                                                FROM user_roles
+                                                WHERE role_id = 3";
+                                                        $result_members = mysqli_query($conn, $sql_members);
+                                                        $row_members = mysqli_fetch_assoc($result_members);
+                                                        echo $row_members['total_members'];
+                                                        ?>
+                                                    </div>
                                                 </div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-instructor">
-                                                    <?php
-                                                    $sql_members = "SELECT COUNT(*) AS total_members
+                                                <div class="col-auto">
+                                                    <i class="fas fa-user-tie fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php
+                            }
+                            ?>
+
+                            <?php
+                            $role_id = $_SESSION['role_id'];
+
+                            if ($role_id == 1 || $role_id == 2 || $role_id == 3) {
+                                ?>
+                                <!-- Total Instructor -->
+                                <div class="col-xl-3 col-md-6 mb-4">
+                                    <div class="card border-left-warning shadow h-100 py-2">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                        Total Instructors
+                                                    </div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-instructor">
+                                                        <?php
+                                                        $sql_members = "SELECT COUNT(*) AS total_members
                                                 FROM user_roles
                                                 WHERE role_id = 4";
-                                                    $result_members = mysqli_query($conn, $sql_members);
-                                                    $row_members = mysqli_fetch_assoc($result_members);
-                                                    echo $row_members['total_members'];
-                                                    ?>
+                                                        $result_members = mysqli_query($conn, $sql_members);
+                                                        $row_members = mysqli_fetch_assoc($result_members);
+                                                        echo $row_members['total_members'];
+                                                        ?>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <i class="fas fa-chalkboard-teacher fa-2x text-gray-300"></i>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-dumbbell fa-2x text-gray-300"></i>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                                <?php
+                            }
+                            ?>
+
+                            <?php
+                            $role_id = $_SESSION['role_id'];
+                            $account_number = $_SESSION['account_number'];
+                            $lastname = $_SESSION['lastname'];
+                            $firstname = $_SESSION['firstname'];
+                            $middlename = $_SESSION['middlename'];
+                            $registration_date = $_SESSION['registration_date'];
+
+                            if ($role_id == 5) {
+                                ?>
+
+
+                                <div class="card-container">
+                                    <div class="card">
+                                        <div class="card-front">
+                                            <p> <?php echo $firstname . ' ' . $middlename . ' ' . $lastname; ?></p>
+                                            <p> <?php echo $account_number; ?></p>
+                                            <p> <?php echo $registration_date; ?></p>
+                                        </div>
+                                        <div class="card-back">
+                                            <div class="qr-code">
+                                                <img src="<?= 'qr_codes/' . $account_number . '.png' ?>" alt="QR Code">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <?php
+                            }
+                            ?>
                         </div>
                     </div>
                     <!-- /.container-fluid -->

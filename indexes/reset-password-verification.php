@@ -107,57 +107,78 @@ function sendMail($email, $otpCode, $name)
     }
 }
 
-if (isset($_POST['search'])) {
-
+if (isset($_POST['reset'])) {
     $email = $_POST['email'];
+    $token = $_POST['token'];
+    $resetCode = $_POST['resetCode'];
+    $newPassword = $_POST['newPassword'];
+    $retypenewPassword = $_POST['retypenewPassword'];
 
-    // Corrected query: column name should not have $ sign
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
+    // Prepare statement to find matching token and email
+    $stmt = $conn->prepare("SELECT * FROM password_resets WHERE email = ? AND token = ?");
+    $stmt->bind_param("ss", $email, $token);
     $stmt->execute();
     $result = $stmt->get_result();
 
     $exists = $result->num_rows > 0;
 
     if (!$exists) {
-        // Email not found, redirect with message
-        header("Location: ../forgot-password.php?notexists=The email is not existing.");
+        // Token is invalid or tampered with
+        header("Location: ../forgot-password-verification.php?error=" . urlencode("Token is invalid, please do not change the URL.") . "&email=" . urlencode($email) . "&token=" . urlencode($token));
         exit();
     } else {
-        $otpCode = rand(100000, 999999);
-        $token = bin2hex(random_bytes(64));
+        $row = $result->fetch_assoc();
+        $otp_code = $row['code'];
+        $created_at = $row['created_at'];
 
-        // Prepare the statement to get the first_name
-        $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        // Set timezone to Asia/Manila
+        $timezone = new DateTimeZone('Asia/Manila');
+        $createdAt = new DateTime($created_at, $timezone);
+        $currentTime = new DateTime('now', $timezone);
 
-        // Fetch the first_name
-        $user = $result->fetch_assoc();
-        $name = $user['firstname'];
+        $minutesElapsed = ($currentTime->getTimestamp() - $createdAt->getTimestamp()) / 60;
 
-        // Corrected query: column name should not have $ sign
-        $resetstmt = $conn->prepare("INSERT INTO password_resets (email, code, token) VALUES (?, ?, ?)");
-        $resetstmt->bind_param("sss", $email, $otpCode, $token);
-        $resetstmt->execute();
-        $resetresult = $resetstmt->get_result();
-        $exists = $resetresult->num_rows > 0;
+        // Optional: Debug log
+        error_log("Created at: " . $createdAt->format('Y-m-d H:i:s'));
+        error_log("Current time: " . $currentTime->format('Y-m-d H:i:s'));
+        error_log("Minutes elapsed: " . $minutesElapsed);
 
-        if (sendMail($email, $otpCode, $name)) {
-            // Redirect to OTP verification page
-            $_SESSION['user_id'] = $user_id;
-            header("Location: ../forgot-password-verification.php?email=" . urlencode($email) . "&token=" . urlencode($token));
-            exit();
-        } else {
-            header("Location: ../login.php?UnexpectedError=Failed to send OTP. Please try again.&$user_data");
+        // Check if the timestamp is in the future (error case)
+        if ($minutesElapsed < 0) {
+            header("Location: ../forgot-password.php?error=" . urlencode("Invalid system time.") . "&email=" . urlencode($email));
             exit();
         }
-    }
 
+        // Expiry check
+        if ($minutesElapsed > 15) {
+            header("Location: ../forgot-password.php?error=" . urlencode("Reset Code has expired.") . "&email=" . urlencode($email));
+            exit();
+        } else {
+            if ($resetCode === $otp_code) {
+                // Check if new passwords match
+                if ($newPassword !== $retypenewPassword) {
+                    header("Location: ../forgot-password-verification.php?error=" . urlencode("Passwords do not match.") . "&email=" . urlencode($email) . "&token=" . urlencode($token));
+                    exit();
+                }
+
+                // Hash and update password
+                $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+                $updateStmt = $conn->prepare("UPDATE users SET password = ?, two_factor_authentication = 0 WHERE email = ?");
+                $updateStmt->bind_param("ss", $hashedPassword, $email);
+                $updateStmt->execute();
+
+
+                header("Location: ../login.php?success=" . urlencode("Password has been reset successfully."));
+                exit();
+            } else {
+                header("Location: ../forgot-password-verification.php?error=" . urlencode("Invalid OTP code.") . "&email=" . urlencode($email) . "&token=" . urlencode($token));
+                exit();
+            }
+        }
+    }
 } else {
     header("Location: ../forgot-password.php");
     exit();
 }
-
 ?>

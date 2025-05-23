@@ -115,16 +115,19 @@
   }
   ?>
 
+
+
+
   <?php
   if (isset($_GET['SessionExpired'])) {
     $message = htmlspecialchars($_GET['SessionExpired']);
     echo "<script>
         Swal.fire({
           position: 'center',
-          icon: 'question',
+          icon: 'error',
           title: '{$message}',
-          showConfirmButton: false,
-          timer: 1500
+          confirmButtonText: 'Login Again',
+        confirmButtonColor: '#ffc107',
         });
     </script>";
   }
@@ -179,7 +182,7 @@
   }
   ?>
 
-<?php
+  <?php
   if (isset($_GET['error'])) {
     $message = htmlspecialchars($_GET['error']);
     echo "<script>
@@ -193,9 +196,23 @@
   }
   ?>
 
-<?php
+  <?php
   if (isset($_GET['logout'])) {
     $message = htmlspecialchars($_GET['logout']);
+    echo "<script>
+        Swal.fire({
+          position: 'center',
+          icon: 'success',
+          title: '{$message}',
+          showConfirmButton: false,
+          timer: 1500
+        });
+    </script>";
+  }
+  ?>
+  <?php
+  if (isset($_GET['success'])) {
+    $message = htmlspecialchars($_GET['success']);
     echo "<script>
         Swal.fire({
           position: 'center',

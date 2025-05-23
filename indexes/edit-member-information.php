@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-include "../../indexes/db_con.php";
+include "../indexes/db_con.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_POST['user_id'];

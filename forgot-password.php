@@ -69,6 +69,20 @@
     }
     ?>
 
+    <?php
+    if (isset($_GET['error'])) {
+        $message = htmlspecialchars($_GET['error']);
+        echo "<script>
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: '{$message}',
+          showConfirmButton: true
+        });
+    </script>";
+    }
+    ?>
+
 
 
     <?php include 'layout/index_header.php'; ?>

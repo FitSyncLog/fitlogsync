@@ -61,7 +61,8 @@
                         <a class="collapse-item <?php if ($current_page == 'manage-banned-members.php')
                             echo 'active text-warning'; ?>" href="manage-banned-members.php">Banned Members</a>
                         <a class="collapse-item <?php if ($current_page == 'manage-suspended-members.php')
-                            echo 'active text-warning'; ?>" href="manage-suspended-members.php">Suspended Members</a>
+                            echo 'active text-warning'; ?>" href="manage-suspended-members.php">Suspended
+                            Members</a>
                         <a class="collapse-item <?php if ($current_page == 'manage-deleted-members.php')
                             echo 'active text-warning'; ?>" href="manage-deleted-members.php">Deleted Members</a>
                     </div>
@@ -72,17 +73,78 @@
     }
     ?>
 
-    <li class="nav-item <?php if ($current_page == 'permission-settings.php')
-        echo 'active'; ?>">
-        <a class="nav-link <?php if ($current_page == 'permission-settings.php')
-            echo 'bg-white text-dark'; ?>"
-            href="permission-settings.php">
-            <i
-                class="fas fa-solid fa-circle-exclamation <?php if ($current_page == 'permission-settings.php')
+    <!-- Other navigation items... -->
+    <?php
+    $page_name = "manage-front-desk.php";
+    $role_id = $_SESSION['role_id'];
+    $query = "SELECT * FROM permissions WHERE page_name = ? AND role_id = ? AND permission = 1";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("si", $page_name, $role_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        ?>
+        <li class="nav-item <?php if ($current_page == 'manage-front-desk.php')
+            echo 'active'; ?>">
+            <a class="nav-link <?php if ($current_page == 'manage-front-desk.php')
+                echo 'bg-white text-dark'; ?>" href="manage-front-desk.php">
+                <i class="fas fa-solid fa-user-tie <?php if ($current_page == 'manage-front-desk.php')
                     echo 'text-dark'; ?>"></i>
-            <span>Role Permissions Settings</span>
-        </a>
-    </li>
+                <span>Manage Front Desk</span>
+            </a>
+        </li>
+        <?php
+    }
+    ?>
+
+    <?php
+    $page_name = "manage-instructors.php";
+    $role_id = $_SESSION['role_id'];
+    $query = "SELECT * FROM permissions WHERE page_name = ? AND role_id = ? AND permission = 1";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("si", $page_name, $role_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        ?>
+        <li class="nav-item <?php if ($current_page == 'manage-instructors.php')
+            echo 'active'; ?>">
+            <a class="nav-link <?php if ($current_page == 'manage-instructors.php')
+                echo 'bg-white text-dark'; ?>" href="manage-instructors.php">
+                <i class="fas fa-solid fa-dumbbell <?php if ($current_page == 'manage-instructors.php')
+                    echo 'text-dark'; ?>"></i>
+                <span>Manage Instructor</span>
+            </a>
+        </li>
+        <?php
+    }
+    ?>
+
+    <?php
+    $page_name = "permission-settings.php";
+    $role_id = $_SESSION['role_id'];
+    $query = "SELECT * FROM permissions WHERE page_name = ? AND role_id = ? AND permission = 1";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("si", $page_name, $role_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        ?>
+        <li class="nav-item <?php if ($current_page == 'permission-settings.php')
+            echo 'active'; ?>">
+            <a class="nav-link <?php if ($current_page == 'permission-settings.php')
+                echo 'bg-white text-dark'; ?>" href="permission-settings.php">
+                <i class="fas fa-solid fa-circle-exclamation <?php if ($current_page == 'permission-settings.php')
+                    echo 'text-dark'; ?>"></i>
+                <span>Role Permissions Settings</span>
+            </a>
+        </li>
+        <?php
+    }
+    ?>
 
 
     <!-- Manage Landing Page -->

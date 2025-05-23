@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+include 'indexes/db_con.php';
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login.php");
     exit();
@@ -17,7 +19,46 @@ if (isset($_GET['error'])) {
         });
     </script>";
 }
+
+$user_id = $_SESSION['user_id'];
+
+// Fetch both questions and answers
+$sql = "SELECT sq1, sq1_res, sq2, sq2_res, sq3, sq3_res FROM security_questions WHERE user_id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$question = "No security question found.";
+
+if ($row = $result->fetch_assoc()) {
+    // Create arrays for questions and answers
+    $questions = [
+        'sq1' => $row['sq1'],
+        'sq2' => $row['sq2'],
+        'sq3' => $row['sq3']
+    ];
+
+    $answers = [
+        'sq1' => $row['sq1_res'],
+        'sq2' => $row['sq2_res'],
+        'sq3' => $row['sq3_res']
+    ];
+
+    // Pick a random question
+    $randomKey = array_rand($questions);
+
+    // Store both the question key and the correct answer in session
+    $_SESSION['security_question_key'] = $randomKey;
+    $_SESSION['correct_answer'] = $answers[$randomKey];
+
+    // The actual question to display
+    $question = $questions[$randomKey];
+}
 ?>
+
+<!DOCTYPE html>
+<!-- Rest of your HTML remains the same -->
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -25,7 +66,7 @@ if (isset($_GET['error'])) {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login | Fit-LOGSYNC</title>
+    <title>LOGIN VERIFICATION | Fit-LOGSYNC</title>
 
     <link rel="stylesheet" type="text/css" href="bootstrap.css" />
     <link rel="stylesheet" type="text/css" href="style.css" />
@@ -103,18 +144,21 @@ if (isset($_GET['error'])) {
                                 <div class="col-12">
                                     <div class="mb-4">
                                         <h3><strong>LOGIN VERIFICATION</strong></h3>
-                                        <p>The OTP code was sent to your email.</p>
+                                        <p>Please answer the security question.</p>
+                                        <h5><strong><?php echo htmlspecialchars($question); ?></strong></h5>
+
                                     </div>
                                 </div>
                             </div>
 
-                            <form id="loginForm" action="indexes/verify-login.php" method="POST">
+                            <form id="loginForm" action="indexes/security-question-authentication.php" method="POST">
                                 <div class="row gy-3 overflow-hidden">
+
                                     <div class="col-12">
                                         <div class="form-floating">
-                                            <input type="text" class="form-control" id="otp_code" name="otp_code"
-                                                placeholder="OTP Code">
-                                            <label for="otp_code">OTP Code</label>
+                                            <input type="text" class="form-control" id="answer" name="answer"
+                                                placeholder="Answer">
+                                            <label for="answer">Answer</label>
                                             <div class="error-message" id="otpError"></div>
                                         </div>
                                     </div>
@@ -126,15 +170,9 @@ if (isset($_GET['error'])) {
                                     </div>
                                 </div>
                             </form>
-
-                            <div class="row">
-                                <div class="col-12">
-                                    <div
-                                        class="d-flex gap-2 gap-md-4 flex-column flex-md-row justify-content-md-end mt-4">
-                                        <a href="security-question.php">I have no access to my email</a>
-                                    </div>
-                                </div>
-                            </div>
+                            <hr>
+                            <p class="small">Note: Please note that two-factor authentication will be disabled after
+                                this. To enable it again, please go to Settings.</p>
                         </div>
                     </div>
                 </div>
@@ -169,40 +207,6 @@ if (isset($_GET['error'])) {
 
     <!-- Main JS File -->
     <script src="assets/js/main.js"></script>
-
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function (event) {
-            let isValid = true;
-
-            // Get the OTP code field
-            const otpCode = document.getElementById('otp_code');
-
-            // Get the error message element
-            const otpError = document.getElementById('otpError');
-
-            // Reset error messages and styles
-            otpError.innerHTML = '';
-            otpCode.classList.remove('error');
-
-            // Validate OTP code
-            if (!otpCode.value) {
-                otpError.innerHTML = '<i class="bi bi-exclamation-circle"></i> OTP Code is required';
-                otpCode.classList.add('error');
-                isValid = false;
-            }
-
-            // Prevent form submission if validation fails
-            if (!isValid) {
-                event.preventDefault();
-                Swal.fire({
-                    position: 'center',
-                    icon: 'error',
-                    title: 'OTP Code is required',
-                    showConfirmButton: true
-                });
-            }
-        });
-    </script>
 
 </body>
 

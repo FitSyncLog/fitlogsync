@@ -196,6 +196,7 @@ if (isset($_POST['login'])) {
                     $_SESSION['status'] = $row_data['status'];
                     $_SESSION['profile_image'] = $row_data['profile_image'];
                     $_SESSION['account_number'] = $row_data['account_number'];
+                    $_SESSION['registration_date'] = $row_data['registration_date'];
                     $_SESSION['login'] = true;
 
                     $status = $row_data['status'];

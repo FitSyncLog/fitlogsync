@@ -108,7 +108,7 @@ if ($result->num_rows > 0) {
                                     FROM users 
                                     JOIN user_roles ON users.user_id = user_roles.user_id 
                                     WHERE user_roles.role_id = 5 
-                                    AND users.status = 'Delete'";
+                                    AND users.status = 'Deleted'";
                                     $result = mysqli_query($conn, $query);
 
                                     if (!$result) {
