@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthController {
-  final String baseUrl = 'http://localhost/fitlogsync/Desktop/database/';
+  final String baseUrl = 'http://localhost/fitlogsync/Desktop/api/';
   final FlutterSecureStorage storage = const FlutterSecureStorage();
 
   // Login method

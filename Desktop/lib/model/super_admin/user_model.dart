@@ -1,23 +1,23 @@
 class User {
   final int? id;
   final String username;
-  final String firstname;
-  final String middlename;
-  final String lastname;
-  final String dateOfBirth;
-  final String gender;
-  final String phoneNumber;
-  final String email;
-  final String address;
+  String firstname;
+  String middlename;
+  String lastname;
+  String dateOfBirth;
+  String gender;
+  String phoneNumber;
+  String email;
+  String address;
   final String accountNumber;
-  final String status;
+  String status;
   final String enrolledBy;
-  final String subscriptionStatus;
+  String subscriptionStatus;
   final String registrationDate;
   final List<String> roles;
-  final String medicalConditions;
-  final String currentMedications;
-  final String previousInjuries;
+  String medicalConditions;
+  String currentMedications;
+  String previousInjuries;
   final String q1;
   final String q2;
   final String q3;
@@ -28,12 +28,12 @@ class User {
   final String q8;
   final String q9;
   final String q10;
-  final String contactPerson;
-  final String contactNumber;
-  final String relationship;
-  final bool rulesAndPolicy;
-  final bool liabilityWaiver;
-  final bool cancellationAndRefundPolicy;
+  String contactPerson;
+  String contactNumber;
+  String relationship;
+  bool rulesAndPolicy;
+  bool liabilityWaiver;
+  bool cancellationAndRefundPolicy;
 
   User({
     required this.id,
@@ -115,5 +115,46 @@ class User {
       liabilityWaiver: json['liability_waiver'] == 1,
       cancellationAndRefundPolicy: json['cancellation_and_refund_policy'] == 1,
     );
+  }
+  
+  // Method to convert the User instance to a JSON map
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id?.toString(),
+      'username': username,
+      'firstname': firstname,
+      'middlename': middlename,
+      'lastname': lastname,
+      'date_of_birth': dateOfBirth,
+      'gender': gender,
+      'phone_number': phoneNumber,
+      'email': email,
+      'address': address,
+      'account_number': accountNumber,
+      'status': status,
+      'enrolled_by': enrolledBy,
+      'subscription_status': subscriptionStatus,
+      'registration_date': registrationDate,
+      'roles': roles.join(', '),
+      'medical_conditions': medicalConditions,
+      'current_medications': currentMedications,
+      'previous_injuries': previousInjuries,
+      'par_q_1': q1,
+      'par_q_2': q2,
+      'par_q_3': q3,
+      'par_q_4': q4,
+      'par_q_5': q5,
+      'par_q_6': q6,
+      'par_q_7': q7,
+      'par_q_8': q8,
+      'par_q_9': q9,
+      'par_q_10': q10,
+      'contact_person': contactPerson,
+      'contact_number': contactNumber,
+      'relationship': relationship,
+      'rules_and_policy': rulesAndPolicy ? 1 : 0,
+      'liability_waiver': liabilityWaiver ? 1 : 0,
+      'cancellation_and_refund_policy': cancellationAndRefundPolicy ? 1 : 0,
+    };
   }
 }

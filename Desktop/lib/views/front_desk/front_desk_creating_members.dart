@@ -51,7 +51,7 @@ class _CreateMemberScreenState extends State<CreateMemberScreen> {
   Map<String, String?> _errors = {};
 
   final List<String> _genders = ["Male", "Female", "Other"];
-  final List<String> _relationships = ["Friend", "Family", "Other"];
+  final List<String> _relationships = ["Parent", "Sibling", "Spouse", "Friend", "Relative", "Other"];
 
   final MemberController _memberController = MemberController();
 
