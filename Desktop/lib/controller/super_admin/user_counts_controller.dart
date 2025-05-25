@@ -5,7 +5,7 @@ import '/model/super_admin/user_counts_model.dart';
 class UserCountsController {
   Future<UserCounts> fetchUserCounts() async {
     try {
-      final response = await http.get(Uri.parse('http://localhost/fitlogsync/Desktop/database/get_user_counts.php'));
+      final response = await http.get(Uri.parse('http://localhost/fitlogsync/Desktop/api/get_user_counts.php'));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);

@@ -39,7 +39,8 @@ $requiredFields = [
     "gender", "address", "phonenumber", "email",
     "password", "confirm_password", "contact_person",
     "contact_number", "relationship", "waiver_rules",
-    "waiver_liability", "waiver_cancel", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10"
+    "waiver_liability", "waiver_cancel", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10",
+    "enrolled_by" // this is the user_id from Flutter
 ];
 
 foreach ($requiredFields as $field) {
@@ -60,7 +61,6 @@ if (!preg_match('/^09\d{9}$/', $data["phonenumber"])) {
     exit;
 }
 
-// Validate password match
 if ($data["password"] !== $data["confirm_password"]) {
     echo json_encode(["success" => false, "message" => "Passwords do not match."]);
     exit;
@@ -75,7 +75,7 @@ if ($conn->connect_error) {
     exit;
 }
 
-// Sanitize input data
+// Sanitize input
 $username = $conn->real_escape_string($data["username"]);
 $firstname = $conn->real_escape_string($data["firstname"]);
 $middlename = $conn->real_escape_string($data["middlename"] ?? '');
@@ -102,68 +102,78 @@ $q7 = $conn->real_escape_string($data["q7"]);
 $q8 = $conn->real_escape_string($data["q8"]);
 $q9 = $conn->real_escape_string($data["q9"]);
 $q10 = $conn->real_escape_string($data["q10"]);
+$enrolled_by_id = $conn->real_escape_string($data["enrolled_by"]); // user_id
+
+// Get enrolling user's full name
+$enrollingUserQuery = $conn->prepare("SELECT firstname, middlename, lastname FROM users WHERE user_id = ?");
+$enrollingUserQuery->bind_param("i", $enrolled_by_id);
+$enrollingUserQuery->execute();
+$enrollingUserResult = $enrollingUserQuery->get_result();
+
+if ($enrollingUserResult->num_rows === 0) {
+    echo json_encode(["success" => false, "message" => "Invalid enrolling user ID."]);
+    exit;
+}
+
+$enrollingUser = $enrollingUserResult->fetch_assoc();
+$enrolled_by = $enrollingUser['firstname'] . ' ' .
+               (!empty($enrollingUser['middlename']) ? $enrollingUser['middlename'] . ' ' : '') .
+               $enrollingUser['lastname'];
 
 // Generate account number
 $accountNumber = generateAccountNumber($conn);
 
 // Set additional fields
-$status = "Not Verified";
+$status = "Active";
 $role = "Member";
 $registration_date = date('Y-m-d');
-$verification_code = "123"; // Placeholder value
+$verification_code = "123"; // Placeholder
 $v_code_expiration = date('Y-m-d H:i:s', strtotime('+10 minutes'));
 
-// Check if username already exists
-$query = $conn->prepare("SELECT * FROM users WHERE username = ?");
-$query->bind_param("s", $username);
+// Check username/email uniqueness
+$query = $conn->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
+$query->bind_param("ss", $username, $email);
 $query->execute();
 $result = $query->get_result();
 
 if ($result->num_rows > 0) {
-    echo json_encode(["success" => false, "message" => "Username already exists."]);
+    echo json_encode(["success" => false, "message" => "Username or Email already exists."]);
     exit;
 }
 
-// Check if email already exists
-$query = $conn->prepare("SELECT * FROM users WHERE email = ?");
-$query->bind_param("s", $email);
-$query->execute();
-$result = $query->get_result();
+// Insert user
+$insertUserQuery = $conn->prepare("INSERT INTO users (username, firstname, middlename, lastname, date_of_birth, password, gender, phone_number, email, address, account_number, status, registration_date, verification_code, v_code_expiration, enrolled_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+$insertUserQuery->bind_param("ssssssssssssssss", $username, $firstname, $middlename, $lastname, $dateofbirth, $password, $gender, $phonenumber, $email, $address, $accountNumber, $status, $registration_date, $verification_code, $v_code_expiration, $enrolled_by);
 
-if ($result->num_rows > 0) {
-    echo json_encode(["success" => false, "message" => "Email is already taken."]);
-    exit;
-}
+if ($insertUserQuery->execute()) {
+    $user_id = $insertUserQuery->insert_id;
 
-// Insert user data into the database
-$query = $conn->prepare("INSERT INTO users (username, firstname, middlename, lastname, date_of_birth, password, gender, phone_number, email, address, account_number, status, registration_date, verification_code, v_code_expiration) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-$query->bind_param("sssssssssssssss", $username, $firstname, $middlename, $lastname, $dateofbirth, $password, $gender, $phonenumber, $email, $address, $accountNumber, $status, $registration_date, $verification_code, $v_code_expiration);
-
-if ($query->execute()) {
-    $user_id = $query->insert_id;
-
-    // Insert additional data (medical background, waivers, emergency contacts, roles)
-    // Example for medical background:
+    // Medical background
     $medicalQuery = $conn->prepare("INSERT INTO medical_backgrounds (user_id, medical_conditions, current_medications, previous_injuries, par_q_1, par_q_2, par_q_3, par_q_4, par_q_5, par_q_6, par_q_7, par_q_8, par_q_9, par_q_10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $medicalQuery->bind_param("isssssssssssss", $user_id, $data["medical_conditions"], $data["current_medications"], $data["previous_injuries"], $q1, $q2, $q3, $q4, $q5, $q6, $q7, $q8, $q9, $q10);
     $medicalQuery->execute();
 
-    // Insert into emergency_contacts table
+    // Emergency contact
     $emergencyQuery = $conn->prepare("INSERT INTO emergency_contacts (user_id, contact_person, contact_number, relationship) VALUES (?, ?, ?, ?)");
     $emergencyQuery->bind_param("isss", $user_id, $contact_person, $contact_number, $relationship);
     $emergencyQuery->execute();
 
-    // Insert into user_roles table with default role "Member"
+    // Role
     $roleQuery = $conn->prepare("INSERT INTO user_roles (user_id, role) VALUES (?, ?)");
     $roleQuery->bind_param("is", $user_id, $role);
     $roleQuery->execute();
 
-    // Insert into waivers table
+    // Waiver
     $waiverQuery = $conn->prepare("INSERT INTO waivers (user_id, rules_and_policy, liability_waiver, cancellation_and_refund_policy) VALUES (?, ?, ?, ?)");
     $waiverQuery->bind_param("iiii", $user_id, $waiver_rules, $waiver_liability, $waiver_cancel);
     $waiverQuery->execute();
 
-    echo json_encode(["success" => true, "message" => "Member created successfully", "account_number" => $accountNumber]);
+    echo json_encode([
+        "success" => true,
+        "message" => "Member created successfully",
+        "account_number" => $accountNumber,
+        "enrolled_by" => $enrolled_by
+    ]);
 } else {
     echo json_encode(["success" => false, "message" => "Failed to create member: " . $conn->error]);
 }

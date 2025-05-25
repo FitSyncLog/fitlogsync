@@ -15,7 +15,7 @@ class _SuperAdminManageInstructorsScreenState
   late Future<List<User>> instructorsFuture;
   final UserController userController = UserController(
     apiUrl:
-        'http://localhost/fitlogsync/Desktop/database/get_instructors.php',
+        'http://localhost/fitlogsync/Desktop/api/get_instructors.php',
   );
 
   @override
