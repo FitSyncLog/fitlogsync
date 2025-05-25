@@ -38,9 +38,9 @@ function generateAccountNumber($conn)
     $random = str_pad(mt_rand(0, 9999), 4, '0', STR_PAD_LEFT);
 
     // Get the last increment number for the current month
-    $sql = "SELECT MAX(SUBSTRING(account_number, 13, 4)) AS last_increment 
-            FROM users 
-            WHERE SUBSTRING(account_number, 1, 4) = ? 
+    $sql = "SELECT MAX(SUBSTRING(account_number, 13, 4)) AS last_increment
+            FROM users
+            WHERE SUBSTRING(account_number, 1, 4) = ?
             AND SUBSTRING(account_number, 5, 4) = ?";
     $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "ss", $year, $monthFormatted);
@@ -305,7 +305,6 @@ VALUES (?, ?, ?, ?, ?, ?, ?)";
             exit();
         }
 
-
         $role_id = 5;
         // Insert user role data into the user_role table
         $sql_user_role = "INSERT INTO user_roles (user_id, role_id)
@@ -327,12 +326,57 @@ VALUES (?, ?, ?, ?, ?, ?, ?)";
             exit();
         }
 
-        $qrCodePath = "../qr_codes/{$accountNumber}.png";
+        $qrCodePath = "../assets/qr_codes/{$accountNumber}.png";
         $moduleSize = 50;
         QRcode::png($accountNumber, $qrCodePath, 'L', $moduleSize, 2);
 
+        // Generate the access card
+        $full_name = $firstname . " " . $lastname;
+        $member_since = date('m/y', strtotime($registration_date));
+
+        // Paths
+        $templatePath = '../assets/access-card/template.png';
+        $font = '../assets/fonts/arial.ttf'; // Ensure this font file exists
+        $namefont = '../assets/fonts/GOTHIC.TTF'; // Ensure this font file exists
+        $numberfont = '../assets/fonts/Kredit Front.otf'; // Ensure this font file exists
+
+        // Check if template and font exist
+        if (!file_exists($templatePath)) {
+            die("Background template not found at $templatePath");
+        }
+        if (!file_exists($font)) {
+            die("Font file not found at $font");
+        }
+
+        // Load background image
+        $image = imagecreatefrompng($templatePath);
+        if (!$image) {
+            die("Failed to load template image.");
+        }
+
+        // Set text color (white)
+        $textColor = imagecolorallocate($image, 255, 255, 255); // white
+        $yellowtextColor = imagecolorallocate($image, 255, 202, 43); // white
+
+        $formattedAccountNumber = implode(' ', str_split($accountNumber, 4));
+
+        // Write text on image
+        imagettftext($image, 160, 0, 210, 1450, $textColor, $numberfont, $formattedAccountNumber);
+        imagettftext($image, 80, 0, 545, 1640, $yellowtextColor, $font, $member_since);
+        imagettftext($image, 80, 0, 210, 1850, $textColor, $namefont, $full_name);
+
+        // Save the new image
+        $account_numberClean = str_replace(' ', '', $accountNumber);
+        $outputPath = "../assets/access-card/{$account_numberClean}-accesscard.jpg";
+
+        if (!is_dir(dirname($outputPath))) {
+            mkdir(dirname($outputPath), 0755, true);
+        }
+        imagejpeg($image, $outputPath, 90);
+        imagedestroy($image);
+
         // Registration successful
-        header("Location: ../manage-members.php?Success=Successfully created a new member!");
+        header("Location: generate-back-card.php?accountNumber={$accountNumber}");
         exit();
     } else {
         // Registration failed

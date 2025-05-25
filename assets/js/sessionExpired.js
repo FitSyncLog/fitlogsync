@@ -1,4 +1,4 @@
-let inactivityTime = 600 * 1000; // 10 minutes in milliseconds
+let inactivityTime = 6000 * 1000; // 10 minutes in milliseconds
 
 function logoutUser() {
     // Make an AJAX call to destroy the session

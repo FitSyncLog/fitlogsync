@@ -27,6 +27,30 @@
         </a>
     </li>
 
+    <?php
+    $page_name = "manage-payments.php";
+    $role_id = $_SESSION['role_id'];
+    $query = "SELECT * FROM permissions WHERE page_name = ? AND role_id = ? AND permission = 1";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("si", $page_name, $role_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        ?>
+        <li class="nav-item <?php if ($current_page == 'manage-payments.php')
+            echo 'active'; ?>">
+            <a class="nav-link <?php if ($current_page == 'manage-payments.php')
+                echo 'bg-white text-dark'; ?>" href="manage-payments.php">
+                <i class="fas fa-solid fa-cash-register <?php if ($current_page == 'manage-payments.php')
+                    echo 'text-dark'; ?>"></i>
+                <span>Manage Payments</span>
+            </a>
+        </li>
+        <?php
+    }
+    ?>
+
     <!-- Other navigation items... -->
     <?php
     $page_name = "manage-member";
@@ -54,17 +78,87 @@
                     <a class="collapse-item <?php if ($current_page == 'manage-members.php' || 'create-new-member.php')
                         echo 'active text-warning'; ?>" href="manage-members.php">All Members</a>
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item <?php if ($current_page == 'manage-pending-members.php')
-                            echo 'active text-warning'; ?>" href="manage-pending-members.php">Pending Members</a>
-                        <a class="collapse-item <?php if ($current_page == 'manage-active-members.php')
-                            echo 'active text-warning'; ?>" href="manage-active-members.php">Active Members</a>
-                        <a class="collapse-item <?php if ($current_page == 'manage-banned-members.php')
-                            echo 'active text-warning'; ?>" href="manage-banned-members.php">Banned Members</a>
-                        <a class="collapse-item <?php if ($current_page == 'manage-suspended-members.php')
-                            echo 'active text-warning'; ?>" href="manage-suspended-members.php">Suspended
-                            Members</a>
-                        <a class="collapse-item <?php if ($current_page == 'manage-deleted-members.php')
-                            echo 'active text-warning'; ?>" href="manage-deleted-members.php">Deleted Members</a>
+                        <?php
+                        $page_name = "manage-pending-members.php";
+                        $role_id = $_SESSION['role_id'];
+                        $query = "SELECT * FROM permissions WHERE page_name = ? AND role_id = ? AND permission = 1";
+                        $stmt = $conn->prepare($query);
+                        $stmt->bind_param("si", $page_name, $role_id);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+
+                        if ($result->num_rows > 0) {
+                            ?>
+                            <a class="collapse-item <?php if ($current_page == 'manage-pending-members.php')
+                                echo 'active text-warning'; ?>" href="manage-pending-members.php">Pending Members</a>
+                            <?php
+                        } ?>
+
+                        <?php
+                        $page_name = "manage-active-members.php";
+                        $role_id = $_SESSION['role_id'];
+                        $query = "SELECT * FROM permissions WHERE page_name = ? AND role_id = ? AND permission = 1";
+                        $stmt = $conn->prepare($query);
+                        $stmt->bind_param("si", $page_name, $role_id);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+
+                        if ($result->num_rows > 0) {
+                            ?>
+                            <a class="collapse-item <?php if ($current_page == 'manage-active-members.php')
+                                echo 'active text-warning'; ?>" href="manage-active-members.php">Active Members</a>
+                            <?php
+                        } ?>
+
+                        <?php
+                        $page_name = "manage-active-members.php";
+                        $role_id = $_SESSION['role_id'];
+                        $query = "SELECT * FROM permissions WHERE page_name = ? AND role_id = ? AND permission = 1";
+                        $stmt = $conn->prepare($query);
+                        $stmt->bind_param("si", $page_name, $role_id);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+
+                        if ($result->num_rows > 0) {
+                            ?>
+                            <a class="collapse-item <?php if ($current_page == 'manage-banned-members.php')
+                                echo 'active text-warning'; ?>" href="manage-banned-members.php">Banned Members</a>
+                            <?php
+                        } ?>
+
+                        <?php
+                        $page_name = "manage-suspended-members.php";
+                        $role_id = $_SESSION['role_id'];
+                        $query = "SELECT * FROM permissions WHERE page_name = ? AND role_id = ? AND permission = 1";
+                        $stmt = $conn->prepare($query);
+                        $stmt->bind_param("si", $page_name, $role_id);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+
+                        if ($result->num_rows > 0) {
+                            ?>
+                            <a class="collapse-item <?php if ($current_page == 'manage-suspended-members.php')
+                                echo 'active text-warning'; ?>" href="manage-suspended-members.php">Suspended
+                                Members</a>
+                            <?php
+                        } ?>
+
+
+                        <?php
+                        $page_name = "manage-deleted-members.php";
+                        $role_id = $_SESSION['role_id'];
+                        $query = "SELECT * FROM permissions WHERE page_name = ? AND role_id = ? AND permission = 1";
+                        $stmt = $conn->prepare($query);
+                        $stmt->bind_param("si", $page_name, $role_id);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+
+                        if ($result->num_rows > 0) {
+                            ?>
+                            <a class="collapse-item <?php if ($current_page == 'manage-deleted-members.php')
+                                echo 'active text-warning'; ?>" href="manage-deleted-members.php">Deleted Members</a>
+                            <?php
+                        } ?>
                     </div>
                 </div>
             </div>
@@ -122,6 +216,79 @@
     }
     ?>
 
+
+    <?php
+    $page_name = "manage-plan.php";
+    $role_id = $_SESSION['role_id'];
+    $query = "SELECT * FROM permissions WHERE page_name = ? AND role_id = ? AND permission = 1";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("si", $page_name, $role_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        ?>
+        <li class="nav-item <?php if ($current_page == 'manage-plan.php')
+            echo 'active'; ?>">
+            <a class="nav-link <?php if ($current_page == 'manage-plan.php')
+                echo 'bg-white text-dark'; ?>" href="manage-plan.php">
+                <i class="fas fa-solid fa-calendar-days <?php if ($current_page == 'manage-plan.php')
+                    echo 'text-dark'; ?>"></i>
+                <span>Manage Plans</span>
+            </a>
+        </li>
+        <?php
+    }
+    ?>
+
+    <?php
+    $page_name = "manage-coupons.php";
+    $role_id = $_SESSION['role_id'];
+    $query = "SELECT * FROM permissions WHERE page_name = ? AND role_id = ? AND permission = 1";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("si", $page_name, $role_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        ?>
+        <li class="nav-item <?php if ($current_page == 'manage-coupons.php')
+            echo 'active'; ?>">
+            <a class="nav-link <?php if ($current_page == 'manage-coupons.php')
+                echo 'bg-white text-dark'; ?>" href="manage-coupons.php">
+                <i class="fas fa-solid fa-ticket <?php if ($current_page == 'manage-coupons.php')
+                    echo 'text-dark'; ?>"></i>
+                <span>Manage Coupons</span>
+            </a>
+        </li>
+        <?php
+    }
+    ?>
+
+    <?php
+    $page_name = "manage-discount.php";
+    $role_id = $_SESSION['role_id'];
+    $query = "SELECT * FROM permissions WHERE page_name = ? AND role_id = ? AND permission = 1";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("si", $page_name, $role_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        ?>
+        <li class="nav-item <?php if ($current_page == 'manage-discount.php')
+            echo 'active'; ?>">
+            <a class="nav-link <?php if ($current_page == 'manage-discount.php')
+                echo 'bg-white text-dark'; ?>" href="manage-discount.php">
+                <i class="fas fa-solid fa-tags <?php if ($current_page == 'manage-discount.php')
+                    echo 'text-dark'; ?>"></i>
+                <span>Manage Discounts</span>
+            </a>
+        </li>
+        <?php
+    }
+    ?>
+
     <?php
     $page_name = "permission-settings.php";
     $role_id = $_SESSION['role_id'];
@@ -145,6 +312,7 @@
         <?php
     }
     ?>
+
 
 
     <!-- Manage Landing Page -->

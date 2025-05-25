@@ -26,6 +26,7 @@ if ($result->num_rows > 0) {
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title>Dashboard | FiT-LOGSYNC</title>
         <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <link
             href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
             rel="stylesheet">
@@ -34,72 +35,10 @@ if ($result->num_rows > 0) {
         <link rel="stylesheet" href="assets/css/sweetalert2.min.css">
         <script src="assets/js/sweetalert2.all.min.js"></script>
         <script src="assets/js/sessionExpired.js"></script>
-        <style>
-            .card-container {
-                perspective: 1000px;
-                width: 300px;
-                height: 200px;
-                margin: 0 auto;
-            }
 
-            .card {
-                width: 100%;
-                height: 100%;
-                position: relative;
-                transform-style: preserve-3d;
-                transition: transform 1s;
-            }
 
-            .card-container:hover .card {
-                transform: rotateY(180deg);
-            }
 
-            .card-front,
-            .card-back {
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                backface-visibility: hidden;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                border-radius: 10px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
 
-            .card-front {
-                background: linear-gradient(135deg, #FFC107,rgb(235, 183, 27));
-                color: white;
-            }
-
-            .card-back {
-                background: linear-gradient(135deg,rgb(14, 14, 14),rgb(19, 19, 19));
-                color: white;
-                transform: rotateY(180deg);
-            }
-
-            .card-front h2,
-            .card-back h2 {
-                margin: 0;
-                font-size: 24px;
-            }
-
-            .card-front p,
-            .card-back p {
-                margin: 5px 0;
-                font-size: 16px;
-            }
-
-            .qr-code {
-                margin-top: 20px;
-            }
-
-            .qr-code img {
-                width: 100px;
-                height: 100px;
-            }
-        </style>
     </head>
 
     <body id="page-top">
@@ -183,7 +122,7 @@ if ($result->num_rows > 0) {
                             <?php
                             $role_id = $_SESSION['role_id'];
 
-                            if ($role_id == 1 || $role_id == 2 || $role_id == 3) {
+                            if ($role_id == 1 || $role_id == 2) {
                                 ?>
                                 <!-- Total Front Desk -->
                                 <div class="col-xl-3 col-md-6 mb-4">
@@ -252,36 +191,79 @@ if ($result->num_rows > 0) {
                             }
                             ?>
 
+                            <!-- virtual card -->
                             <?php
                             $role_id = $_SESSION['role_id'];
-                            $account_number = $_SESSION['account_number'];
-                            $lastname = $_SESSION['lastname'];
-                            $firstname = $_SESSION['firstname'];
-                            $middlename = $_SESSION['middlename'];
-                            $registration_date = $_SESSION['registration_date'];
+                            $accountNumber = $_SESSION['account_number'];
 
                             if ($role_id == 5) {
                                 ?>
+                                <style>
+                                    .card-container {
+                                        perspective: 1000px;
+                                        width: 100%;
+                                        max-width: 500px;
+                                        /* Adjust the maximum width as needed */
+                                        height: 0;
+                                        padding-bottom: 28%;
+                                        /* Aspect ratio for the card (3:2) */
+                                        position: relative;
+                                        margin: 20px auto;
+                                    }
 
+                                    .card {
+                                        position: absolute;
+                                        width: 120%;
+                                        height: auto;
+                                        transform-style: preserve-3d;
+                                        transition: transform 0.6s;
+                                    }
 
-                                <div class="card-container">
-                                    <div class="card">
-                                        <div class="card-front">
-                                            <p> <?php echo $firstname . ' ' . $middlename . ' ' . $lastname; ?></p>
-                                            <p> <?php echo $account_number; ?></p>
-                                            <p> <?php echo $registration_date; ?></p>
-                                        </div>
-                                        <div class="card-back">
-                                            <div class="qr-code">
-                                                <img src="<?= 'qr_codes/' . $account_number . '.png' ?>" alt="QR Code">
+                                    .card-front,
+                                    .card-back {
+                                        position: absolute;
+                                        width: 100%;
+                                        height: auto;
+                                        backface-visibility: hidden;
+                                        display: flex;
+                                        justify-content: center;
+                                        align-items: center;
+                                        border-radius: 10px;
+                                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                                    }
+
+                                    .card-back {
+                                        transform: rotateY(180deg);
+                                    }
+
+                                    .card-flipped {
+                                        transform: rotateY(180deg);
+                                    }
+
+                                    .card img {
+                                        width: 100%;
+                                        height: auto;
+                                        object-fit: contain;
+                                    }
+                                </style>
+                                <div class="container d-flex flex-column align-items-center">
+                                    <div class="card-container" onclick="flipCard()">
+                                        <div class="card">
+                                            <div class="card-front">
+                                                <img src="assets/access-card/<?php echo $accountNumber; ?>-accesscard.jpg"
+                                                    alt="Front Card" class="img-fluid">
+                                            </div>
+                                            <div class="card-back">
+                                                <img src="assets/access-card-back/<?php echo $accountNumber; ?>-qr.png"
+                                                    alt="Back Card" class="img-fluid">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
                                 <?php
                             }
                             ?>
+
                         </div>
                     </div>
                     <!-- /.container-fluid -->
@@ -298,6 +280,14 @@ if ($result->num_rows > 0) {
         <a class="scroll-to-top rounded" href="#page-top">
             <i class="fas fa-angle-up"></i>
         </a>
+
+        <script>
+            function flipCard() {
+                const card = document.querySelector('.card');
+                card.classList.toggle('card-flipped');
+            }
+        </script>
+
 
         <!-- JavaScript for Dynamic Date and Time -->
         <script>
