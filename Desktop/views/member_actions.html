@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Actions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --primary-light: #818CF8;
+            --accent: #C4B5FD;
+            --dark-bg: #0F172A;
+            --dark-bg-2: #1E293B;
+            --dark-bg-3: #334155;
+            --text-white: #FFFFFF;
+            --text-light: #E2E8F0;
+            --text-muted: #CBD5E1;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
+        body {
+            background-color: var(--dark-bg-2);
+            color: var(--text-white);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .action-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--dark-bg);
+            border-radius: 15px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            background: var(--dark-bg-2);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: var(--text-white);
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: var(--dark-bg-2);
+            border-color: var(--primary);
+            color: var(--text-white);
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .status-inactive {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .member-info {
+            background: var(--dark-bg-2);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .member-info-item {
+            margin-bottom: 1rem;
+        }
+
+        .member-info-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .member-info-value {
+            color: var(--text-white);
+            font-weight: 500;
+        }
+
+        .delete-confirmation {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .delete-icon {
+            font-size: 4rem;
+            color: var(--danger);
+            margin-bottom: 1.5rem;
+        }
+
+        .readonly-field {
+            background-color: var(--dark-bg-3) !important;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <!-- View Member Section -->
+    <div id="viewMemberSection" class="action-container">
+        <h2 class="mb-4">Member Details</h2>
+        <div class="member-info">
+            <div class="row">
+                <!-- Personal Information -->
+                <div class="col-md-6">
+                    <h4 class="mb-3">Personal Information</h4>
+                    <div class="member-info-item">
+                        <div class="member-info-label">Account Number</div>
+                        <div class="member-info-value" id="viewAccountNumber"></div>
+                    </div>
+                    <div class="member-info-item">
+                        <div class="member-info-label">First Name</div>
+                        <div class="member-info-value" id="viewFirstName"></div>
+                    </div>
+                    <div class="member-info-item">
+                        <div class="member-info-label">Last Name</div>
+                        <div class="member-info-value" id="viewLastName"></div>
+                    </div>
+                    <div class="member-info-item">
+                        <div class="member-info-label">Email</div>
+                        <div class="member-info-value" id="viewEmail"></div>
+                    </div>
+                    <div class="member-info-item">
+                        <div class="member-info-label">Phone</div>
+                        <div class="member-info-value" id="viewPhone"></div>
+                    </div>
+                    <div class="member-info-item">
+                        <div class="member-info-label">Gender</div>
+                        <div class="member-info-value" id="viewGender"></div>
+                    </div>
+                    <div class="member-info-item">
+                        <div class="member-info-label">Date of Birth</div>
+                        <div class="member-info-value" id="viewDateOfBirth"></div>
+                    </div>
+                    <div class="member-info-item">
+                        <div class="member-info-label">Address</div>
+                        <div class="member-info-value" id="viewAddress"></div>
+                    </div>
+                </div>
+
+                <!-- Membership Information -->
+                <div class="col-md-6">
+                    <h4 class="mb-3">Membership Information</h4>
+                    <div class="member-info-item">
+                        <div class="member-info-label">Membership Type</div>
+                        <div class="member-info-value" id="viewMembershipType"></div>
+                    </div>
+                    <div class="member-info-item">
+                        <div class="member-info-label">Status</div>
+                        <div class="member-info-value">
+                            <span class="status-badge" id="viewStatus"></span>
+                        </div>
+                    </div>
+                    <div class="member-info-item">
+                        <div class="member-info-label">Join Date</div>
+                        <div class="member-info-value" id="viewJoinDate"></div>
+                    </div>
+
+                    <h4 class="mb-3 mt-4">Emergency Contact</h4>
+                    <div class="member-info-item">
+                        <div class="member-info-label">Emergency Contact Name</div>
+                        <div class="member-info-value" id="viewEmergencyContactName"></div>
+                    </div>
+                    <div class="member-info-item">
+                        <div class="member-info-label">Emergency Contact Phone</div>
+                        <div class="member-info-value" id="viewEmergencyContactPhone"></div>
+                    </div>
+
+                    <h4 class="mb-3 mt-4">Health Information</h4>
+                    <div class="member-info-item">
+                        <div class="member-info-label">Health Conditions</div>
+                        <div class="member-info-value" id="viewHealthConditions"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-end mt-4">
+            <button class="btn btn-secondary me-2" onclick="closeAction()">Close</button>
+            <button class="btn btn-primary" onclick="switchToEdit()">Edit Member</button>
+        </div>
+    </div>
+
+    <!-- Edit Member Section -->
+    <div id="editMemberSection" class="action-container" style="display: none;">
+        <h2 class="mb-4">Edit Member</h2>
+        <form id="editMemberForm">
+            <div class="row">
+                <!-- Personal Information -->
+                <div class="col-md-6">
+                    <h4 class="mb-3">Personal Information</h4>
+                    <div class="form-group">
+                        <label class="form-label">Account Number</label>
+                        <input type="text" class="form-control readonly-field" id="editAccountNumber" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="editFirstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="editLastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" id="editPhone">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Gender</label>
+                        <select class="form-select" id="editGender">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Date of Birth</label>
+                        <input type="date" class="form-control" id="editDateOfBirth">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Address</label>
+                        <textarea class="form-control" id="editAddress" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <!-- Membership Information -->
+                <div class="col-md-6">
+                    <h4 class="mb-3">Membership Information</h4>
+                    <div class="form-group">
+                        <label class="form-label">Membership Type</label>
+                        <select class="form-select" id="editMembershipType" required>
+                            <option value="Basic">Basic</option>
+                            <option value="Premium">Premium</option>
+                            <option value="VIP">VIP</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" id="editStatus" required>
+                            <option value="Active">Active</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Suspended">Suspended</option>
+                            <option value="Banned">Banned</option>
+                        </select>
+                    </div>
+
+                    <h4 class="mb-3 mt-4">Emergency Contact</h4>
+                    <div class="form-group">
+                        <label class="form-label">Emergency Contact Name</label>
+                        <input type="text" class="form-control" id="editEmergencyContactName">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Emergency Contact Phone</label>
+                        <input type="tel" class="form-control" id="editEmergencyContactPhone">
+                    </div>
+
+                    <h4 class="mb-3 mt-4">Health Information</h4>
+                    <div class="form-group">
+                        <label class="form-label">Health Conditions</label>
+                        <textarea class="form-control" id="editHealthConditions" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="text-end mt-4">
+                <button type="button" class="btn btn-secondary me-2" onclick="closeAction()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Delete Member Section -->
+    <div id="deleteMemberSection" class="action-container" style="display: none;">
+        <div class="delete-confirmation">
+            <i class="fas fa-exclamation-triangle delete-icon"></i>
+            <h2 class="mb-4">Delete Member</h2>
+            <p class="mb-4">Are you sure you want to delete this member? This action cannot be undone.</p>
+            <div class="member-info mb-4">
+                <div class="member-info-item">
+                    <div class="member-info-label">Account Number</div>
+                    <div class="member-info-value" id="deleteAccountNumber"></div>
+                </div>
+                <div class="member-info-item">
+                    <div class="member-info-label">Name</div>
+                    <div class="member-info-value" id="deleteName"></div>
+                </div>
+            </div>
+            <div class="text-center">
+                <button class="btn btn-secondary me-2" onclick="closeAction()">Cancel</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">Delete Member</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to show the appropriate section and populate data
+        function showAction(action, memberId) {
+            // Hide all sections first
+            document.querySelectorAll('.action-container').forEach(container => {
+                container.style.display = 'none';
+            });
+
+            // Show the appropriate section based on action
+            const sectionId = action + 'MemberSection';
+            document.getElementById(sectionId).style.display = 'block';
+
+            // Fetch member data and populate the form/view
+            fetchMemberData(memberId, action);
+        }
+
+        // Function to fetch member data
+        async function fetchMemberData(memberId, action) {
+            try {
+                console.log('Fetching member data for ID:', memberId); // Debug log
+                const response = await fetch(`/Desktop/controller/MemberController.php?action=getById&id=${memberId}`);
+                const data = await response.json();
+                console.log('Received member data:', data); // Debug log
+
+                if (data.success) {
+                    populateData(data.member, action);
+                } else {
+                    console.error('Failed to fetch member data:', data.message);
+                    alert(data.message || 'Failed to fetch member data');
+                }
+            } catch (error) {
+                console.error('Error fetching member data:', error);
+                alert('An error occurred while fetching member data');
+            }
+        }
+
+        // Function to populate data based on action
+        function populateData(member, action) {
+            console.log('Populating data for action:', action, 'with member:', member); // Debug log
+            
+            switch(action) {
+                case 'view':
+                    document.getElementById('viewAccountNumber').textContent = member.account_number;
+                    document.getElementById('viewFirstName').textContent = member.firstname;
+                    document.getElementById('viewLastName').textContent = member.lastname;
+                    document.getElementById('viewEmail').textContent = member.email;
+                    document.getElementById('viewPhone').textContent = member.phone_number || 'Not provided';
+                    document.getElementById('viewGender').textContent = member.gender || 'Not provided';
+                    document.getElementById('viewDateOfBirth').textContent = member.date_of_birth || 'Not provided';
+                    document.getElementById('viewAddress').textContent = member.address || 'Not provided';
+                    document.getElementById('viewMembershipType').textContent = member.membership_type || 'Basic';
+                    document.getElementById('viewStatus').textContent = member.status;
+                    document.getElementById('viewStatus').className = `status-badge status-${member.status.toLowerCase()}`;
+                    document.getElementById('viewJoinDate').textContent = member.registration_date;
+                    document.getElementById('viewEmergencyContactName').textContent = member.emergency_contact_name || 'Not provided';
+                    document.getElementById('viewEmergencyContactPhone').textContent = member.emergency_contact_phone || 'Not provided';
+                    document.getElementById('viewHealthConditions').textContent = member.health_conditions || 'None';
+                    break;
+
+                case 'edit':
+                    document.getElementById('editAccountNumber').value = member.account_number;
+                    document.getElementById('editFirstName').value = member.firstname;
+                    document.getElementById('editLastName').value = member.lastname;
+                    document.getElementById('editEmail').value = member.email;
+                    document.getElementById('editPhone').value = member.phone_number || '';
+                    document.getElementById('editGender').value = member.gender || '';
+                    document.getElementById('editDateOfBirth').value = member.date_of_birth || '';
+                    document.getElementById('editAddress').value = member.address || '';
+                    document.getElementById('editMembershipType').value = member.membership_type || 'Basic';
+                    document.getElementById('editStatus').value = member.status;
+                    document.getElementById('editEmergencyContactName').value = member.emergency_contact_name || '';
+                    document.getElementById('editEmergencyContactPhone').value = member.emergency_contact_phone || '';
+                    document.getElementById('editHealthConditions').value = member.health_conditions || '';
+                    break;
+
+                case 'delete':
+                    document.getElementById('deleteAccountNumber').textContent = member.account_number;
+                    document.getElementById('deleteName').textContent = `${member.firstname} ${member.lastname}`;
+                    break;
+            }
+        }
+
+        // Function to switch from view to edit mode
+        function switchToEdit() {
+            document.getElementById('viewMemberSection').style.display = 'none';
+            document.getElementById('editMemberSection').style.display = 'block';
+        }
+
+        // Update the form submission handler
+        document.getElementById('editMemberForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const memberData = {
+                accountNumber: document.getElementById('editAccountNumber').value,
+                firstname: document.getElementById('editFirstName').value,
+                lastname: document.getElementById('editLastName').value,
+                email: document.getElementById('editEmail').value,
+                phone: document.getElementById('editPhone').value,
+                gender: document.getElementById('editGender').value,
+                date_of_birth: document.getElementById('editDateOfBirth').value,
+                address: document.getElementById('editAddress').value,
+                membership_type: document.getElementById('editMembershipType').value,
+                status: document.getElementById('editStatus').value,
+                emergency_contact_name: document.getElementById('editEmergencyContactName').value,
+                emergency_contact_phone: document.getElementById('editEmergencyContactPhone').value,
+                health_conditions: document.getElementById('editHealthConditions').value
+            };
+
+            try {
+                const response = await fetch('/Desktop/controller/MemberController.php?action=update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(memberData)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Member updated successfully');
+                    closeAction();
+                    // Refresh the member list in the parent window
+                    window.parent.fetchMembers();
+                } else {
+                    alert(result.message || 'Failed to update member');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while updating member');
+            }
+        });
+
+        // Function to confirm and handle member deletion
+        async function confirmDelete() {
+            const accountNumber = document.getElementById('deleteAccountNumber').textContent;
+            
+            try {
+                const response = await fetch('/Desktop/controller/MemberController.php?action=delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ accountNumber })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Member deleted successfully');
+                    closeAction();
+                    // Refresh the member list in the parent window
+                    window.parent.fetchMembers();
+                } else {
+                    alert('Failed to delete member');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while deleting member');
+            }
+        }
+
+        // Function to close the action window
+        function closeAction() {
+            window.parent.hideActionForm();
+        }
+    </script>
+</body>
+</html> 

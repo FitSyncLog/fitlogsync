@@ -1,0 +1,41 @@
+# Enable rewriting
+RewriteEngine On
+
+# Handle PHP errors
+php_flag display_errors on
+php_value error_reporting E_ALL
+
+# Set default character set
+AddDefaultCharset UTF-8
+
+# Handle JSON content type
+AddType application/json .json
+
+# Force PHP to handle JSON
+<FilesMatch "\.php$">
+    SetHandler application/x-httpd-php
+</FilesMatch>
+
+# Set CORS headers
+Header set Access-Control-Allow-Origin "http://localhost"
+Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type, Accept"
+Header set Access-Control-Allow-Credentials "true"
+
+# Handle OPTIONS requests
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ $1 [R=200,L]
+
+# Prevent directory listing
+Options -Indexes
+
+# Protect files and directories
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Redirect all requests to index.php except for existing files
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L] 

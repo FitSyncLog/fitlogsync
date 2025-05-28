@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FitLogSync - Register Member</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --primary-light: #818CF8;
+            --accent: #C4B5FD;
+            --dark-bg: #0F172A;
+            --dark-bg-2: #1E293B;
+            --dark-bg-3: #334155;
+            --text-white: #FFFFFF;
+            --text-light: #E2E8F0;
+            --text-muted: #CBD5E1;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-light);
+            background-color: var(--dark-bg);
+        }
+
+        /* Add styles for the form container */
+        .container-fluid {
+            background: var(--dark-bg-2);
+            border-radius: 15px;
+            padding: 2rem !important;
+            margin: 1rem;
+            width: calc(100% - 2rem);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Update form section titles to be more visible */
+        .text-warning, .section-title {
+            color: var(--warning) !important;
+            font-weight: 600;
+            font-size: 1.25rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Make strong text more visible */
+        strong {
+            color: var(--text-white);
+            font-weight: 600;
+        }
+
+        .form-floating > .form-control,
+        .form-floating > .form-select {
+            border-radius: 10px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            font-size: 0.95rem;
+            background: white;
+            color: black;
+        }
+
+        .form-floating > .form-control::placeholder {
+            color: transparent !important;
+        }
+
+        .form-floating > .form-select::placeholder {
+            color: transparent !important;
+        }
+
+        .form-floating > label {
+            color: black;
+            font-weight: 500;
+            background: transparent !important;
+            padding: 1rem;
+        }
+
+        .form-floating > .form-control:focus,
+        .form-floating > .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+            background: var(--dark-bg-3);
+        }
+
+        .form-floating > .form-control:not(:placeholder-shown),
+        .form-floating > .form-select:not(:placeholder-shown) {
+            background: var(--dark-bg-2);
+        }
+
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-select:focus ~ label {
+            color: var(--primary-light);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 2px;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--warning);
+            border-color: var(--warning);
+        }
+
+        .form-check-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        .form-check-label {
+            font-size: 0.95rem;
+            color: black;
+        }
+
+        .error {
+            border-color: var(--danger) !important;
+            background: rgba(239, 68, 68, 0.1) !important;
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            font-weight: 500;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            padding: 5px;
+            color: var(--text-muted);
+            z-index: 10;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none;
+            color: var(--text-white);
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .par-q-section {
+            background: linear-gradient(135deg, var(--dark-bg-2) 0%, var(--dark-bg-3) 100%);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .par-q-section strong {
+            color: var(--primary-light);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Style for PAR-Q questions */
+        .par-q-section .col-md-12 {
+            background: rgba(99, 102, 241, 0.1);
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: var(--text-white) !important;
+        }
+
+        .par-q-section .col-md-12 strong {
+            color: var(--primary-light);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+        }
+
+        /* Question text and general text */
+        .question-text,
+        .par-q-section .col-md-12,
+        .form-check-label,
+        .waiver-section .form-check-label,
+        .col-md-12:not(strong) {
+            color: var(--text-white) !important;
+        }
+
+        .waiver-section {
+            background: linear-gradient(135deg, var(--dark-bg-2) 0%, var(--dark-bg-3) 100%);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .waiver-section a {
+            color: var(--primary-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .waiver-section a:hover {
+            color: var(--primary);
+        }
+
+        textarea.form-control {
+            border-radius: 12px;
+            min-height: 100px;
+            color: black !important;
+            background-color: white !important;
+        }
+
+        .form-select {
+            cursor: pointer;
+            color: black;
+            background-color: white !important;
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .form-select option {
+            background-color: white;
+            color: black;
+        }
+
+        /* Custom styling for date input */
+        input[type="date"] {
+            cursor: pointer;
+            color: black;
+        }
+
+        /* Improve spacing between sections */
+        hr.my-4 {
+            opacity: 0.1;
+            border-color: var(--dark-bg-3);
+            margin: 2rem 0;
+        }
+
+        /* Style for form groups */
+        .form-floating {
+            margin-bottom: 1rem;
+        }
+
+        /* Improve radio button groups */
+        .form-check-input[type="radio"] {
+            cursor: pointer;
+        }
+
+        .form-check-input[type="radio"]:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Add subtle hover effect to form fields */
+        .form-control:hover,
+        .form-select:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Override placeholder color */
+        ::placeholder {
+            color: black !important;
+            opacity: 1 !important;
+        }
+
+        /* Add text shadow for better readability */
+        .section-title,
+        .form-check-label,
+        .form-floating > label {
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Style select options */
+        .form-select option:checked {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: white;
+        }
+
+        /* Improve question text visibility */
+        .question-text, 
+        .col-md-12:not(strong) {
+            color: var(--text-white);
+            line-height: 1.6;
+        }
+
+        /* Make PAR-Q questions more visible */
+        .par-q-section .col-md-12 {
+            color: var(--text-white);
+            background: rgba(27, 25, 88, 0.063);
+        }
+
+        /* Enhance form text and labels */
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Make links more visible */
+        .waiver-section a {
+            color: var(--primary-light);
+            font-weight: 600;
+        }
+
+        /* Improve form select text */
+        .form-select {
+            color: black;
+        }
+
+        /* Make error messages more visible */
+        .error-message {
+            color: var(--danger);
+            font-weight: 500;
+        }
+
+        /* Improve section headers */
+        h5.text-warning {
+            color: var(--primary-light) !important;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 2rem 0 1.5rem;
+            text-align: center;
+        }
+
+        /* Contact of Emergency and Medical Background headers */
+        .text-warning.text-center {
+            color: var(--primary-light) !important;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        /* Make strong text more visible */
+        strong {
+            color: var(--primary-light);
+            font-weight: 600;
+        }
+
+        /* Style for PAR-Q questions */
+        .par-q-section .col-md-12 {
+            background: rgba(99, 102, 241, 0.1);
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .par-q-section .col-md-12 strong {
+            color: var(--primary-light);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+        }
+
+        /* Question text and general text */
+        .question-text,
+        .par-q-section .col-md-12,
+        .form-check-label,
+        .waiver-section .form-check-label,
+        .col-md-12:not(strong) {
+            color: var(--text-white) !important;
+        }
+
+        /* Form inputs and labels */
+        .form-floating > .form-control,
+        .form-floating > .form-select {
+            border-radius: 10px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            font-size: 0.95rem;
+            background: white;
+            color: black;
+        }
+
+        /* Remove placeholder when label is shown */
+        .form-floating > .form-control::placeholder {
+            color: transparent !important;
+        }
+
+        .form-floating > .form-select::placeholder {
+            color: transparent !important;
+        }
+
+        .form-floating > label {
+            color: black;
+            font-weight: 500;
+            background: transparent !important;
+            padding: 1rem;
+        }
+
+        /* Make floating labels visible on focus/filled */
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label,
+        .form-floating > .form-select ~ label {
+            opacity: 1;
+            background: transparent !important;
+            transform: scale(0.85) translateY(-1rem) translateX(0.15rem);
+        }
+
+        /* Ensure proper styling for inputs */
+        .form-control,
+        .form-select {
+            background-color: white !important;
+            color: black !important;
+        }
+
+        /* Override any floating label backgrounds */
+        .form-floating > .form-control ~ label::after {
+            background: transparent !important;
+        }
+
+        /* Style for PAR-Q questions */
+        .par-q-section .col-md-12 {
+            background: rgba(99, 102, 241, 0.1);
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: var(--text-white) !important;
+        }
+
+        /* Radio buttons and their labels */
+        .form-check-input {
+            background-color: var(--dark-bg-2);
+            border-color: var(--text-muted);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Make Yes/No labels white */
+        .par-q-section .form-check-label {
+            color: var(--text-white) !important;
+        }
+
+        /* Keep other form check labels black */
+        .waiver-section .form-check-label {
+            color: black !important;
+        }
+
+        /* Textarea specific styles */
+        textarea.form-control {
+            min-height: 100px;
+            color: black !important;
+            background-color: white !important;
+        }
+
+        /* Select specific styles */
+        .form-select {
+            background-color: white !important;
+        }
+
+        .form-select option {
+            background-color: white;
+            color: black;
+        }
+
+        /* Add hover effects for better interaction */
+        .form-check:hover .form-check-label {
+            color: var(--primary-light);
+        }
+
+        /* Register button */
+        .btn-warning {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none;
+            color: var(--text-white);
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: var(--text-white);
+        }
+
+        /* Make all text inputs white text */
+        input.form-control,
+        textarea.form-control,
+        select.form-select {
+            color: black !important;
+        }
+
+        /* Override any dark text */
+        .form-control,
+        .form-select,
+        .form-check-label,
+        .col-md-12,
+        p,
+        span {
+            color: black !important;
+        }
+
+        /* Make placeholder text visible but not too bright */
+        ::placeholder {
+            color: black !important;
+            opacity: 1 !important;
+        }
+
+        /* Style select options and dropdowns */
+        .form-select,
+        .form-select option,
+        select.form-select,
+        select.form-select option {
+            color: black !important;
+            background-color: white !important;
+        }
+
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+        }
+
+        /* Ensure dropdown text is visible */
+        select.form-select option:checked,
+        select.form-select:focus option:checked {
+            background: var(--primary) !important;
+            color: white !important;
+        }
+
+        select.form-select option:hover {
+            background: var(--primary-light) !important;
+            color: white !important;
+        }
+
+        /* Override any dark text in PAR-Q section */
+        .par-q-section * {
+            color: var(--text-white) !important;
+        }
+
+        .par-q-section strong {
+            color: var(--primary-light) !important;
+        }
+
+        /* Style for PAR-Q questions and radio buttons */
+        .par-q-section .form-check-label,
+        .par-q-section .form-check input[type="radio"] + label {
+            color: var(--text-white) !important;
+        }
+
+        /* Style for waiver section */
+        .waiver-section {
+            background: linear-gradient(135deg, var(--dark-bg-2) 0%, var(--dark-bg-3) 100%);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: var(--text-white) !important;
+        }
+
+        .waiver-section .form-check-label {
+            color: var(--text-white) !important;
+        }
+
+        .waiver-section a {
+            color: var(--primary-light) !important;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .waiver-section a:hover {
+            color: var(--primary) !important;
+        }
+
+        .waiver-section strong {
+            color: var(--primary-light) !important;
+        }
+
+        /* Override any dark text in form checks */
+        .form-check-label {
+            color: var(--text-white) !important;
+        }
+
+        /* Make sure radio button text is white */
+        input[type="radio"] + label,
+        input[type="checkbox"] + label {
+            color: var(--text-white) !important;
+        }
+
+        /* Remove previous personal information styles */
+        .section-title {
+            color: var(--text-white) !important;
+            font-size: 1.1rem !important;
+            margin: 1.5rem 0 1rem !important;
+            font-weight: 600 !important;
+        }
+
+        /* Style only the Personal Information header */
+        h5.section-title:first-of-type {
+            color: #818CF8 !important;  /* Light blue */
+            font-size: 1.25rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 2rem !important;
+            text-align: center;
+        }
+
+        /* Add a blue underline to the Personal Information header */
+        h5.section-title:first-of-type::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(to right, #6366F1, #818CF8);
+            margin: 0.5rem auto 0;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid p-0">
+        <form id="registrationForm" class="px-3">
+            <!-- Personal Information -->
+            <h5 class="section-title">Personal Information</h5>
+            <div class="row g-3">
+                <!-- Username -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Username">
+                        <label for="username">Username</label>
+                        <div class="error-message" id="usernameError"></div>
+                    </div>
+                </div>
+                <!-- Last Name -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Last Name">
+                        <label for="lastname">Last Name</label>
+                        <div class="error-message" id="lastnameError"></div>
+                    </div>
+                </div>
+                <!-- First Name -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="firstname" name="firstname" placeholder="First Name">
+                        <label for="firstname">First Name</label>
+                        <div class="error-message" id="firstnameError"></div>
+                    </div>
+                </div>
+                <!-- Middle Name -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="middlename" name="middlename" placeholder="Middle Name">
+                        <label for="middlename">Middle Name</label>
+                        <div class="error-message" id="middlenameError"></div>
+                    </div>
+                </div>
+                <!-- Date of Birth -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="date" class="form-control" id="dateofbirth" name="dateofbirth" placeholder="Date of Birth">
+                        <label for="dateofbirth">Date of Birth</label>
+                        <div class="error-message" id="dateofbirthError"></div>
+                    </div>
+                </div>
+                <!-- Gender -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select class="form-select" id="gender" name="gender">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Prefer not to say">Prefer not to say</option>
+                        </select>
+                        <label for="gender">Gender</label>
+                        <div class="error-message" id="genderError"></div>
+                    </div>
+                </div>
+                <!-- Address -->
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="address" name="address" placeholder="Address">
+                        <label for="address">Address</label>
+                        <div class="error-message" id="addressError"></div>
+                    </div>
+                </div>
+                <!-- Phone Number -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="phonenumber" name="phonenumber" placeholder="Phone Number">
+                        <label for="phonenumber">Phone Number</label>
+                        <div class="error-message" id="phonenumberError"></div>
+                    </div>
+                </div>
+                <!-- Email -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+                        <label for="email">Email</label>
+                        <div class="error-message" id="emailError"></div>
+                    </div>
+                </div>
+                <!-- Password -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                        <label for="password">Password</label>
+                        <div class="error-message" id="passwordError"></div>
+                    </div>
+                    <i class="bi bi-eye-slash toggle-password" id="togglePassword"></i>
+                </div>
+                <!-- Confirm Password -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm Password">
+                        <label for="confirm_password">Confirm Password</label>
+                        <div class="error-message" id="confirm_passwordError"></div>
+                    </div>
+                    <i class="bi bi-eye-slash toggle-password" id="toggleConfirmPassword"></i>
+                </div>
+            </div>
+
+            <!-- Medical Background -->
+            <hr class="my-4">
+            <h5 class="text-warning text-center"><strong>Contact of Emergency</strong></h5>
+            <div class="row g-3">
+                <!-- Contact Person -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="contact_person" name="contact_person" placeholder="Contact Person">
+                        <label for="contact_person">Contact Person</label>
+                        <div class="error-message" id="contact_personError"></div>
+                    </div>
+                </div>
+                <!-- Contact Number -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="contact_number" name="contact_number" placeholder="Contact Number">
+                        <label for="contact_number">Contact Number</label>
+                        <div class="error-message" id="contact_numberError"></div>
+                    </div>
+                </div>
+                <!-- Relationship -->
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <select class="form-select" id="relationship" name="relationship">
+                            <option value="">Select Relationship</option>
+                            <option value="Mother">Mother</option>
+                            <option value="Father">Father</option>
+                            <option value="Sister">Sister</option>
+                            <option value="Brother">Brother</option>
+                            <option value="Friend">Friend</option>
+                            <option value="Boyfriend">Boyfriend</option>
+                            <option value="Girlfriend">Girlfriend</option>
+                            <option value="Sister in Law">Sister in Law</option>
+                            <option value="Brother in Law">Brother in Law</option>
+                            <option value="Mother in Law">Mother in Law</option>
+                            <option value="Father in Law">Father in Law</option>
+                            <option value="Wife">Wife</option>
+                            <option value="Husband">Husband</option>
+                            <option value="Daughter">Daughter</option>
+                            <option value="Cousin">Cousin</option>
+                            <option value="Godmother">Godmother</option>
+                            <option value="Godfather">Godfather</option>
+                        </select>
+                        <label for="relationship">Relationship</label>
+                        <div class="error-message" id="relationshipError"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical Background -->
+            <hr class="my-4">
+            <h5 class="text-warning text-center"><strong>Medical Background</strong></h5>
+            <div class="row g-3">
+                <!-- Medical Conditions -->
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <textarea class="form-control" id="medical_conditions" name="medical_conditions" placeholder="Medical Conditions" style="height: 100px"></textarea>
+                        <label for="medical_conditions">Medical Conditions</label>
+                        <div class="error-message" id="medical_conditionsError"></div>
+                    </div>
+                </div>
+                <!-- Current Medications -->
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <textarea class="form-control" id="current_medications" name="current_medications" placeholder="Current Medications" style="height: 100px"></textarea>
+                        <label for="current_medications">Current Medications</label>
+                        <div class="error-message" id="current_medicationsError"></div>
+                    </div>
+                </div>
+                <!-- Previous Injuries -->
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <textarea class="form-control" id="previous_injuries" name="previous_injuries" placeholder="Previous Injuries" style="height: 100px"></textarea>
+                        <label for="previous_injuries">Previous Injuries</label>
+                        <div class="error-message" id="previous_injuriesError"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Physical Activity Readiness Questions (PAR-Q) -->
+            <hr class="my-4">
+            <h5 class="text-warning text-center"><strong>Physical Activity Readiness Questions (PAR-Q)</strong></h5>
+            <div class="row g-3">
+                <!-- Q1 -->
+                <div class="col-md-12">
+                    <strong>Q1:</strong> Has your doctor ever said that you have a heart condition and that you should only do physical activity recommended by a doctor?
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q1" id="q1_yes" value="Yes">
+                        <label class="form-check-label" for="q1_yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q1" id="q1_no" value="No">
+                        <label class="form-check-label" for="q1_no">No</label>
+                    </div>
+                    <div class="error-message" id="q1Error"></div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="col-md-12">
+                    <strong>Q2:</strong> Do you feel pain in your chest when you perform physical activity?
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q2" id="q2_yes" value="Yes">
+                        <label class="form-check-label" for="q2_yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q2" id="q2_no" value="No">
+                        <label class="form-check-label" for="q2_no">No</label>
+                    </div>
+                    <div class="error-message" id="q2Error"></div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="col-md-12">
+                    <strong>Q3:</strong> In the past month, have you had chest pain when you were not doing physical activity?
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q3" id="q3_yes" value="Yes">
+                        <label class="form-check-label" for="q3_yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q3" id="q3_no" value="No">
+                        <label class="form-check-label" for="q3_no">No</label>
+                    </div>
+                    <div class="error-message" id="q3Error"></div>
+                </div>
+
+                <!-- Q4 -->
+                <div class="col-md-12">
+                    <strong>Q4:</strong> Do you lose your balance because of dizziness or do you ever lose consciousness?
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q4" id="q4_yes" value="Yes">
+                        <label class="form-check-label" for="q4_yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q4" id="q4_no" value="No">
+                        <label class="form-check-label" for="q4_no">No</label>
+                    </div>
+                    <div class="error-message" id="q4Error"></div>
+                </div>
+
+                <!-- Q5 -->
+                <div class="col-md-12">
+                    <strong>Q5:</strong> Do you have a bone or joint problem that could be worsened by a change in your physical activity?
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q5" id="q5_yes" value="Yes">
+                        <label class="form-check-label" for="q5_yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q5" id="q5_no" value="No">
+                        <label class="form-check-label" for="q5_no">No</label>
+                    </div>
+                    <div class="error-message" id="q5Error"></div>
+                </div>
+
+                <!-- Q6 -->
+                <div class="col-md-12">
+                    <strong>Q6:</strong> Is your doctor currently prescribing any medication for your blood pressure or heart condition?
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q6" id="q6_yes" value="Yes">
+                        <label class="form-check-label" for="q6_yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q6" id="q6_no" value="No">
+                        <label class="form-check-label" for="q6_no">No</label>
+                    </div>
+                    <div class="error-message" id="q6Error"></div>
+                </div>
+
+                <!-- Q7 -->
+                <div class="col-md-12">
+                    <strong>Q7:</strong> Do you have any chronic medical conditions that may affect your ability to exercise safely?
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q7" id="q7_yes" value="Yes">
+                        <label class="form-check-label" for="q7_yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q7" id="q7_no" value="No">
+                        <label class="form-check-label" for="q7_no">No</label>
+                    </div>
+                    <div class="error-message" id="q7Error"></div>
+                </div>
+
+                <!-- Q8 -->
+                <div class="col-md-12">
+                    <strong>Q8:</strong> Are you pregnant or have you given birth in the last 6 months?
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q8" id="q8_yes" value="Yes">
+                        <label class="form-check-label" for="q8_yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q8" id="q8_no" value="No">
+                        <label class="form-check-label" for="q8_no">No</label>
+                    </div>
+                    <div class="error-message" id="q8Error"></div>
+                </div>
+
+                <!-- Q9 -->
+                <div class="col-md-12">
+                    <strong>Q9:</strong> Do you have any recent injuries or surgeries that may limit your physical activity?
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q9" id="q9_yes" value="Yes">
+                        <label class="form-check-label" for="q9_yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q9" id="q9_no" value="No">
+                        <label class="form-check-label" for="q9_no">No</label>
+                    </div>
+                    <div class="error-message" id="q9Error"></div>
+                </div>
+
+                <!-- Q10 -->
+                <div class="col-md-12">
+                    <strong>Q10:</strong> Do you know of any other reason why you should not do physical activity?
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q10" id="q10_yes" value="Yes">
+                        <label class="form-check-label" for="q10_yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q10" id="q10_no" value="No">
+                        <label class="form-check-label" for="q10_no">No</label>
+                    </div>
+                    <div class="error-message" id="q10Error"></div>
+                </div>
+            </div>
+
+            <!-- Security Questions -->
+            <hr class="my-4">
+            <h5 class="text-warning text-center"><strong>Security Questions</strong></h5>
+            <div class="row g-3">
+                <!-- Security Question 1 -->
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <select class="form-select" id="security_question1" name="security_question1" onchange="updateQuestionOptions()">
+                            <option value="">Select Security Question 1</option>
+                            <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                            <option value="In what city were you born?">In what city were you born?</option>
+                            <option value="What is your father's middle name?">What is your father's middle name?</option>
+                            <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+                            <option value="What is your grandmother's first name?">What is your grandmother's first name?</option>
+                            <option value="What was the name of your first school?">What was the name of your first school?</option>
+                            <option value="What is the name of your first pet?">What is the name of your first pet?</option>
+                            <option value="What was the make and model of your first car?">What was the make and model of your first car?</option>
+                            <option value="What was the name of your childhood best friend?">What was the name of your childhood best friend?</option>
+                            <option value="In what city did your parents meet?">In what city did your parents meet?</option>
+                            <option value="What is your favorite book?">What is your favorite book?</option>
+                            <option value="What was the first concert you attended?">What was the first concert you attended?</option>
+                            <option value="What is your favorite movie?">What is your favorite movie?</option>
+                            <option value="What is your favorite food?">What is your favorite food?</option>
+                            <option value="What is your favorite childhood TV show?">What is your favorite childhood TV show?</option>
+                        </select>
+                        <label for="security_question1">Security Question 1</label>
+                        <div class="error-message" id="security_question1Error"></div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="security_answer1" name="security_answer1" placeholder="Answer for Security Question 1">
+                        <label for="security_answer1">Answer for Security Question 1</label>
+                        <div class="error-message" id="security_answer1Error"></div>
+                    </div>
+                </div>
+
+                <!-- Security Question 2 -->
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <select class="form-select" id="security_question2" name="security_question2" onchange="updateQuestionOptions()">
+                            <option value="">Select Security Question 2</option>
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                        <label for="security_question2">Security Question 2</label>
+                        <div class="error-message" id="security_question2Error"></div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="security_answer2" name="security_answer2" placeholder="Answer for Security Question 2">
+                        <label for="security_answer2">Answer for Security Question 2</label>
+                        <div class="error-message" id="security_answer2Error"></div>
+                    </div>
+                </div>
+
+                <!-- Security Question 3 -->
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <select class="form-select" id="security_question3" name="security_question3" onchange="updateQuestionOptions()">
+                            <option value="">Select Security Question 3</option>
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                        <label for="security_question3">Security Question 3</label>
+                        <div class="error-message" id="security_question3Error"></div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="security_answer3" name="security_answer3" placeholder="Answer for Security Question 3">
+                        <label for="security_answer3">Answer for Security Question 3</label>
+                        <div class="error-message" id="security_answer3Error"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Waiver/Agreements -->
+            <hr class="my-4">
+            <h5 class="text-warning text-center"><strong>Waiver and Agreements</strong></h5>
+            <div class="row g-3">
+                <!-- Rules and Policy -->
+                <div class="col-md-12">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="waiver_rules" name="waiver_rules">
+                        <label class="form-check-label" for="waiver_rules">The member agree to the <a href="rule_and_policy.html" target="_blank"><strong>Rules and Policy</strong></a>.</label>
+                        <div class="error-message" id="waiver_rulesError"></div>
+                    </div>
+                </div>
+                <!-- Liability Waiver -->
+                <div class="col-md-12">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="waiver_liability" name="waiver_liability">
+                        <label class="form-check-label" for="waiver_liability">The member agree to the <a href="liability_waiver.html" target="_blank"><strong>Liability Waiver</strong></a>.</label>
+                        <div class="error-message" id="waiver_liabilityError"></div>
+                    </div>
+                </div>
+                <!-- Cancellation and Refund Policy -->
+                <div class="col-md-12">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="waiver_cancel" name="waiver_cancel">
+                        <label class="form-check-label" for="waiver_cancel">The member agree to the <a href="cancellation_and_refund_policy.html" target="_blank"><strong>Cancellation and Refund Policy</strong></a>.</label>
+                        <div class="error-message" id="waiver_cancelError"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button - Removed Back button -->
+            <div class="d-grid gap-2 col-md-6 mx-auto mt-4">
+                <button type="submit" class="btn btn-warning" name="register">
+                    <i class="fas fa-user-plus me-2"></i>Register Member
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="../renderer/register_members.js"></script>
+    <script>
+        // Add this script before the closing body tag
+        document.addEventListener('DOMContentLoaded', function() {
+            // Security questions array
+            const securityQuestions = [
+                "What is your mother's maiden name?",
+                "In what city were you born?",
+                "What is your father's middle name?",
+                "What was your childhood nickname?",
+                "What is your grandmother's first name?",
+                "What was the name of your first school?",
+                "What is the name of your first pet?",
+                "What was the make and model of your first car?",
+                "What was the name of your childhood best friend?",
+                "In what city did your parents meet?",
+                "What is your favorite book?",
+                "What was the first concert you attended?",
+                "What is your favorite movie?",
+                "What is your favorite food?",
+                "What is your favorite childhood TV show?"
+            ];
+
+            // Function to populate security questions
+            function populateSecurityQuestions() {
+                const question1 = document.getElementById('security_question1');
+                const question2 = document.getElementById('security_question2');
+                const question3 = document.getElementById('security_question3');
+
+                // Clear existing options except the first one
+                question1.innerHTML = '<option value="">Select Security Question 1</option>';
+                question2.innerHTML = '<option value="">Select Security Question 2</option>';
+                question3.innerHTML = '<option value="">Select Security Question 3</option>';
+
+                // Populate all questions
+                securityQuestions.forEach(question => {
+                    question1.add(new Option(question, question));
+                    question2.add(new Option(question, question));
+                    question3.add(new Option(question, question));
+                });
+            }
+
+            // Function to update available questions
+            function updateQuestionOptions() {
+                const question1 = document.getElementById('security_question1');
+                const question2 = document.getElementById('security_question2');
+                const question3 = document.getElementById('security_question3');
+
+                const selected1 = question1.value;
+                const selected2 = question2.value;
+                const selected3 = question3.value;
+
+                // Reset and repopulate all dropdowns
+                populateSecurityQuestions();
+
+                // Remove selected options from other dropdowns
+                if (selected1) {
+                    removeOption(question2, selected1);
+                    removeOption(question3, selected1);
+                }
+                if (selected2) {
+                    removeOption(question1, selected2);
+                    removeOption(question3, selected2);
+                }
+                if (selected3) {
+                    removeOption(question1, selected3);
+                    removeOption(question2, selected3);
+                }
+
+                // Restore selected values
+                question1.value = selected1;
+                question2.value = selected2;
+                question3.value = selected3;
+            }
+
+            // Helper function to remove an option from a select element
+            function removeOption(selectElement, value) {
+                for (let i = 0; i < selectElement.options.length; i++) {
+                    if (selectElement.options[i].value === value) {
+                        selectElement.remove(i);
+                        break;
+                    }
+                }
+            }
+
+            // Initialize security questions
+            populateSecurityQuestions();
+
+            // Add event listeners for question changes
+            document.getElementById('security_question1').addEventListener('change', updateQuestionOptions);
+            document.getElementById('security_question2').addEventListener('change', updateQuestionOptions);
+            document.getElementById('security_question3').addEventListener('change', updateQuestionOptions);
+        });
+    </script>
+</body>
+</html>

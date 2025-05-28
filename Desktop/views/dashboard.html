@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FitLogSync - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+      :root {
+        --sidebar-width: 280px;
+        --primary: #6366F1;
+        --primary-dark: #4F46E5;
+        --primary-light: #818CF8;
+        --accent: #C4B5FD;
+        --dark-bg: #0F172A;
+        --dark-bg-2: #1E293B;
+        --dark-bg-3: #334155;
+        --text-white: #FFFFFF;
+        --text-light: #E2E8F0;
+        --text-muted: #CBD5E1;
+        --success: #10B981;
+        --warning: #F59E0B;
+        --danger: #EF4444;
+      }
+
+      body {
+        min-height: 100vh;
+        background-color: var(--dark-bg);
+        font-family: 'Poppins', sans-serif;
+        color: var(--text-white);
+      }
+
+      .sidebar {
+        width: var(--sidebar-width);
+        background: linear-gradient(180deg, var(--dark-bg-2) 0%, var(--dark-bg) 100%);
+        min-height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        padding: 1.5rem;
+        box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
+        border-right: 1px solid rgba(99, 102, 241, 0.2);
+      }
+
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 2rem;
+        background: var(--dark-bg);
+        min-height: 100vh;
+      }
+
+      .nav-link {
+        color: var(--text-white);
+        padding: 0.8rem 1rem;
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+
+      .nav-link:hover {
+        color: var(--text-white);
+        background: rgba(99, 102, 241, 0.1);
+      }
+
+      .nav-link.active {
+        color: var(--text-white);
+        background: var(--primary);
+        font-weight: 600;
+      }
+
+      .nav-link small {
+        color: var(--text-muted) !important;
+      }
+
+      .nav-link.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .stat-card {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        color: var(--text-white);
+        backdrop-filter: blur(10px);
+      }
+
+      .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary);
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%);
+      }
+
+      .stat-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        color: var(--text-white);
+      }
+
+      .role-badge {
+        background: rgba(99, 102, 241, 0.1);
+        color: var(--text-white);
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        margin-top: 1rem;
+        text-align: center;
+        font-weight: 500;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        border: none;
+        color: var(--text-white);
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+      }
+
+      .card {
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Registration form container styles */
+      #register-form-section .card {
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        background: rgba(99, 102, 241, 0.1);
+      }
+      
+      #register-form-section .card-header {
+        background: transparent;
+        padding: 1.5rem 1.5rem 1rem;
+        border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+      }
+      
+      #register-form-section .card-header h5 {
+        color: var(--text-white);
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        font-size: 1.25rem;
+      }
+      
+      #register-form-section .btn-outline-secondary {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-color: rgba(255, 255, 255, 0.3);
+        color: var(--text-white);
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.1);
+      }
+      
+      #register-form-section .btn-outline-secondary:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.4);
+        color: var(--text-white);
+        transform: rotate(90deg);
+      }
+      
+      #registration-form-container {
+        max-height: calc(100vh - 180px);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+        padding: 0 1.5rem;
+      }
+      
+      #registration-form-container::-webkit-scrollbar {
+        width: 6px;
+      }
+      
+      #registration-form-container::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      
+      #registration-form-container::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 3px;
+      }
+      
+      .section-title {
+        color: var(--text-white);
+        font-size: 1.1rem !important;
+        margin: 1.5rem 0 1rem !important;
+        font-weight: 600 !important;
+      }
+
+      h2, h3, h4, h5, h6 {
+        color: var(--text-white);
+        font-weight: 600;
+      }
+
+      .text-muted {
+        color: var(--text-muted) !important;
+      }
+
+      /* Override any Bootstrap text-primary colors */
+      .text-primary {
+        color: var(--primary) !important;
+      }
+
+      /* Add a subtle text shadow for better readability */
+      .card h2, .card h3, .card h4, .card h5, .card h6,
+      .stat-card h2, .stat-card h3, .stat-card h4, .stat-card h5, .stat-card h6 {
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      .card p, .stat-card p {
+        color: var(--text-muted);
+      }
+
+      /* Make headings in main content more visible */
+      .main-content h2 {
+        color: var(--text-white);
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+      }
+
+      /* Ensure all text in main content is visible */
+      .main-content p {
+        color: var(--text-white);
+      }
+
+      /* Style the Member Management title */
+      .d-flex h2 {
+        color: var(--text-white) !important;
+      }
+
+      /* Make table text white */
+      table {
+        color: var(--text-white) !important;
+      }
+
+      .table {
+        color: var(--text-white);
+      }
+
+      .table td, .table th {
+        color: var(--text-white);
+      }
+
+      /* Override any dark text */
+      * {
+        color: var(--text-white);
+      }
+
+      /* Registration form section styles */
+      #register-form-section {
+        position: fixed;
+        top: 0;
+        left: var(--sidebar-width);
+        width: calc(100% - var(--sidebar-width));
+        height: 100vh;
+        background: var(--dark-bg);
+        overflow-y: auto;
+        z-index: 1000;
+        padding: 2rem;
+      }
+
+      #register-form-section iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background: var(--dark-bg);
+      }
+
+      .close-button {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1001;
+        background: var(--dark-bg-2);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        color: var(--text-white);
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .close-button:hover {
+        background: var(--dark-bg-3);
+        transform: rotate(90deg);
+      }
+
+      /* Style the member management section */
+      #members-content .card {
+        background: var(--dark-bg-2);
+        border: 1px solid var(--dark-bg-3);
+      }
+
+      #members-content .card-body {
+        color: var(--text-light);
+      }
+
+      /* Stats number colors */
+      .stat-card h3 {
+        color: var(--text-white);
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+      }
+
+      /* Gradient text for emphasis */
+      .gradient-text {
+        background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* Form inputs and labels */
+      .form-floating > .form-control,
+      .form-floating > .form-select {
+        border-radius: 10px;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        font-size: 0.95rem;
+        background: white;
+        color: black;
+      }
+
+      /* Remove placeholder when label is shown */
+      .form-floating > .form-control::placeholder {
+        color: transparent !important;
+      }
+
+      .form-floating > .form-select::placeholder {
+        color: transparent !important;
+      }
+
+      .form-floating > label {
+        color: black;
+        font-weight: 500;
+        background: transparent !important;
+      }
+
+      /* Make floating labels visible on focus/filled */
+      .form-floating > .form-control:focus ~ label,
+      .form-floating > .form-control:not(:placeholder-shown) ~ label,
+      .form-floating > .form-select ~ label {
+        opacity: 1;
+        background: transparent !important;
+        transform: scale(0.85) translateY(-1rem) translateX(0.15rem);
+      }
+
+      /* Ensure proper styling for inputs */
+      .form-control,
+      .form-select {
+        background-color: white !important;
+        color: black !important;
+      }
+
+      /* Style select options and dropdowns */
+      .form-select,
+      .form-select option,
+      select.form-select,
+      select.form-select option {
+          color: black !important;
+          background-color: white !important;
+      }
+
+      .form-select:focus {
+          border-color: var(--primary);
+          box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+      }
+
+      /* Ensure dropdown text is visible */
+      select.form-select option:checked,
+      select.form-select:focus option:checked {
+          background: var(--primary) !important;
+          color: white !important;
+      }
+
+      select.form-select option:hover {
+          background: var(--primary-light) !important;
+          color: white !important;
+      }
+
+      /* Override any floating label backgrounds */
+      .form-floating > .form-control ~ label::after {
+        background: transparent !important;
+      }
+
+      /* Ensure the main content area doesn't overlap */
+      .main-content {
+        position: relative;
+        min-height: 100vh;
+      }
+
+      /* Make sure the registration form scrolls properly */
+      #registration-form-container {
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+        padding: 0 1rem;
+      }
+
+      /* Adjust scrollbar styling */
+      #registration-form-container::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      #registration-form-container::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      #registration-form-container::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 3px;
+      }
+
+      /* Basic styles for registration form */
+      #register-form-section {
+        margin: 20px;
+      }
+
+      #register-form-section .card {
+        background: var(--dark-bg-2);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+      }
+
+      #register-form-section .card-body {
+        padding: 20px;
+      }
+
+      #registration-form-container {
+        padding: 15px;
+      }
+
+      /* Custom Dialog Styles */
+      .custom-dialog {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: var(--dark-bg-2);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: 15px;
+        padding: 2rem;
+        z-index: 2000;
+        min-width: 320px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      }
+
+      .custom-dialog-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 1999;
+        backdrop-filter: blur(4px);
+      }
+
+      .custom-dialog h3 {
+        color: var(--text-white);
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+
+      .custom-dialog p {
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+      }
+
+      .custom-dialog-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+      }
+
+      .custom-dialog-buttons button {
+        padding: 0.5rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .btn-confirm {
+        background: var(--primary);
+        color: white;
+        border: none;
+      }
+
+      .btn-cancel {
+        background: transparent;
+        color: var(--text-white);
+        border: 1px solid var(--text-muted);
+      }
+
+      .btn-confirm:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+      }
+
+      .btn-cancel:hover {
+        border-color: var(--text-white);
+      }
+
+      .success-dialog {
+        background: linear-gradient(135deg, var(--dark-bg-2) 0%, var(--dark-bg-3) 100%);
+        border: 1px solid var(--success);
+      }
+
+      .success-dialog i {
+        color: var(--success);
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+
+      /* Table Styles */
+      .members-table {
+        width: 100%;
+        background: var(--dark-bg-2);
+        border-radius: 15px;
+        overflow: hidden;
+        margin-top: 1rem;
+      }
+
+      .members-table th {
+        background: rgba(99, 102, 241, 0.1);
+        color: var(--primary-light);
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+      }
+
+      .members-table td {
+        padding: 1rem;
+        color: var(--text-white);
+        border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+      }
+
+      .members-table tbody tr:hover {
+        background: rgba(99, 102, 241, 0.05);
+      }
+
+      .members-table .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .members-table .btn-action {
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .members-table .btn-view {
+        background: var(--success);
+        color: white;
+        border: none;
+      }
+
+      .members-table .btn-edit {
+        background: var(--primary);
+        color: white;
+        border: none;
+      }
+
+      .members-table .btn-delete {
+        background: var(--danger);
+        color: white;
+        border: none;
+      }
+
+      .members-table .status-active {
+        color: var(--success);
+        background: rgba(16, 185, 129, 0.1);
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.875rem;
+      }
+
+      .members-table .status-inactive {
+        color: var(--danger);
+        background: rgba(239, 68, 68, 0.1);
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.875rem;
+      }
+
+      .table-container {
+        overflow-x: auto;
+        border-radius: 15px;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+      }
+
+      /* Search and Filter Section */
+      .table-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .search-box {
+        flex: 1;
+        min-width: 200px;
+        position: relative;
+      }
+
+      .search-box input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border-radius: 10px;
+        background: var(--dark-bg-2);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        color: var(--text-white);
+      }
+
+      .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+      }
+
+      .filter-box select {
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        background: var(--dark-bg-2);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        color: var(--text-white);
+        min-width: 150px;
+      }
+
+      /* Button hover effects */
+      .btn-action:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-view:hover {
+        background: #0ea271;
+      }
+
+      .btn-edit:hover {
+        background: #4F46E5;
+      }
+
+      .btn-delete:hover {
+        background: #dc2626;
+      }
+
+      /* Profile Section Styles */
+      .profile-section {
+        padding: 2rem;
+      }
+
+      .profile-header {
+        background: linear-gradient(135deg, var(--dark-bg-2) 0%, var(--dark-bg-3) 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        text-align: center;
+      }
+
+      .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: var(--primary);
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+        border: 4px solid rgba(99, 102, 241, 0.2);
+      }
+
+      .profile-name {
+        font-size: 1.5rem;
+        color: var(--text-white);
+        margin-bottom: 0.5rem;
+      }
+
+      .profile-role {
+        color: var(--primary-light);
+        font-size: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .profile-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .stat-card {
+        background: var(--dark-bg-2);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+      }
+
+      .profile-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .profile-card {
+        background: var(--dark-bg-2);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: 15px;
+        padding: 1.5rem;
+      }
+
+      .profile-card h3 {
+        color: var(--primary-light);
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .profile-card h3 i {
+        font-size: 1rem;
+      }
+
+      .info-group {
+        margin-bottom: 1rem;
+      }
+
+      .info-label {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .info-value {
+        color: var(--text-white);
+        font-size: 1rem;
+      }
+
+      .btn-edit-profile {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .btn-edit-profile:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+      }
+
+      /* Add these styles for sorting icons */
+      .members-table th {
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .members-table th i {
+        margin-left: 5px;
+        opacity: 0.3;
+      }
+
+      .members-table th.sort-asc i {
+        opacity: 1;
+        transform: rotate(180deg);
+      }
+
+      .members-table th.sort-desc i {
+        opacity: 1;
+      }
+
+      /* Style for no results message */
+      .no-results {
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-muted);
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="text-center text-white mb-4">
+        <div class="stat-icon mx-auto mb-3">
+          <i class="fas fa-dumbbell fa-lg text-white"></i>
+        </div>
+        <h4 class="mb-2">FitLogSync</h4>
+        <div class="role-badge">
+          Welcome, <span id="user-name">User</span>
+          <div class="small mt-1" id="role-display"></div>
+        </div>
+      </div>
+
+      <nav class="nav flex-column mt-4">
+        <a href="#" class="nav-link active" onclick="showSection('overview')">
+          <i class="fas fa-home me-2"></i>Overview
+        </a>
+        <a href="#" class="nav-link" onclick="showSection('members')" id="members-link">
+          <i class="fas fa-users me-2"></i>Member Management
+          <small class="d-block text-white-50 ps-4">Required: Front Desk or higher</small>
+        </a>
+        <a href="#" class="nav-link" onclick="showSection('classes')" id="classes-link">
+          <i class="fas fa-dumbbell me-2"></i>Class Management
+          <small class="d-block text-white-50 ps-4">Required: Instructor or higher</small>
+        </a>
+        <a href="#" class="nav-link" onclick="showSection('reports')" id="reports-link">
+          <i class="fas fa-chart-bar me-2"></i>Reports
+          <small class="d-block text-white-50 ps-4">Required: Admin or higher</small>
+        </a>
+        <a href="#" class="nav-link" onclick="showSection('profile')">
+          <i class="fas fa-user me-2"></i>Profile
+        </a>
+        <a href="#" class="nav-link mt-auto" onclick="logout()">
+          <i class="fas fa-sign-out-alt me-2"></i>Logout
+        </a>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Overview Section -->
+      <div id="overview-section" class="dashboard-section">
+        <h2 class="mb-4">Dashboard Overview</h2>
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <div class="stat-card">
+              <div class="stat-icon text-white">
+                <i class="fas fa-users"></i>
+              </div>
+              <h3 class="h2 mb-2">150</h3>
+              <p class="text-muted mb-0">Total Members</p>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="stat-card">
+              <div class="stat-icon text-white">
+                <i class="fas fa-dumbbell"></i>
+              </div>
+              <h3 class="h2 mb-2">12</h3>
+              <p class="text-muted mb-0">Active Classes</p>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="stat-card">
+              <div class="stat-icon text-white">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <h3 class="h2 mb-2">45</h3>
+              <p class="text-muted mb-0">Today's Check-ins</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Member Management Section -->
+      <div id="members-section" class="dashboard-section d-none">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Member Management</h2>
+          <button class="btn btn-primary" onclick="showRegisterForm()">
+            <i class="fas fa-plus me-2"></i>Add New Member
+          </button>
+        </div>
+        <div id="members-content">
+          <div class="card">
+            <div class="card-body">
+              <!-- Table Controls -->
+              <div class="table-controls">
+                <div class="search-box">
+                  <i class="fas fa-search"></i>
+                  <input type="text" placeholder="Search members..." id="searchMembers">
+                </div>
+                <div class="filter-box">
+                  <select id="statusFilter">
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Table Container -->
+              <div class="table-container">
+                <table class="members-table">
+                  <thead>
+                    <tr>
+                      <th data-sort="accountNumber">Account Number <i class="fas fa-sort"></i></th>
+                      <th data-sort="name">Name <i class="fas fa-sort"></i></th>
+                      <th data-sort="email">Email <i class="fas fa-sort"></i></th>
+                      <th data-sort="phone">Phone <i class="fas fa-sort"></i></th>
+                      <th data-sort="status">Status <i class="fas fa-sort"></i></th>
+                      <th data-sort="joinDate">Join Date <i class="fas fa-sort"></i></th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="membersTableBody">
+                    <!-- Data will be populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Member Actions Container -->
+        <div id="member-actions-container" class="d-none" style="position: fixed; top: 0; left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000;">
+          <iframe id="member-actions-frame" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+        </div>
+
+        <!-- Simple container for register_members.html -->
+        <div id="register-form-section" class="d-none">
+          <button class="close-button" onclick="hideRegisterForm()">
+            <i class="fas fa-times"></i>
+          </button>
+          <iframe id="register-form-iframe" src=""></iframe>
+        </div>
+      </div>
+
+      <!-- Class Management Section -->
+      <div id="classes-section" class="dashboard-section d-none">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Class Management</h2>
+          <button class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Add New Class
+          </button>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <p>Manage your fitness classes here. This section requires Instructor access or higher.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reports Section -->
+      <div id="reports-section" class="dashboard-section d-none">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Reports</h2>
+          <button class="btn btn-primary">
+            <i class="fas fa-download me-2"></i>Download Report
+          </button>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <p>View and generate reports here. This section requires Admin access or higher.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Section -->
+      <div id="profile-section" class="dashboard-section d-none">
+        <div class="profile-section">
+          <div class="profile-header">
+            <div class="profile-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <h2 class="profile-name" id="profileName">Loading...</h2>
+            <div class="profile-role" id="profileRole">Loading...</div>
+            <button class="btn-edit-profile">
+              <i class="fas fa-edit"></i>
+              Edit Profile
+            </button>
+          </div>
+
+          <div class="profile-stats">
+            <div class="stat-card">
+              <h3>Last Login</h3>
+              <p id="lastLogin">Today at 9:30 AM</p>
+            </div>
+            <div class="stat-card">
+              <h3>Account Status</h3>
+              <p><span class="status-active">Active</span></p>
+            </div>
+            <div class="stat-card">
+              <h3>Member Since</h3>
+              <p id="memberSince">January 15, 2024</p>
+            </div>
+          </div>
+
+          <div class="profile-content">
+            <div class="profile-card">
+              <h3><i class="fas fa-info-circle"></i> Personal Information</h3>
+              <div class="info-group">
+                <div class="info-label">Full Name</div>
+                <div class="info-value" id="fullName">Loading...</div>
+              </div>
+              <div class="info-group">
+                <div class="info-label">Email</div>
+                <div class="info-value" id="email">Loading...</div>
+              </div>
+              <div class="info-group">
+                <div class="info-label">Phone</div>
+                <div class="info-value" id="phone">Loading...</div>
+              </div>
+              <div class="info-group">
+                <div class="info-label">Address</div>
+                <div class="info-value" id="address">Loading...</div>
+              </div>
+            </div>
+
+            <div class="profile-card">
+              <h3><i class="fas fa-shield-alt"></i> Account Settings</h3>
+              <div class="info-group">
+                <div class="info-label">Username</div>
+                <div class="info-value" id="username">Loading...</div>
+              </div>
+              <div class="info-group">
+                <div class="info-label">Role</div>
+                <div class="info-value" id="role">Loading...</div>
+              </div>
+              <div class="info-group">
+                <div class="info-label">Last Password Change</div>
+                <div class="info-value" id="lastPasswordChange">2 months ago</div>
+              </div>
+              <div class="info-group">
+                <div class="info-label">Two-Factor Authentication</div>
+                <div class="info-value">Not Enabled</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Check login status when page loads
+      window.addEventListener('load', function() {
+        const userData = localStorage.getItem('user');
+        if (!userData) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        const user = JSON.parse(userData);
+        document.getElementById('user-name').textContent = user.firstname || user.username;
+        document.getElementById('role-display').textContent = `Role: ${user.role || 'Member'}`;
+        
+        // Update navigation based on role
+        updateNavigation(user.role_id);
+      });
+
+      // Update navigation based on user role
+      function updateNavigation(roleId) {
+        const links = {
+          'members-link': { requiredRole: 3, roleName: 'Front Desk' },
+          'classes-link': { requiredRole: 4, roleName: 'Instructor' },
+          'reports-link': { requiredRole: 2, roleName: 'Admin' }
+        };
+
+        for (const [linkId, { requiredRole }] of Object.entries(links)) {
+          const link = document.getElementById(linkId);
+          if (roleId > requiredRole) {
+            link.classList.add('disabled');
+            link.style.pointerEvents = 'none';
+            link.title = 'Insufficient permissions';
+          } else {
+            link.classList.remove('disabled');
+          }
+        }
+      }
+
+      // Show different sections
+      function showSection(sectionId) {
+        // Hide all sections
+        document.querySelectorAll('.dashboard-section').forEach(section => {
+          section.classList.add('d-none');
+        });
+        
+        // Show selected section
+        document.getElementById(`${sectionId}-section`).classList.remove('d-none');
+        
+        // Update active link
+        document.querySelectorAll('.nav-link').forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('onclick').includes(sectionId)) {
+            link.classList.add('active');
+          }
+        });
+
+        // Load data based on section
+        if (sectionId === 'members') {
+          fetchMembers();
+        } else if (sectionId === 'profile') {
+          loadUserProfile();
+        }
+      }
+
+      // Logout function
+      function logout() {
+        showCustomDialog(
+          'Confirm Logout',
+          'Are you sure you want to logout?',
+          'Logout',
+          'Cancel',
+          () => {
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+          }
+        );
+      }
+
+      function showRegisterForm() {
+        // Check if user has front desk access or higher
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role_id > 3) {
+          alert('You do not have permission to register new members. Front Desk access or higher is required.');
+          return;
+        }
+
+        // Show registration form section
+        const registerSection = document.getElementById('register-form-section');
+        registerSection.classList.remove('d-none');
+        registerSection.style.display = 'block';
+        
+        // Load register_members.html in the iframe
+        const iframe = document.getElementById('register-form-iframe');
+        iframe.src = 'register_members.html';
+      }
+
+      function hideRegisterForm() {
+        const registerSection = document.getElementById('register-form-section');
+        registerSection.classList.add('d-none');
+        registerSection.style.display = 'none';
+        
+        // Clear the iframe source
+        const iframe = document.getElementById('register-form-iframe');
+        iframe.src = '';
+      }
+
+      // Add this script before the closing body tag
+      document.addEventListener('DOMContentLoaded', function() {
+        // Security questions array
+        const securityQuestions = [
+          "What is your mother's maiden name?",
+          "In what city were you born?",
+          "What is your father's middle name?",
+          "What was your childhood nickname?",
+          "What is your grandmother's first name?",
+          "What was the name of your first school?",
+          "What is the name of your first pet?",
+          "What was the make and model of your first car?",
+          "What was the name of your childhood best friend?",
+          "In what city did your parents meet?",
+          "What is your favorite book?",
+          "What was the first concert you attended?",
+          "What is your favorite movie?",
+          "What is your favorite food?",
+          "What is your favorite childhood TV show?"
+        ];
+
+        // Function to populate security questions
+        function populateSecurityQuestions() {
+          const question1 = document.getElementById('security_question1');
+          const question2 = document.getElementById('security_question2');
+          const question3 = document.getElementById('security_question3');
+
+          if (!question1 || !question2 || !question3) return; // Exit if elements don't exist
+
+          // Clear existing options except the first one
+          question1.innerHTML = '<option value="">Select Security Question 1</option>';
+          question2.innerHTML = '<option value="">Select Security Question 2</option>';
+          question3.innerHTML = '<option value="">Select Security Question 3</option>';
+
+          // Populate all questions
+          securityQuestions.forEach(question => {
+            question1.add(new Option(question, question));
+            question2.add(new Option(question, question));
+            question3.add(new Option(question, question));
+          });
+        }
+
+        // Function to update available questions
+        function updateQuestionOptions() {
+          const question1 = document.getElementById('security_question1');
+          const question2 = document.getElementById('security_question2');
+          const question3 = document.getElementById('security_question3');
+
+          if (!question1 || !question2 || !question3) return; // Exit if elements don't exist
+
+          const selected1 = question1.value;
+          const selected2 = question2.value;
+          const selected3 = question3.value;
+
+          // Reset and repopulate all dropdowns
+          populateSecurityQuestions();
+
+          // Remove selected options from other dropdowns
+          if (selected1) {
+            removeOption(question2, selected1);
+            removeOption(question3, selected1);
+          }
+          if (selected2) {
+            removeOption(question1, selected2);
+            removeOption(question3, selected2);
+          }
+          if (selected3) {
+            removeOption(question1, selected3);
+            removeOption(question2, selected3);
+          }
+
+          // Restore selected values
+          question1.value = selected1;
+          question2.value = selected2;
+          question3.value = selected3;
+        }
+
+        // Helper function to remove an option from a select element
+        function removeOption(selectElement, value) {
+          for (let i = 0; i < selectElement.options.length; i++) {
+            if (selectElement.options[i].value === value) {
+              selectElement.remove(i);
+              break;
+            }
+          }
+        }
+
+        // Initialize security questions when registration form is loaded
+        function initializeSecurityQuestions() {
+          if (document.getElementById('security_question1')) {
+            populateSecurityQuestions();
+            // Add event listeners for question changes
+            document.getElementById('security_question1').addEventListener('change', updateQuestionOptions);
+            document.getElementById('security_question2').addEventListener('change', updateQuestionOptions);
+            document.getElementById('security_question3').addEventListener('change', updateQuestionOptions);
+          }
+        }
+
+        // Call initialization when registration form is loaded
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.addedNodes.length) {
+              if (document.getElementById('security_question1')) {
+                initializeSecurityQuestions();
+              }
+            }
+          });
+        });
+
+        // Start observing the registration form container
+        const registrationFormContainer = document.getElementById('registration-form-container');
+        if (registrationFormContainer) {
+          observer.observe(registrationFormContainer, { childList: true, subtree: true });
+        }
+      });
+
+      // Add these functions at the beginning of your script section
+      function showCustomDialog(title, message, confirmText, cancelText, onConfirm) {
+        const dialog = document.createElement('div');
+        dialog.className = 'custom-dialog';
+        dialog.innerHTML = `
+          <h3>${title}</h3>
+          <p>${message}</p>
+          <div class="custom-dialog-buttons">
+            ${cancelText ? `<button class="btn-cancel">${cancelText}</button>` : ''}
+            <button class="btn-confirm">${confirmText}</button>
+          </div>
+        `;
+
+        const overlay = document.createElement('div');
+        overlay.className = 'custom-dialog-overlay';
+
+        document.body.appendChild(overlay);
+        document.body.appendChild(dialog);
+
+        overlay.style.display = 'block';
+        dialog.style.display = 'block';
+
+        const confirmBtn = dialog.querySelector('.btn-confirm');
+        const cancelBtn = dialog.querySelector('.btn-cancel');
+
+        confirmBtn.addEventListener('click', () => {
+          if (onConfirm) onConfirm();
+          closeDialog();
+        });
+
+        if (cancelBtn) {
+          cancelBtn.addEventListener('click', closeDialog);
+        }
+
+        function closeDialog() {
+          dialog.remove();
+          overlay.remove();
+        }
+      }
+
+      function showSuccessDialog(message) {
+        const dialog = document.createElement('div');
+        dialog.className = 'custom-dialog success-dialog';
+        dialog.innerHTML = `
+          <i class="fas fa-check-circle"></i>
+          <h3>Success!</h3>
+          <p>${message}</p>
+          <div class="custom-dialog-buttons">
+            <button class="btn-confirm">OK</button>
+          </div>
+        `;
+
+        const overlay = document.createElement('div');
+        overlay.className = 'custom-dialog-overlay';
+
+        document.body.appendChild(overlay);
+        document.body.appendChild(dialog);
+
+        overlay.style.display = 'block';
+        dialog.style.display = 'block';
+
+        const confirmBtn = dialog.querySelector('.btn-confirm');
+        confirmBtn.addEventListener('click', () => {
+          dialog.remove();
+          overlay.remove();
+        });
+      }
+
+      // Update the registration success handling
+      function initializeRegistrationForm() {
+        const form = document.getElementById('memberRegistrationForm');
+        if (!form) return;
+
+        form.addEventListener('submit', async function(event) {
+          event.preventDefault();
+          
+          if (!validateRegistrationForm(form)) {
+            return;
+          }
+
+          const formData = new FormData(form);
+          const data = Object.fromEntries(formData.entries());
+
+          try {
+            const response = await fetch('http://localhost/Desktop/controller/UserController.php?action=createMember', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+              showSuccessDialog('Member registered successfully!');
+              setTimeout(() => {
+                hideRegisterForm();
+                document.getElementById('members-section').classList.remove('d-none');
+              }, 2000);
+            } else {
+              showCustomDialog('Registration Failed', result.message || 'Please try again.', 'OK');
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            showCustomDialog('Error', 'Registration failed. Please try again.', 'OK');
+          }
+        });
+      }
+
+      // Add search and filter functionality
+      document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchMembers');
+        const statusFilter = document.getElementById('statusFilter');
+
+        if (searchInput) {
+          searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.members-table tbody tr');
+
+            rows.forEach(row => {
+              const text = row.textContent.toLowerCase();
+              const shouldShow = text.includes(searchTerm);
+              const statusMatch = statusFilter.value === 'all' || 
+                row.querySelector(`.status-${statusFilter.value}`) !== null;
+              
+              row.style.display = shouldShow && statusMatch ? '' : 'none';
+            });
+          });
+        }
+
+        if (statusFilter) {
+          statusFilter.addEventListener('change', function() {
+            const filterValue = this.value;
+            const searchTerm = searchInput.value.toLowerCase();
+            const rows = document.querySelectorAll('.members-table tbody tr');
+
+            rows.forEach(row => {
+              const searchMatch = text.includes(searchTerm);
+              const statusMatch = filterValue === 'all' || 
+                row.querySelector(`.status-${filterValue}`) !== null;
+              
+              row.style.display = searchMatch && statusMatch ? '' : 'none';
+            });
+          });
+        }
+
+        // Initialize action buttons
+        document.querySelectorAll('.btn-action').forEach(button => {
+          button.addEventListener('click', function() {
+            const action = this.classList.contains('btn-view') ? 'view' :
+                         this.classList.contains('btn-edit') ? 'edit' :
+                         'delete';
+            const row = this.closest('tr');
+            const memberId = row.cells[0].textContent;
+
+            switch(action) {
+              case 'view':
+                showCustomDialog('Member Details', 'View details for member ' + memberId, 'Close');
+                break;
+              case 'edit':
+                showCustomDialog('Edit Member', 'Edit details for member ' + memberId, 'Close');
+                break;
+              case 'delete':
+                showCustomDialog(
+                  'Confirm Delete',
+                  'Are you sure you want to delete member ' + memberId + '?',
+                  'Delete',
+                  'Cancel',
+                  () => {
+                    // Handle delete action
+                    row.remove();
+                    showSuccessDialog('Member successfully deleted!');
+                  }
+                );
+                break;
+            }
+          });
+        });
+      });
+
+      // Add this function to load user profile data
+      function loadUserProfile() {
+        const userData = JSON.parse(localStorage.getItem('user'));
+        if (!userData) return;
+
+        // Update profile information
+        document.getElementById('profileName').textContent = `${userData.firstname} ${userData.lastname}`;
+        document.getElementById('profileRole').textContent = userData.role || 'Member';
+        document.getElementById('fullName').textContent = `${userData.firstname} ${userData.lastname}`;
+        document.getElementById('email').textContent = userData.email || 'Not provided';
+        document.getElementById('phone').textContent = userData.phonenumber || 'Not provided';
+        document.getElementById('address').textContent = userData.address || 'Not provided';
+        document.getElementById('username').textContent = userData.username;
+        document.getElementById('role').textContent = userData.role || 'Member';
+      }
+
+      // Initialize profile when page loads
+      document.addEventListener('DOMContentLoaded', function() {
+        // Your existing initialization code...
+        
+        // Add click handler for edit profile button
+        const editProfileBtn = document.querySelector('.btn-edit-profile');
+        if (editProfileBtn) {
+          editProfileBtn.addEventListener('click', function() {
+            showCustomDialog(
+              'Edit Profile',
+              'Profile editing functionality will be implemented soon.',
+              'OK'
+            );
+          });
+        }
+      });
+
+      // Add these functions to handle member data
+      let allMembers = []; // Store all members for filtering
+      let currentSort = {
+        column: null,
+        direction: 'asc'
+      };
+
+      async function fetchMembers() {
+        try {
+          const response = await fetch('/Desktop/controller/MemberController.php?action=getAll');
+          const result = await response.json();
+          
+          if (result.success) {
+            console.log('Fetched members:', result.data); // Debug log
+            allMembers = result.data;
+            displayMembers(allMembers);
+            initializeTableSorting();
+          } else {
+            console.error('Failed to fetch members:', result.message);
+            showCustomDialog('Error', result.message || 'Failed to fetch members', 'OK');
+          }
+        } catch (error) {
+          console.error('Error fetching members:', error);
+          showCustomDialog('Error', 'Failed to fetch members. Please try again.', 'OK');
+        }
+      }
+
+      function displayMembers(members) {
+        const tableBody = document.getElementById('membersTableBody');
+        tableBody.innerHTML = '';
+
+        if (members.length === 0) {
+          const noResultsRow = document.createElement('tr');
+          noResultsRow.innerHTML = `
+            <td colspan="7" class="no-results">
+                No members found matching your search criteria
+            </td>
+          `;
+          tableBody.appendChild(noResultsRow);
+          return;
+        }
+
+        members.forEach(member => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${member.account_number || 'N/A'}</td>
+            <td>${member.firstname} ${member.lastname}</td>
+            <td>${member.email}</td>
+            <td>${member.phone_number || 'N/A'}</td>
+            <td><span class="${getStatusClass(member.status)}">${member.status}</span></td>
+            <td>${member.registration_date}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn-action btn-view" title="View Details" onclick="viewMember(${member.id})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn-action btn-edit" title="Edit Member" onclick="editMember(${member.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-action btn-delete" title="Delete Member" onclick="deleteMember(${member.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+      }
+
+      function viewMember(id) {
+        console.log('Viewing member with ID:', id); // Debug log
+        const actionsContainer = document.getElementById('member-actions-container');
+        const actionsFrame = document.getElementById('member-actions-frame');
+        
+        actionsFrame.src = `views/member_actions.html`;
+        actionsContainer.classList.remove('d-none');
+        
+        // Wait for iframe to load then show the view section
+        actionsFrame.onload = function() {
+            actionsFrame.contentWindow.showAction('view', id);
+        };
+      }
+
+      function editMember(id) {
+        console.log('Editing member with ID:', id); // Debug log
+        const actionsContainer = document.getElementById('member-actions-container');
+        const actionsFrame = document.getElementById('member-actions-frame');
+        
+        actionsFrame.src = `views/member_actions.html`;
+        actionsContainer.classList.remove('d-none');
+        
+        // Wait for iframe to load then show the edit section
+        actionsFrame.onload = function() {
+            actionsFrame.contentWindow.showAction('edit', id);
+        };
+      }
+
+      function deleteMember(id) {
+        console.log('Deleting member with ID:', id); // Debug log
+        const actionsContainer = document.getElementById('member-actions-container');
+        const actionsFrame = document.getElementById('member-actions-frame');
+        
+        actionsFrame.src = `views/member_actions.html`;
+        actionsContainer.classList.remove('d-none');
+        
+        // Wait for iframe to load then show the delete section
+        actionsFrame.onload = function() {
+            actionsFrame.contentWindow.showAction('delete', id);
+        };
+      }
+
+      function hideActionForm() {
+        const actionsContainer = document.getElementById('member-actions-container');
+        actionsContainer.classList.add('d-none');
+        const actionsFrame = document.getElementById('member-actions-frame');
+        actionsFrame.src = '';
+      }
+
+      // Update status filter options to match database values
+      document.addEventListener('DOMContentLoaded', function() {
+        const statusFilter = document.getElementById('statusFilter');
+        if (statusFilter) {
+          statusFilter.innerHTML = `
+            <option value="all">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Pending">Pending</option>
+            <option value="Suspended">Suspended</option>
+            <option value="Banned">Banned</option>
+            <option value="Deleted">Deleted</option>
+          `;
+        }
+      });
+
+      function getStatusClass(status) {
+        const statusClasses = {
+          'Active': 'status-active',
+          'Pending': 'status-pending',
+          'Suspended': 'status-suspended',
+          'Banned': 'status-banned',
+          'Deleted': 'status-deleted'
+        };
+        return statusClasses[status] || 'status-pending';
+      }
+
+      // Add styles for new status classes
+      const styleSheet = document.createElement("style");
+      styleSheet.textContent = `
+        .status-active {
+          color: var(--success);
+          background: rgba(16, 185, 129, 0.1);
+          padding: 0.25rem 0.75rem;
+          border-radius: 999px;
+          font-size: 0.875rem;
+        }
+        
+        .status-pending {
+          color: var(--warning);
+          background: rgba(245, 158, 11, 0.1);
+          padding: 0.25rem 0.75rem;
+          border-radius: 999px;
+          font-size: 0.875rem;
+        }
+        
+        .status-suspended {
+          color: var(--warning);
+          background: rgba(245, 158, 11, 0.1);
+          padding: 0.25rem 0.75rem;
+          border-radius: 999px;
+          font-size: 0.875rem;
+        }
+        
+        .status-banned {
+          color: var(--danger);
+          background: rgba(239, 68, 68, 0.1);
+          padding: 0.25rem 0.75rem;
+          border-radius: 999px;
+          font-size: 0.875rem;
+        }
+        
+        .status-deleted {
+          color: var(--text-muted);
+          background: rgba(156, 163, 175, 0.1);
+          padding: 0.25rem 0.75rem;
+          border-radius: 999px;
+          font-size: 0.875rem;
+        }
+      `;
+      document.head.appendChild(styleSheet);
+
+      // Initialize table sorting
+      function initializeTableSorting() {
+        const headers = document.querySelectorAll('.members-table th[data-sort]');
+        headers.forEach(header => {
+          header.addEventListener('click', () => {
+            const column = header.dataset.sort;
+            sortTable(column);
+          });
+        });
+      }
+
+      // Sort table function
+      function sortTable(column) {
+        const headers = document.querySelectorAll('.members-table th');
+        headers.forEach(header => {
+          if (header.dataset.sort === column) {
+            if (currentSort.column === column) {
+              currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+              header.classList.toggle('sort-asc', currentSort.direction === 'asc');
+              header.classList.toggle('sort-desc', currentSort.direction === 'desc');
+            } else {
+              header.classList.remove('sort-asc', 'sort-desc');
+              header.classList.add('sort-asc');
+              currentSort.column = column;
+              currentSort.direction = 'asc';
+            }
+          } else {
+            header.classList.remove('sort-asc', 'sort-desc');
+          }
+        });
+
+        const sortedMembers = [...allMembers].sort((a, b) => {
+          let valueA = a[column] || '';
+          let valueB = b[column] || '';
+
+          // Special handling for dates
+          if (column === 'joinDate') {
+            valueA = new Date(valueA);
+            valueB = new Date(valueB);
+          }
+
+          if (valueA < valueB) return currentSort.direction === 'asc' ? -1 : 1;
+          if (valueA > valueB) return currentSort.direction === 'asc' ? 1 : -1;
+          return 0;
+        });
+
+        displayMembers(sortedMembers);
+      }
+
+      // Enhanced search function
+      function searchMembers() {
+        const searchTerm = document.getElementById('searchMembers').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value;
+
+        const filteredMembers = allMembers.filter(member => {
+          const matchesSearch = Object.values(member).some(value => 
+            String(value).toLowerCase().includes(searchTerm)
+          );
+
+          const matchesStatus = statusFilter === 'all' || member.status === statusFilter;
+
+          return matchesSearch && matchesStatus;
+        });
+
+        displayMembers(filteredMembers);
+      }
+
+      // Update event listeners
+      document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchMembers');
+        const statusFilter = document.getElementById('statusFilter');
+
+        if (searchInput) {
+          searchInput.addEventListener('input', searchMembers);
+        }
+
+        if (statusFilter) {
+          statusFilter.addEventListener('change', searchMembers);
+        }
+      });
+    </script>
+  </body>
+</html>
