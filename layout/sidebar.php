@@ -27,6 +27,20 @@
         </a>
     </li>
 
+    <?php 
+    $role_id = $_SESSION['role_id'];
+    if ($role_id == 5) { ?>
+
+
+    <!-- Nav Item - My Subscription -->
+    <li class="nav-item <?php if ($current_page == 'my-subscription.php') echo 'active'; ?>">
+        <a class="nav-link <?php if ($current_page == 'my-subscription.php') echo 'bg-white text-dark'; ?>" href="my-subscription.php">
+            <i class="fas fa-fw fa-calendar-check <?php if ($current_page == 'my-subscription.php') echo 'text-dark'; ?>"></i>
+            <span>My Subscription</span>
+        </a>
+    </li>
+    <?php } ?>
+
     <?php
     $page_name = "manage-payments.php";
     $role_id = $_SESSION['role_id'];

@@ -148,7 +148,7 @@ if ($result->num_rows > 0) {
 
                             if ($role_id == 1 || $role_id == 2) {
                                 ?>
-                                <!-- Total Front Desk -->
+                                <!-- Total Transactions Today -->
                                 <div class="col-xl-3 col-md-6 mb-4">
                                     <div class="card border-left-warning shadow h-100 py-2">
                                         <div class="card-body">
@@ -157,34 +157,33 @@ if ($result->num_rows > 0) {
                                                     <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                                         Total Transaction
                                                     </div>
-                                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-members">
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-transactions">
                                                         <?php
-                                                        $sql_members = "SELECT COUNT(*) AS total_members
-                                                FROM user_roles
-                                                WHERE role_id = 3";
-                                                        $result_members = mysqli_query($conn, $sql_members);
-                                                        $row_members = mysqli_fetch_assoc($result_members);
-                                                        echo $row_members['total_members'];
+                                                        // Set timezone to Manila
+                                                        date_default_timezone_set('Asia/Manila');
+                                                        $today = date('Y-m-d');
+                                                        
+                                                        $sql_transactions = "SELECT COUNT(*) AS total_transactions 
+                                                                           FROM payment_transactions 
+                                                                           WHERE DATE(transaction_date_time) = ?";
+                                                        $stmt = $conn->prepare($sql_transactions);
+                                                        $stmt->bind_param("s", $today);
+                                                        $stmt->execute();
+                                                        $result = $stmt->get_result();
+                                                        $row = $result->fetch_assoc();
+                                                        echo $row['total_transactions'];
                                                         ?>
                                                     </div>
                                                 </div>
                                                 <div class="col-auto">
-                                                    <i class="fas fa-user-tie fa-2x text-gray-300"></i>
+                                                    <i class="fas fa-receipt fa-2x text-gray-300"></i>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <?php
-                            }
-                            ?>
 
-                            <?php
-                            $role_id = $_SESSION['role_id'];
-
-                            if ($role_id == 1 || $role_id == 2) {
-                                ?>
-                                <!-- Total Front Desk -->
+                                <!-- New Subscribers Today -->
                                 <div class="col-xl-3 col-md-6 mb-4">
                                     <div class="card border-left-warning shadow h-100 py-2">
                                         <div class="card-body">
@@ -193,34 +192,35 @@ if ($result->num_rows > 0) {
                                                     <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                                         New Subscribers
                                                     </div>
-                                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-members">
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="new-subscribers">
                                                         <?php
-                                                        $sql_members = "SELECT COUNT(*) AS total_members
-                                                FROM user_roles
-                                                WHERE role_id = 3";
-                                                        $result_members = mysqli_query($conn, $sql_members);
-                                                        $row_members = mysqli_fetch_assoc($result_members);
-                                                        echo $row_members['total_members'];
+                                                        $sql_new = "SELECT COUNT(DISTINCT pt.user_id) as new_subscribers
+                                                                   FROM payment_transactions pt
+                                                                   WHERE DATE(pt.transaction_date_time) = ?
+                                                                   AND pt.user_id IN (
+                                                                       SELECT user_id
+                                                                       FROM subscriptions
+                                                                       GROUP BY user_id
+                                                                       HAVING COUNT(*) = 1
+                                                                   )";
+                                                        $stmt = $conn->prepare($sql_new);
+                                                        $stmt->bind_param("s", $today);
+                                                        $stmt->execute();
+                                                        $result = $stmt->get_result();
+                                                        $row = $result->fetch_assoc();
+                                                        echo $row['new_subscribers'];
                                                         ?>
                                                     </div>
                                                 </div>
                                                 <div class="col-auto">
-                                                    <i class="fas fa-user-tie fa-2x text-gray-300"></i>
+                                                    <i class="fas fa-user-plus fa-2x text-gray-300"></i>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <?php
-                            }
-                            ?>
 
-                            <?php
-                            $role_id = $_SESSION['role_id'];
-
-                            if ($role_id == 1 || $role_id == 2) {
-                                ?>
-                                <!-- Total Front Desk -->
+                                <!-- Renewed Subscribers Today -->
                                 <div class="col-xl-3 col-md-6 mb-4">
                                     <div class="card border-left-warning shadow h-100 py-2">
                                         <div class="card-body">
@@ -229,19 +229,59 @@ if ($result->num_rows > 0) {
                                                     <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                                         Renewed Subscribers
                                                     </div>
-                                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-members">
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="renewed-subscribers">
                                                         <?php
-                                                        $sql_members = "SELECT COUNT(*) AS total_members
-                                                FROM user_roles
-                                                WHERE role_id = 3";
-                                                        $result_members = mysqli_query($conn, $sql_members);
-                                                        $row_members = mysqli_fetch_assoc($result_members);
-                                                        echo $row_members['total_members'];
+                                                        $sql_renewed = "SELECT COUNT(DISTINCT pt.user_id) as renewed_subscribers
+                                                                      FROM payment_transactions pt
+                                                                      WHERE DATE(pt.transaction_date_time) = ?
+                                                                      AND pt.user_id IN (
+                                                                          SELECT user_id
+                                                                          FROM subscriptions
+                                                                          GROUP BY user_id
+                                                                          HAVING COUNT(*) > 1
+                                                                      )";
+                                                        $stmt = $conn->prepare($sql_renewed);
+                                                        $stmt->bind_param("s", $today);
+                                                        $stmt->execute();
+                                                        $result = $stmt->get_result();
+                                                        $row = $result->fetch_assoc();
+                                                        echo $row['renewed_subscribers'];
                                                         ?>
                                                     </div>
                                                 </div>
                                                 <div class="col-auto">
-                                                    <i class="fas fa-user-tie fa-2x text-gray-300"></i>
+                                                    <i class="fas fa-sync fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Total Sales Today -->
+                                <div class="col-xl-3 col-md-6 mb-4">
+                                    <div class="card border-left-warning shadow h-100 py-2">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                        Total Sales
+                                                    </div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-sales">
+                                                        <?php
+                                                        $sql_sales = "SELECT COALESCE(SUM(grand_total), 0) as total_sales
+                                                                     FROM payment_transactions
+                                                                     WHERE DATE(transaction_date_time) = ?";
+                                                        $stmt = $conn->prepare($sql_sales);
+                                                        $stmt->bind_param("s", $today);
+                                                        $stmt->execute();
+                                                        $result = $stmt->get_result();
+                                                        $row = $result->fetch_assoc();
+                                                        echo '₱ ' . number_format($row['total_sales'], 2);
+                                                        ?>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-peso-sign fa-2x text-gray-300"></i>
                                                 </div>
                                             </div>
                                         </div>

@@ -2,6 +2,9 @@
 session_start();
 require "db_con.php";
 
+// Set timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
@@ -28,17 +31,17 @@ if (isset($_POST['newTransaction'])) {
     $check_query = "SELECT * FROM subscriptions 
                    WHERE user_id = ? 
                    AND (
-                       (starting_date <= ? AND expiration_date >= ?) OR
-                       (starting_date <= ? AND expiration_date >= starting_date)
+                       (starting_date <= ? AND expiration_date > ?) OR
+                       (? < expiration_date AND ? >= starting_date)
                    )";
     $check_stmt = $conn->prepare($check_query);
-    $check_stmt->bind_param("isss", $user_id, $starting_date, $starting_date, $starting_date);
+    $check_stmt->bind_param("issss", $user_id, $starting_date, $starting_date, $starting_date, $starting_date);
     $check_stmt->execute();
     $check_result = $check_stmt->get_result();
     
     if ($check_result->num_rows > 0) {
         $existing_sub = $check_result->fetch_assoc();
-        header("Location: ../create-transaction.php?Failed=Active subscription found for the selected period");
+        header("Location: ../create-transaction.php?Failed=Active subscription found for the selected period. Please select a date after " . date('F d, Y', strtotime($existing_sub['expiration_date'])));
         exit();
     }
 
@@ -172,12 +175,12 @@ if (isset($_POST['newTransaction'])) {
     $total_discount = $discount_total_at_transaction + $coupon_total_at_transaction;
     $grand_total = $subtotal - $total_discount;
 
-    // Set other transaction details
+    // Set other transaction details with Manila timezone
     $transaction_date_time = date('Y-m-d H:i:s');
     $payment_method = 'cash';
     $transact_by = $_SESSION['user_id'];
 
-    // Generate acknowledgement receipt number (YYYYMMDD####)
+    // Generate acknowledgement receipt number (YYYYMMDD####) using Manila timezone
     $date_part = date('Ymd');
     
     // Get the latest receipt number for today
@@ -488,7 +491,7 @@ if (isset($_POST['newTransaction'])) {
 
                     $logo = "https://rmmccomsoc.org/fitlogsync1.png";
 
-                    // Format the date and time
+                    // Format the date and time using Manila timezone
                     $formatted_date = date('F d, Y', strtotime($transaction_date_time));
                     $formatted_time = date('g:i A', strtotime($transaction_date_time));
 

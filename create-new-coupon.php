@@ -127,7 +127,8 @@ if ($result->num_rows > 0) {
                                         <div class="form-group">
                                             <label for="couponValue">Value</label>
                                             <input type="number" class="form-control" id="couponValue" name="coupon_value"
-                                                required value="<?= $coupon_value ?>">
+                                                required value="<?= $coupon_value ?>" min="0">
+                                            <small id="valueHelp" class="form-text text-muted">For percentage type, value must be between 0 and 100.</small>
                                         </div>
 
                                         <div class="form-group">
@@ -178,7 +179,54 @@ if ($result->num_rows > 0) {
         <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
         <script src="js/demo/datatables-demo.js"></script>
 
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const percentageRadio = document.getElementById('percentage');
+                const amountRadio = document.getElementById('amount');
+                const valueInput = document.getElementById('couponValue');
+                const form = valueInput.closest('form');
 
+                function validateValue() {
+                    if (percentageRadio.checked) {
+                        if (valueInput.value > 100) {
+                            valueInput.value = 100;
+                        }
+                        valueInput.max = 100;
+                    } else {
+                        valueInput.removeAttribute('max');
+                    }
+                }
+
+                // Initial validation
+                validateValue();
+
+                // Validate on radio button change
+                percentageRadio.addEventListener('change', validateValue);
+                amountRadio.addEventListener('change', validateValue);
+
+                // Validate on form submit
+                form.addEventListener('submit', function(e) {
+                    if (percentageRadio.checked && (valueInput.value < 0 || valueInput.value > 100)) {
+                        e.preventDefault();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Invalid Value',
+                            text: 'For percentage type, value must be between 0 and 100.'
+                        });
+                    }
+                });
+
+                // Validate on value input
+                valueInput.addEventListener('input', function() {
+                    if (percentageRadio.checked && this.value > 100) {
+                        this.value = 100;
+                    }
+                    if (this.value < 0) {
+                        this.value = 0;
+                    }
+                });
+            });
+        </script>
     </body>
 
     </html>
