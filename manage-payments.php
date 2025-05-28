@@ -25,7 +25,7 @@ if ($result->num_rows > 0) {
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>Manage Coupon | FiT-LOGSYNC</title>
+        <title>Manage Payments | FiT-LOGSYNC</title>
         <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <link
@@ -45,9 +45,11 @@ if ($result->num_rows > 0) {
                 body * {
                     visibility: hidden;
                 }
+
                 .modal-content * {
                     visibility: visible;
                 }
+
                 .modal {
                     position: absolute;
                     left: 0;
@@ -58,24 +60,30 @@ if ($result->num_rows > 0) {
                     visibility: visible;
                     overflow: visible !important;
                 }
+
                 .modal-dialog {
                     width: 100% !important;
                     max-width: 100% !important;
                     margin: 0;
                     padding: 0;
                 }
+
                 .modal-content {
                     border: 0 !important;
                 }
+
                 .modal-header {
                     display: none !important;
                 }
+
                 .modal-footer {
                     display: none !important;
                 }
+
                 .receipt-container {
                     padding: 15px !important;
                 }
+
                 @page {
                     margin: 0.5cm;
                 }
@@ -245,7 +253,13 @@ if ($result->num_rows > 0) {
                         </div>
 
                         <?php
-                        $query = "SELECT * FROM payment_transactions ";
+                        $query = "SELECT pt.*, 
+                            c.coupon_name, c.coupon_type, c.coupon_value,
+                            d.discount_name, d.discount_type, d.discount_value
+                        FROM payment_transactions pt
+                        LEFT JOIN coupons c ON pt.coupon_id = c.coupon_id
+                        LEFT JOIN discounts d ON pt.discount_id = d.discount_id
+                        WHERE DATE(pt.transaction_date_time) = CURDATE()";
                         $result = $conn->query($query);
                         ?>
                         <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -272,11 +286,6 @@ if ($result->num_rows > 0) {
                                             </tr>
                                         </thead>
 
-                                        <?php
-                                        $query = "SELECT * FROM payment_transactions";
-                                        $result = $conn->query($query);
-                                        ?>
-
                                         <tbody>
                                             <?php
                                             if ($result->num_rows > 0) {
@@ -290,20 +299,37 @@ if ($result->num_rows > 0) {
                                                     $plan_description_at_transaction = $row['plan_description_at_transaction'] ?? '';
                                                     $plan_price_at_transaction = $row['plan_price_at_transaction'] ?? '';
                                                     $plan_duration_at_transaction = $row['plan_duration_at_transaction'] ?? '';
-                                                    $coupon_id = $row['coupon_id'] ?? '';
-                                                    $coupon_name_at_transaction = $row['coupon_name_at_transaction'] ?? '';
-                                                    $coupon_code_at_transaction = $row['coupon_code_at_transaction'] ?? '';
-                                                    $coupon_type_at_transaction = $row['coupon_type_at_transaction'] ?? '';
-                                                    $coupon_value_at_transaction = $row['coupon_value_at_transaction'] ?? '';
-                                                    $coupon_total_at_transaction = $row['coupon_total_at_transaction'] ?? '';
-                                                    $discount_id = $row['discount_id'] ?? '';
-                                                    $discount_type_at_transaction = $row['discount_type_at_transaction'] ?? '';
-                                                    $discount_value_at_transaction = $row['discount_value_at_transaction'] ?? '';
-                                                    $discount_total_at_transaction = $row['discount_total_at_transaction'] ?? '';
+                                                    $coupon_id = $row['coupon_id'] ?? null;
+                                                    $discount_id = $row['discount_id'] ?? null;
                                                     $grand_total = $row['grand_total'];
                                                     $transaction_date_time = $row['transaction_date_time'];
                                                     $payment_method = $row['payment_method'];
                                                     $transact_by = $row['transact_by'];
+
+                                                    // Calculate discount amount if discount exists
+                                                    $discount_amount = 0;
+                                                    $subtotal = $plan_price_at_transaction * $plan_duration_at_transaction;
+                                                    $amount_after_category_discount = $subtotal;
+
+                                                    if ($discount_id) {
+                                                        if ($row['discount_type'] === 'percentage') {
+                                                            $discount_amount = $subtotal * ($row['discount_value'] / 100);
+                                                            $amount_after_category_discount = $subtotal - $discount_amount;
+                                                        } else {
+                                                            $discount_amount = $row['discount_value'];
+                                                            $amount_after_category_discount = $subtotal - $discount_amount;
+                                                        }
+                                                    }
+
+                                                    // Calculate coupon amount if coupon exists
+                                                    $coupon_amount = 0;
+                                                    if ($coupon_id) {
+                                                        if ($row['coupon_type'] === 'percentage') {
+                                                            $coupon_amount = $amount_after_category_discount * ($row['coupon_value'] / 100);
+                                                        } else {
+                                                            $coupon_amount = $row['coupon_value'];
+                                                        }
+                                                    }
 
                                                     $transaction_date_time_formatted = date('F d, Y | g:i A', strtotime($transaction_date_time));
 
@@ -351,8 +377,57 @@ if ($result->num_rows > 0) {
                             mysqli_data_seek($result, 0);  // Reset the result pointer
                             while ($row = $result->fetch_assoc()) {
                                 $payment_transaction_id = $row['payment_transaction_id'];
-                                // ... (all your existing variable assignments)
+                                
+                                // Fetch transaction details for this specific payment_transaction_id
+                                $modal_query = "SELECT pt.*, 
+                                    c.coupon_name, c.coupon_type, c.coupon_value,
+                                    d.discount_name, d.discount_type, d.discount_value,
+                                    u.lastname as member_lastname, u.firstname as member_firstname, u.account_number,
+                                    tb.lastname as transact_by_lastname, tb.firstname as transact_by_firstname,
+                                    s.starting_date, s.expiration_date
+                                FROM payment_transactions pt
+                                LEFT JOIN coupons c ON pt.coupon_id = c.coupon_id
+                                LEFT JOIN discounts d ON pt.discount_id = d.discount_id
+                                LEFT JOIN users u ON pt.user_id = u.user_id
+                                LEFT JOIN users tb ON pt.transact_by = tb.user_id
+                                LEFT JOIN subscriptions s ON pt.payment_transaction_id = s.payment_transaction_id
+                                WHERE pt.payment_transaction_id = ?";
+                                
+                                $modal_stmt = $conn->prepare($modal_query);
+                                $modal_stmt->bind_param("i", $payment_transaction_id);
+                                $modal_stmt->execute();
+                                $modal_result = $modal_stmt->get_result();
+                                $modal_row = $modal_result->fetch_assoc();
+
+                                // Calculate discount amount if discount exists
+                                $discount_amount = 0;
+                                $subtotal = $modal_row['plan_price_at_transaction'] * $modal_row['plan_duration_at_transaction'];
+                                $amount_after_category_discount = $subtotal;
+
+                                if ($modal_row['discount_id']) {
+                                    if ($modal_row['discount_type'] === 'percentage') {
+                                        $discount_amount = $subtotal * ($modal_row['discount_value'] / 100);
+                                        $amount_after_category_discount = $subtotal - $discount_amount;
+                                    } else {
+                                        $discount_amount = $modal_row['discount_value'];
+                                        $amount_after_category_discount = $subtotal - $discount_amount;
+                                    }
+                                }
+
+                                // Calculate coupon amount if coupon exists
+                                $coupon_amount = 0;
+                                if ($modal_row['coupon_id']) {
+                                    if ($modal_row['coupon_type'] === 'percentage') {
+                                        $coupon_amount = $amount_after_category_discount * ($modal_row['coupon_value'] / 100);
+                                    } else {
+                                        $coupon_amount = $modal_row['coupon_value'];
+                                    }
+                                }
+
+                                $member_full_name = $modal_row['member_lastname'] . ', ' . $modal_row['member_firstname'];
+                                $transact_by_full_name = $modal_row['transact_by_lastname'] . ', ' . $modal_row['transact_by_firstname'];
                                 ?>
+
                                 <!-- Modal for each transaction -->
                                 <div class="modal fade" id="paymentModal<?= $payment_transaction_id ?>" tabindex="-1" role="dialog"
                                     aria-labelledby="paymentModalLabel<?= $payment_transaction_id ?>" aria-hidden="true">
@@ -398,7 +473,8 @@ if ($result->num_rows > 0) {
                                                             }
                                                             ?>
                                                             <h3 class="font-weight-bold">Fit-LOGSYNC</h3>
-                                                            <p class="mb-0"><?= $address ?> | <?= $phone_number ?> | <?= $email ?></p>
+                                                            <p class="mb-0"><?= $address ?> | <?= $phone_number ?> | <?= $email ?>
+                                                            </p>
                                                         </div>
                                                     </div>
 
@@ -408,17 +484,17 @@ if ($result->num_rows > 0) {
                                                     <div class="row mb-3">
                                                         <div class="col-md-6">
                                                             <p class="mb-1"><strong>Acknowledgement Receipt No.:</strong>
-                                                                <?= $row['acknowledgement_receipt_number'] ?></p>
+                                                                <?= $modal_row['acknowledgement_receipt_number'] ?></p>
                                                             <p class="mb-1"><strong>Date:</strong>
-                                                                <?= date('F d, Y', strtotime($row['transaction_date_time'])) ?></p>
+                                                                <?= date('F d, Y', strtotime($modal_row['transaction_date_time'])) ?></p>
                                                             <p class="mb-1"><strong>Time:</strong>
-                                                                <?= date('g:i A', strtotime($row['transaction_date_time'])) ?></p>
+                                                                <?= date('g:i A', strtotime($modal_row['transaction_date_time'])) ?></p>
                                                         </div>
                                                         <div class="col-md-6 text-right">
                                                             <p class="mb-1"><strong>Processed By:</strong>
                                                                 <?= $transact_by_full_name ?></p>
                                                             <p class="mb-1"><strong>Payment Method:</strong>
-                                                                <?= ucfirst($row['payment_method']) ?></p>
+                                                                <?= ucfirst($modal_row['payment_method']) ?></p>
                                                         </div>
                                                     </div>
 
@@ -427,7 +503,7 @@ if ($result->num_rows > 0) {
                                                         <h5 class="font-weight-bold">Member Information</h5>
                                                         <p class="mb-1"><strong>Name:</strong> <?= $member_full_name ?></p>
                                                         <p class="mb-1"><strong>Account Number:</strong>
-                                                            <?= rtrim(chunk_split($member['account_number'], 4, '-'), ' - ') ?></p>
+                                                            <?= rtrim(chunk_split($modal_row['account_number'], 4, '-'), ' - ') ?></p>
                                                     </div>
 
                                                     <!-- Transaction Details -->
@@ -443,38 +519,43 @@ if ($result->num_rows > 0) {
                                                             <tbody>
                                                                 <tr>
                                                                     <td>
-                                                                        <strong><?= $row['plan_name_at_transaction'] ?></strong><br>
-                                                                        <small><?= $row['plan_description_at_transaction'] ?></small><br>
-                                                                        <small><?= $row['plan_duration_at_transaction'] ?>
-                                                                            month(s)</small>
+                                                                        <strong><?= $modal_row['plan_name_at_transaction'] ?></strong><br>
+                                                                        <small><?= $modal_row['plan_description_at_transaction'] ?></small><br>
+                                                                        <small>₱<?= number_format($modal_row['plan_price_at_transaction'], 2) ?>
+                                                                            / month X <?= $modal_row['plan_duration_at_transaction'] ?> month(s)
+                                                                        </small><br>
+                                                                        <small class="text-warning">
+                                                                            <strong>Subscription Period:</strong><br>
+                                                                            <?= date('F d, Y', strtotime($modal_row['starting_date'])) ?> - 
+                                                                            <?= date('F d, Y', strtotime($modal_row['expiration_date'])) ?>
+                                                                        </small>
                                                                     </td>
                                                                     <td class="text-right">₱
-                                                                        <?= number_format($row['plan_price_at_transaction'] * $row['plan_duration_at_transaction'], 2) ?>
+                                                                        <?= number_format($subtotal, 2) ?>
                                                                     </td>
                                                                 </tr>
 
-                                                                <?php if (!empty($row['coupon_name_at_transaction'])): ?>
+                                                                <?php if ($modal_row['discount_id']): ?>
                                                                     <tr>
                                                                         <td>
-                                                                            <strong>Coupon Discount</strong><br>
-                                                                            <small><?= $row['coupon_name_at_transaction'] ?>
-                                                                                (<?= $row['coupon_code_at_transaction'] ?>)</small><br>
-                                                                            <small><?= $row['coupon_type_at_transaction'] == 'percentage' ? $row['coupon_value_at_transaction'] . '%' : '₱' . $row['coupon_value_at_transaction'] ?></small>
+                                                                            <strong><?= $modal_row['discount_name'] ?> Discount</strong><br>
+                                                                            <small><?= $modal_row['discount_type'] === 'percentage' ? $modal_row['discount_value'] . '%' : '₱' . number_format($modal_row['discount_value'], 2) ?></small>
                                                                         </td>
                                                                         <td class="text-right text-danger">-₱
-                                                                            <?= number_format($row['coupon_total_at_transaction'], 2) ?>
+                                                                            <?= number_format($discount_amount, 2) ?>
                                                                         </td>
                                                                     </tr>
                                                                 <?php endif; ?>
 
-                                                                <?php if (!empty($row['discount_type_at_transaction'])): ?>
+                                                                <?php if ($modal_row['coupon_id']): ?>
                                                                     <tr>
                                                                         <td>
-                                                                            <strong>Additional Discount</strong><br>
-                                                                            <small><?= $row['discount_type_at_transaction'] == 'percentage' ? $row['discount_value_at_transaction'] . '%' : '₱' . $row['discount_value_at_transaction'] ?></small>
+                                                                            <strong>Coupon Discount:</strong> 
+                                                                            <?= $modal_row['coupon_type'] === 'percentage' ? $modal_row['coupon_value'] . '%' : '₱' . number_format($modal_row['coupon_value'], 2) ?><br>
+                                                                            <small><strong>Event Name:</strong> <?= $modal_row['coupon_name'] ?></small><br>
                                                                         </td>
                                                                         <td class="text-right text-danger">-₱
-                                                                            <?= number_format($row['discount_total_at_transaction'], 2) ?>
+                                                                            <?= number_format($coupon_amount, 2) ?>
                                                                         </td>
                                                                     </tr>
                                                                 <?php endif; ?>
@@ -482,7 +563,7 @@ if ($result->num_rows > 0) {
                                                                 <tr class="font-weight-bold">
                                                                     <td class="text-right">TOTAL</td>
                                                                     <td class="text-right">₱
-                                                                        <?= number_format($row['grand_total'], 2) ?>
+                                                                        <?= number_format($modal_row['grand_total'], 2) ?>
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
@@ -509,7 +590,8 @@ if ($result->num_rows > 0) {
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-warning" onclick="printReceipt('paymentModal<?= $payment_transaction_id ?>')">
+                                                <button type="button" class="btn btn-warning"
+                                                    onclick="printReceipt('paymentModal<?= $payment_transaction_id ?>')">
                                                     <i class="fas fa-print"></i> Print Receipt
                                                 </button>
                                             </div>
@@ -541,15 +623,15 @@ if ($result->num_rows > 0) {
         <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
         <script src="js/demo/datatables-demo.js"></script>
 
-        <!-- Add this before the closing body tag -->
+        <!-- Print Receipt Function -->
         <script>
             function printReceipt(modalId) {
                 const modal = document.getElementById(modalId);
                 const originalContents = document.body.innerHTML;
-                
+
                 // Get only the receipt content
                 const printContents = modal.querySelector('.modal-content').innerHTML;
-                
+
                 // Create a new window with only the receipt content
                 const printWindow = window.open('', '_blank');
                 printWindow.document.open();
@@ -587,11 +669,11 @@ if ($result->num_rows > 0) {
                     </html>
                 `);
                 printWindow.document.close();
-                
+
                 // Wait for resources to load
-                printWindow.onload = function() {
+                printWindow.onload = function () {
                     printWindow.print();
-                    printWindow.onafterprint = function() {
+                    printWindow.onafterprint = function () {
                         printWindow.close();
                     };
                 };
@@ -599,8 +681,8 @@ if ($result->num_rows > 0) {
         </script>
     </body>
 
-    </html>
-    <?php
+</html>
+<?php
 } else {
     header("Location: dashboard.php/?AccessDenied=You do not have permission to access this page.");
     exit();

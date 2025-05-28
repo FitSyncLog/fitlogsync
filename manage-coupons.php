@@ -294,11 +294,12 @@ if ($result->num_rows > 0) {
                                                                             $eventDate = new DateTime($start_date);
 
                                                                             // Calculate the difference
-                                                                            $interval = $today->diff($eventDate)->days;
+                                                                            $interval = $today->diff($eventDate);
+                                                                            $daysDifference = $interval->days;
                                                                             $isBeforeEvent = $today < $eventDate;
 
-                                                                            // Show delete button only if it's NOT 1 day before the event
-                                                                            if (!($isBeforeEvent && $interval <= 1)) {
+                                                                            // Show buttons only if we're more than 1 day before the event
+                                                                            if ($isBeforeEvent && $daysDifference > 1) {
                                                                                 ?>
                                                                                 <a href="edit-coupon.php?coupon_id=<?= $row['coupon_id'] ?>"
                                                                                     class="btn btn-warning">Edit</a>

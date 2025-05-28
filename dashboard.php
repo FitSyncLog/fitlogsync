@@ -101,7 +101,9 @@ if ($result->num_rows > 0) {
                                                         <?php
                                                         $sql_members = "SELECT COUNT(*) AS total_members
                                                 FROM user_roles
-                                                WHERE role_id = 5";
+                                                JOIN users ON users.user_id = user_roles.user_id
+                                                WHERE user_roles.role_id = 5
+                                                AND users.status = 'Active'";
                                                         $result_members = mysqli_query($conn, $sql_members);
                                                         $row_members = mysqli_fetch_assoc($result_members);
                                                         echo $row_members['total_members'];

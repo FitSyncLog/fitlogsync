@@ -305,10 +305,8 @@ VALUES (?, ?, ?, ?, ?, ?, ?)";
             exit();
         }
 
-        $role_id = 5;
-        // Insert user role data into the user_role table
-        $sql_user_role = "INSERT INTO user_roles (user_id, role_id)
-                VALUES (?, ?)";
+        // Insert user role
+        $sql_user_role = "INSERT INTO user_roles (user_id, role_id) VALUES (?, 5)";
         $stmt_user_role = mysqli_prepare($conn, $sql_user_role);
 
         if ($stmt_user_role === false) {
@@ -317,7 +315,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?)";
             exit();
         }
 
-        mysqli_stmt_bind_param($stmt_user_role, "ii", $user_id, $role_id);
+        mysqli_stmt_bind_param($stmt_user_role, "i", $user_id);
         $result_user_role = mysqli_stmt_execute($stmt_user_role);
 
         if (!$result_user_role) {
@@ -329,6 +327,47 @@ VALUES (?, ?, ?, ?, ?, ?, ?)";
         $qrCodePath = "../assets/qr_codes/{$accountNumber}.png";
         $moduleSize = 50;
         QRcode::png($accountNumber, $qrCodePath, 'L', $moduleSize, 2);
+
+        // Generate the back card with QR code
+        $backgroundPath = '../assets/qr_codes/template.png';
+        $outputPath = "../assets/access-card-back/{$accountNumber}-qr.png";
+
+        // Create directory if it doesn't exist
+        if (!is_dir(dirname($outputPath))) {
+            mkdir(dirname($outputPath), 0755, true);
+        }
+
+        // Load background image
+        $background = imagecreatefrompng($backgroundPath);
+        if (!$background) {
+            error_log("Failed to load back card background image.");
+        } else {
+            // Load QR code image
+            $qrCode = imagecreatefrompng($qrCodePath);
+            if (!$qrCode) {
+                error_log("Failed to load QR code image.");
+            } else {
+                // Get dimensions
+                $bgWidth = imagesx($background);
+                $bgHeight = imagesy($background);
+                $qrWidth = imagesx($qrCode);
+                $qrHeight = imagesy($qrCode);
+
+                // Calculate position to center QR code
+                $x = (int) (($bgWidth - $qrWidth) / 2);
+                $y = (int) (($bgHeight - $qrHeight) / 2);
+
+                // Merge QR code onto background
+                imagecopy($background, $qrCode, $x, $y, 0, 0, $qrWidth, $qrHeight);
+
+                // Save result
+                imagepng($background, $outputPath);
+
+                // Free memory
+                imagedestroy($qrCode);
+            }
+            imagedestroy($background);
+        }
 
         // Generate the access card
         $full_name = $firstname . " " . $lastname;
@@ -375,12 +414,22 @@ VALUES (?, ?, ?, ?, ?, ?, ?)";
         imagejpeg($image, $outputPath, 90);
         imagedestroy($image);
 
-        // Registration successful
-        header("Location: generate-back-card.php?accountNumber={$accountNumber}");
+        // Send welcome email with e-access card
+        require_once "send-welcome-email.php";
+        $fullName = $firstname . ' ' . ($middlename ? $middlename . ' ' : '') . $lastname;
+        $emailSent = sendWelcomeEmail($email, $fullName, $accountNumber);
+
+        if (!$emailSent) {
+            // Log the error but continue with registration
+            error_log("Failed to send welcome email to: " . $email);
+            header("Location: ../manage-members.php?Success=New member registered successfully! (Note: Welcome email could not be sent)");
+        } else {
+            header("Location: ../manage-members.php?Success=New member registered successfully!");
+        }
         exit();
     } else {
-        // Registration failed
-        header("Location: ../create-new-member.php?Failed=Database error!");
+        $error_message = "Failed to insert user data.";
+        header("Location: ../create-new-member.php?Failed=" . urlencode($error_message) . "&" . $user_data);
         exit();
     }
 
