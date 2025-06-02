@@ -30,17 +30,22 @@ function sendWelcomeEmail($email, $name, $accountNumber)
 
         // Check front access card file
         $frontCardPath = __DIR__ . "/../assets/access-card/{$accountNumber}-accesscard.jpg";
+        $backCardPath = __DIR__ . "/../assets/access-card-back/{$accountNumber}-qr.png";
 
         if (!file_exists($frontCardPath)) {
             throw new Exception("Access card file not found");
         }
+        if (!file_exists($backCardPath)) {
+            throw new Exception("QR Code not found");
+        }
 
         // Attachment (front card only)
         $mail->addAttachment($frontCardPath, "FiTLOGSYNC_AccessCard_Front.jpg");
+        $mail->addAttachment($backCardPath, "FiTLOGSYNC_AccessCard_QR_Code.png");
 
         // Content
         $mail->isHTML(true);
-        $mail->Subject = "Welcome to FiT-LOGSYNC! 🎉";
+        $mail->Subject = "Welcome to FiT-LOGSYNC!";
 
         // Publicly Hosted Image URLs
         $headerImageURL = "https://rmmccomsoc.org/fitlogsync-email-header.png";
