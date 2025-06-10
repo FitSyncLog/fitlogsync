@@ -335,7 +335,7 @@ if ($result->num_rows > 0) {
 </html>
 <?php
 } else {
-    header("Location: dashboard.php/?AccessDenied=You do not have permission to access this page.");
+    header("Location: dashboard.php?AccessDenied=You do not have permission to access this page.");
     exit();
 }
 ?> 

@@ -132,7 +132,8 @@ if ($result->num_rows > 0) {
                                                     <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                                         Active Subscriptions
                                                     </div>
-                                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="active-subscriptions">
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800"
+                                                        id="active-subscriptions">
                                                         <?php
                                                         $sql_active = "SELECT COUNT(DISTINCT user_id) AS active_subs 
                                                                       FROM subscriptions 
@@ -163,7 +164,8 @@ if ($result->num_rows > 0) {
                                                     <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
                                                         Expired Subscriptions
                                                     </div>
-                                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="expired-subscriptions">
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800"
+                                                        id="expired-subscriptions">
                                                         <?php
                                                         $sql_expired = "SELECT COUNT(DISTINCT user_id) AS expired_subs 
                                                                        FROM subscriptions 
@@ -221,55 +223,56 @@ if ($result->num_rows > 0) {
                         </div>
 
                         <?php if ($role_id == 1 || $role_id == 2 || $role_id == 3) { ?>
-                        <!-- Content Row -->
-                        <div class="row">
-                            <!-- Monthly Revenue Chart -->
-                            <div class="col-xl-8 col-lg-7">
-                                <div class="card shadow mb-4">
-                                    <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary">Monthly Revenue</h6>
+                            <!-- Content Row -->
+                            <div class="row">
+                                <!-- Monthly Revenue Chart -->
+                                <div class="col-xl-8 col-lg-7">
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Monthly Revenue</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="chart-area">
+                                                <canvas id="revenueChart"></canvas>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="card-body">
-                                        <div class="chart-area">
-                                            <canvas id="revenueChart"></canvas>
+                                </div>
+
+                                <!-- New Members Chart -->
+                                <div class="col-xl-4 col-lg-5">
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">New Members per Month</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="chart-pie">
+                                                <canvas id="newMembersChart"></canvas>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- New Members Chart -->
-                            <div class="col-xl-4 col-lg-5">
-                                <div class="card shadow mb-4">
-                                    <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary">New Members per Month</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="chart-pie">
-                                            <canvas id="newMembersChart"></canvas>
+                            <!-- Attendance Heatmap -->
+                            <div class="row">
+                                <div class="col-xl-12">
+                                    <div class="card shadow mb-4">
+                                        <div
+                                            class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                            <h6 class="m-0 font-weight-bold text-primary">Gym Usage Heatmap</h6>
+                                            <span class="badge badge-warning">Coming Soon</span>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="text-center text-gray-500 py-5">
+                                                <i class="fas fa-chart-line fa-3x mb-3"></i>
+                                                <p>Attendance heatmap feature is currently under development.</p>
+                                                <p>This will show peak gym usage hours to help members plan their visits.</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Attendance Heatmap -->
-                        <div class="row">
-                            <div class="col-xl-12">
-                                <div class="card shadow mb-4">
-                                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                        <h6 class="m-0 font-weight-bold text-primary">Gym Usage Heatmap</h6>
-                                        <span class="badge badge-warning">Coming Soon</span>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="text-center text-gray-500 py-5">
-                                            <i class="fas fa-chart-line fa-3x mb-3"></i>
-                                            <p>Attendance heatmap feature is currently under development.</p>
-                                            <p>This will show peak gym usage hours to help members plan their visits.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         <?php } ?>
 
                         <!-- virtual card -->
@@ -321,29 +324,32 @@ if ($result->num_rows > 0) {
                                             <h6 class="m-0 font-weight-bold text-primary">Subscription Timer</h6>
                                         </div>
                                         <div class="card-body text-center">
-                                            <?php if ($subscription) { 
+                                            <?php if ($subscription) {
                                                 $now = new DateTime('now', new DateTimeZone('Asia/Manila'));
                                                 $expiry = new DateTime($subscription['expiration_date'], new DateTimeZone('Asia/Manila'));
                                                 $diff = $now->diff($expiry);
                                                 $days_remaining = $diff->days;
                                                 $is_expired = $now > $expiry;
-                                            ?>
-                                                <div class="display-4 font-weight-bold <?= $is_expired ? 'text-danger' : 'text-success' ?>">
+                                                ?>
+                                                <div
+                                                    class="display-4 font-weight-bold <?= $is_expired ? 'text-danger' : 'text-success' ?>">
                                                     <?= $days_remaining ?> Days
                                                 </div>
-                                                <p class="mt-2"><?= $is_expired ? 'EXPIRED' : 'Remaining on your subscription' ?></p>
+                                                <p class="mt-2"><?= $is_expired ? 'EXPIRED' : 'Remaining on your subscription' ?>
+                                                </p>
                                                 <div class="progress mt-3">
                                                     <?php
                                                     $start = new DateTime($subscription['starting_date'], new DateTimeZone('Asia/Manila'));
                                                     $total_days = $start->diff($expiry)->days;
                                                     $progress = $is_expired ? 0 : (($total_days - $days_remaining) / $total_days * 100);
                                                     ?>
-                                                    <div class="progress-bar bg-warning" role="progressbar" style="width: <?= $progress ?>%"></div>
+                                                    <div class="progress-bar bg-warning" role="progressbar"
+                                                        style="width: <?= $progress ?>%"></div>
                                                 </div>
-                                            <?php } else { 
+                                            <?php } else {
                                                 // Additional debug information
                                                 error_log("No active subscription found for user: " . $user_id);
-                                            ?>
+                                                ?>
                                                 <div class="text-center py-4">
                                                     <i class="fas fa-exclamation-circle fa-3x text-warning mb-3"></i>
                                                     <h5 class="text-danger">No Active Subscription</h5>
@@ -485,7 +491,7 @@ if ($result->num_rows > 0) {
                             </div>
 
                             <script>
-                                document.getElementById('virtualCard').addEventListener('click', function() {
+                                document.getElementById('virtualCard').addEventListener('click', function () {
                                     this.classList.toggle('flipped');
                                 });
                             </script>
@@ -573,7 +579,7 @@ if ($result->num_rows > 0) {
                     sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
                     dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
                     s = '',
-                    toFixedFix = function(n, prec) {
+                    toFixedFix = function (n, prec) {
                         var k = Math.pow(10, prec);
                         return '' + Math.round(n * k) / k;
                     };
